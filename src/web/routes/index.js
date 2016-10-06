@@ -1,4 +1,6 @@
-import { sendPug } from '../pug';
+import { sendPage } from '../react-template';
+
+var SynctubePage = require('../../ps/Synctube.Client.Page/index.js');
 
 export default function initialize(app, channelIndex, maxEntries) {
     app.get('/', (req, res) => {
@@ -13,9 +15,8 @@ export default function initialize(app, channelIndex, maxEntries) {
 
             channels = channels.slice(0, maxEntries);
 
-            sendPug(res, 'index', {
-                channels: channels
-            });
+            var page = SynctubePage.Index.create({ channels });
+            sendPage(res, page);
         });
     });
 }

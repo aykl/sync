@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import net from 'net';
 import express from 'express';
-import { sendPug } from './pug';
+import { sendPage } from './react-template';
 import Logger from '../logger';
 import Config from '../config';
 import bodyParser from 'body-parser';
@@ -75,10 +75,16 @@ function handleLegacySocketConfig(req, res) {
     res.send(sioconfig);
 }
 
+var Maybe = require('../ps/Data.Maybe/index.js');
+var SynctubePage = require('../ps/Synctube.Client.Page/index.js');
+var SynctubeHttpErrorPage =
+  require('../ps/Synctube.Client.Page.HttpError/index.js');
+
 function handleUserAgreement(req, res) {
-    sendPug(res, 'tos', {
-        domain: Config.get('http.domain')
-    });
+  var siteTitle = "siteTitle";
+  var domain = Config.get('http.domain');
+  var page = SynctubePage.Tos.create({ siteTitle, domain });
+  sendPage(res, page);
 }
 
 function initializeErrorHandlers(app) {
@@ -92,10 +98,11 @@ function initializeErrorHandlers(app) {
         if (err) {
             if (err instanceof CSRFError) {
                 res.status(HTTPStatus.FORBIDDEN);
-                return sendPug(res, 'csrferror', {
+                var page = SynctubePage.CsrfError.create({
                     path: req.path,
                     referer: req.header('referer')
                 });
+                return sendPage(res, page);
             }
 
             let { message, status } = err;
@@ -104,7 +111,7 @@ function initializeErrorHandlers(app) {
             }
             if (!message) {
                 message = 'An unknown error occurred.';
-            } else if (/\.(pug|js)/.test(message)) {
+            } else if (/\.js/.test(message)) {
                 // Prevent leakage of stack traces
                 message = 'An internal error occurred.';
             }
@@ -115,11 +122,28 @@ function initializeErrorHandlers(app) {
             }
 
             res.status(status);
-            return sendPug(res, 'httperror', {
-                path: req.path,
-                status: status,
-                message: message
-            });
+            var error = null;
+            switch (status) {
+                case HTTPStatus.FORBIDDEN: {
+                  var errorMessage = message ? message : "No message";
+                  error = SynctubeHttpErrorPage.Forbidden.create(errorMessage);
+                  break;
+                }
+                case HTTPStatus.NOT_FOUND: {
+                  var errorMessage = message
+                    ? Maybe.Just.create(message) : Maybe.Nothing.create();
+                  error = SynctubeHttpErrorPage.NotFound.create(errorMessage);
+                  break;
+                }
+                default: {
+                  var errorMessage = message ? message : "No message";
+                  error = SynctubeHttpErrorPage.Generic.create(status)(errorMessage);
+                }
+            }
+
+            var page = SynctubePage.HttpError.create({ error });
+
+            return sendPage(res, page);
         } else {
             next();
         }
@@ -186,7 +210,7 @@ module.exports = {
         require('./acp').init(app);
         require('../google2vtt').attach(app);
         require('./routes/google_drive_userscript')(app);
-        app.use(serveStatic(path.join(__dirname, '..', '..', 'www'), {
+        app.use(serveStatic(path.join(__dirname, '..', '..', 'dist/www'), {
             maxAge: webConfig.getCacheTTL()
         }));
 

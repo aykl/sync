@@ -37,7 +37,10 @@
     "oauth": "^0.9.12",
     "pug": "^2.0.0-beta3",
     "q": "^1.4.1",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
     "redis": "^2.4.2",
+    "rimraf": "^2.5.4",
     "sanitize-html": "git://github.com/calzoneman/sanitize-html",
     "serve-static": "^1.10.0",
     "socket.io": "^1.4.0",
@@ -48,9 +51,14 @@
     "yamljs": "^0.1.6"
   },
   "scripts": {
+    "clean-frontend": "rimraf dist",
+    "prebuild-purescript": "rimraf dist/www/ps && mkdir dist/www/ps",
+    "build-purescript": "pulp -w build --src-path app --skip-entry-point -o lib/ps -t dist/www/ps/ps.js",
+    "prebuild-frontend": "npm run clean-frontend && mkdir dist",
+    "build-frontend": "cp -r www dist",
     "build-player": "$npm_node_execpath build-player.js",
     "build-server": "babel -D --source-maps --loose es6.destructuring,es6.forOf --out-dir lib/ src/",
-    "postinstall": "./postinstall.sh",
+    "postinstall": "bower install && ./postinstall.sh",
     "server-dev": "babel -D --watch --source-maps --loose es6.destructuring,es6.forOf --out-dir lib/ src/",
     "generate-userscript": "$npm_node_execpath gdrive-userscript/generate-userscript $@ > www/js/cytube-google-drive.user.js"
   },

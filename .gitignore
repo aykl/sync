@@ -12,3 +12,6 @@ torlist
 www/cache
 google-drive-subtitles
 lib/
+dist
+bower_components
+state
