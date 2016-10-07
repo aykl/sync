@@ -31,8 +31,8 @@ function handleAccountEditPage(req, res) {
         return;
     }
 
-    var loginName = Maybe.Nothing.create();
-    var editResult = Maybe.Nothing.create();
+    var loginName = Maybe.Nothing.value;
+    var editResult = Maybe.Nothing.value;
     var csrfToken = typeof res.req.csrfToken === 'function'
       ? res.req.csrfToken() : '';
     var page = SynctubePage.AccountEdit.create({
@@ -79,7 +79,7 @@ function handleChangePassword(req, res) {
     if (newpassword.length === 0) {
       var editResult = Maybe.Just
         .create(Either.Left.create("New password must not be empty"));
-      loginName = Maybe.Nothing.create();
+      loginName = Maybe.Nothing.value;
       var csrfToken = typeof res.req.csrfToken === 'function'
         ? res.req.csrfToken() : '';
       var page = SynctubePage.AccountEdit.create({
@@ -92,7 +92,7 @@ function handleChangePassword(req, res) {
     if (!req.user) {
       var editResult = Maybe.Just
         .create(Either.Left.create("You must be logged in to change your password"));
-      loginName = Maybe.Nothing.create();
+      loginName = Maybe.Nothing.value;
       var csrfToken = typeof res.req.csrfToken === 'function'
         ? res.req.csrfToken() : '';
       var page = SynctubePage.AccountEdit.create({
@@ -108,7 +108,7 @@ function handleChangePassword(req, res) {
         if (err) {
             var editResult = Maybe.Just
               .create(Either.Left.create(err));
-            loginName = Maybe.Nothing.create();
+            loginName = Maybe.Nothing.value;
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
             var page = SynctubePage.AccountEdit.create({
@@ -122,7 +122,7 @@ function handleChangePassword(req, res) {
             if (err) {
                 var editResult = Maybe.Just
                   .create(Either.Left.create(err));
-                loginName = Maybe.Nothing.create();
+                loginName = Maybe.Nothing.value;
                 var csrfToken = typeof res.req.csrfToken === 'function'
                   ? res.req.csrfToken() : '';
                 var page = SynctubePage.AccountEdit.create({
@@ -139,7 +139,7 @@ function handleChangePassword(req, res) {
                 if (err) {
                     var editResult = Maybe.Just
                       .create(Either.Left.create(err));
-                    loginName = Maybe.Nothing.create();
+                    loginName = Maybe.Nothing.value;
                     var csrfToken = typeof res.req.csrfToken === 'function'
                       ? res.req.csrfToken() : '';
                     var page = SynctubePage.AccountEdit.create({
@@ -155,7 +155,7 @@ function handleChangePassword(req, res) {
                     if (err) {
                         var editResult = Maybe.Just
                           .create(Either.Left.create(err));
-                        loginName = Maybe.Nothing.create();
+                        loginName = Maybe.Nothing.value;
                         var csrfToken = typeof res.req.csrfToken === 'function'
                           ? res.req.csrfToken() : '';
                         var page = SynctubePage.AccountEdit.create({
@@ -182,7 +182,7 @@ function handleChangePassword(req, res) {
 
                     var editResult = Maybe.Just
                       .create(Either.Right.create("Password changed."));
-                    loginName = Maybe.Nothing.create();
+                    loginName = Maybe.Nothing.value;
                     var csrfToken = typeof res.req.csrfToken === 'function'
                       ? res.req.csrfToken() : '';
                     var page = SynctubePage.AccountEdit.create({
@@ -216,7 +216,7 @@ function handleChangeEmail(req, res) {
     if (!$util.isValidEmail(email) && email !== "") {
       var editResult = Maybe.Just
         .create(Either.Left.create("Invalid email address"));
-      var loginName = Maybe.Nothing.create();
+      var loginName = Maybe.Nothing.value;
       var page = SynctubePage.AccountEdit.create({
         csrfToken, loginName, editResult
       });
@@ -228,7 +228,7 @@ function handleChangeEmail(req, res) {
         if (err) {
             var editResult = Maybe.Just
               .create(Either.Left.create(err));
-            var loginName = Maybe.Nothing.create();
+            var loginName = Maybe.Nothing.value;
             var page = SynctubePage.AccountEdit.create({
               csrfToken, loginName, editResult
             });
@@ -240,7 +240,7 @@ function handleChangeEmail(req, res) {
             if (err) {
                 var editResult = Maybe.Just
                   .create(Either.Left.create(err));
-                var loginName = Maybe.Nothing.create();
+                var loginName = Maybe.Nothing.value;
                 var page = SynctubePage.AccountEdit.create({
                   csrfToken, loginName, editResult
                 });
@@ -275,8 +275,8 @@ function handleAccountChannelPage(req, res) {
       var channels = [];
       var csrfToken = typeof res.req.csrfToken === 'function'
         ? res.req.csrfToken() : '';
-      var newChannelError = Maybe.Nothing.create();
-      var deleteChannelError = Maybe.Nothing.create();
+      var newChannelError = Maybe.Nothing.value;
+      var deleteChannelError = Maybe.Nothing.value;
       var page = SynctubePage.AccountChannels.create({
         csrfToken, loggedIn, channels
         , newChannelError, deleteChannelError
@@ -289,8 +289,8 @@ function handleAccountChannelPage(req, res) {
         var loggedIn = !!res.user;
         var csrfToken = typeof res.req.csrfToken === 'function'
           ? res.req.csrfToken() : '';
-        var newChannelError = Maybe.Nothing.create();
-        var deleteChannelError = Maybe.Nothing.create();
+        var newChannelError = Maybe.Nothing.value;
+        var deleteChannelError = Maybe.Nothing.value;
         var page = SynctubePage.AccountChannels.create({
           csrfToken, loggedIn, channels
           , newChannelError, deleteChannelError
@@ -336,8 +336,8 @@ function handleNewChannel(req, res) {
         var channels = [];
         var csrfToken = typeof res.req.csrfToken === 'function'
           ? res.req.csrfToken() : '';
-        var newChannelError = Maybe.Nothing.create();
-        var deleteChannelError = Maybe.Nothing.create();
+        var newChannelError = Maybe.Nothing.value;
+        var deleteChannelError = Maybe.Nothing.value;
         var page = SynctubePage.AccountChannels.create({
           csrfToken, loggedIn, channels
           , newChannelError, deleteChannelError
@@ -352,7 +352,7 @@ function handleNewChannel(req, res) {
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
             var newChannelError = Maybe.Just.create(err);
-            var deleteChannelError = Maybe.Nothing.create();
+            var deleteChannelError = Maybe.Nothing.value;
             var page = SynctubePage.AccountChannels.create({
               csrfToken, loggedIn, channels: []
               , newChannelError, deleteChannelError
@@ -367,7 +367,7 @@ function handleNewChannel(req, res) {
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
             var newChannelError = Maybe.Just.create("That channel name is reserved");
-            var deleteChannelError = Maybe.Nothing.create();
+            var deleteChannelError = Maybe.Nothing.value;
             var page = SynctubePage.AccountChannels.create({
               csrfToken, loggedIn, channels
               , newChannelError, deleteChannelError
@@ -385,7 +385,7 @@ function handleNewChannel(req, res) {
             var newChannelErrorMessage = "You are not allowed to register more than " +
                              Config.get("max-channels-per-user") + " channels.";
             var newChannelError = Maybe.Just.create(newChannelErrorMessage);
-            var deleteChannelError = Maybe.Nothing.create();
+            var deleteChannelError = Maybe.Nothing.value;
             var page = SynctubePage.AccountChannels.create({
               csrfToken, loggedIn, channels
               , newChannelError, deleteChannelError
@@ -420,8 +420,8 @@ function handleNewChannel(req, res) {
             var channels = [];
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
-            var newChannelError = err ? Maybe.Just.create(err) : Maybe.Nothing.create();
-            var deleteChannelError = Maybe.Nothing.create();
+            var newChannelError = err ? Maybe.Just.create(err) : Maybe.Nothing.value;
+            var deleteChannelError = Maybe.Nothing.value;
             var page = SynctubePage.AccountChannels.create({
               csrfToken, loggedIn, channels
               , newChannelError, deleteChannelError
@@ -447,8 +447,8 @@ function handleDeleteChannel(req, res) {
         var channels = [];
         var csrfToken = typeof res.req.csrfToken === 'function'
           ? res.req.csrfToken() : '';
-        var newChannelError = Maybe.Nothing.create();
-        var deleteChannelError = Maybe.Nothing.create();
+        var newChannelError = Maybe.Nothing.value;
+        var deleteChannelError = Maybe.Nothing.value;
         var page = SynctubePage.AccountChannels.create({
           csrfToken, loggedIn, channels
           , newChannelError, deleteChannelError
@@ -464,7 +464,7 @@ function handleDeleteChannel(req, res) {
             var channels = [];
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
-            var newChannelError = Maybe.Nothing.create();
+            var newChannelError = Maybe.Nothing.value;
             var deleteChannelError = Maybe.Just.create(err);
             var page = SynctubePage.AccountChannels.create({
               csrfToken, loggedIn, channels
@@ -482,7 +482,7 @@ function handleDeleteChannel(req, res) {
                 }
                 var csrfToken = typeof res.req.csrfToken === 'function'
                   ? res.req.csrfToken() : '';
-                var newChannelError = Maybe.Nothing.create();
+                var newChannelError = Maybe.Nothing.value;
                 var deleteChannelError = Maybe.Just.create("You do not have permission to delete this channel");
                 var page = SynctubePage.AccountChannels.create({
                   csrfToken, loggedIn, channels
@@ -520,8 +520,8 @@ function handleDeleteChannel(req, res) {
                 }
                 var csrfToken = typeof res.req.csrfToken === 'function'
                   ? res.req.csrfToken() : '';
-                var newChannelError = Maybe.Nothing.create();
-                var deleteChannelError = Maybe.Nothing.create();
+                var newChannelError = Maybe.Nothing.value;
+                var deleteChannelError = Maybe.Nothing.value;
                 if (err) {
                   deleteChannelError = Maybe.Just.create(err);
                 }
@@ -545,8 +545,8 @@ function handleAccountProfilePage(req, res) {
     }
 
     if (!req.user) {
-      var error = Maybe.Nothing.create();
-      var profile = Maybe.Nothing.create();
+      var error = Maybe.Nothing.value;
+      var profile = Maybe.Nothing.value;
       var csrfToken = typeof res.req.csrfToken === 'function'
         ? res.req.csrfToken() : '';
       var page = SynctubePage.AccountProfile.create({
@@ -558,7 +558,7 @@ function handleAccountProfilePage(req, res) {
     db.users.getProfile(req.user.name, function (err, profile) {
         if (err) {
             var error = Maybe.Just.create(err);
-            var profile = Maybe.Nothing.create();
+            var profile = Maybe.Nothing.value;
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
             var page = SynctubePage.AccountProfile.create({
@@ -567,7 +567,7 @@ function handleAccountProfilePage(req, res) {
             return sendPage(res, page);
         }
 
-        var error = Maybe.Nothing.create();
+        var error = Maybe.Nothing.value;
         var profile = Maybe.Just.create({
           image: profile.image,
           text: profile.text,
@@ -590,7 +590,7 @@ function handleAccountProfile(req, res) {
 
     if (!req.user) {
       var error = Maybe.Just.create("You must be logged in to edit your profile");
-      var profile = Maybe.Nothing.create();
+      var profile = Maybe.Nothing.value;
       var csrfToken = typeof res.req.csrfToken === 'function'
         ? res.req.csrfToken() : '';
       var page = SynctubePage.AccountProfile.create({
@@ -605,7 +605,7 @@ function handleAccountProfile(req, res) {
     db.users.setProfile(req.user.name, { image: image, text: text }, function (err) {
         if (err) {
             var error = Maybe.Just.create(err);
-            var profile = Maybe.Nothing.create();
+            var profile = Maybe.Nothing.value;
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
             var page = SynctubePage.AccountProfile.create({
@@ -615,7 +615,7 @@ function handleAccountProfile(req, res) {
         }
 
 
-        var error = Maybe.Nothing.create();
+        var error = Maybe.Nothing.value;
         var profile = Maybe.Just.create({
           image, text, login: req.user.name
         });
@@ -636,7 +636,7 @@ function handlePasswordResetPage(req, res) {
         return;
     }
 
-    var reset = SynctubeAccountPasswordResetPage.NoReset.create();
+    var reset = SynctubeAccountPasswordResetPage.NoReset.value;
     var csrfToken = typeof res.req.csrfToken === 'function'
       ? res.req.csrfToken() : '';
     var page = SynctubePage.AccountPasswordReset.create({ csrfToken, reset });

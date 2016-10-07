@@ -8,8 +8,8 @@ var pug = require("pug");
 var path = require("path");
 var webserver = require("./webserver");
 var cookieall = webserver.cookieall;
-var sendPage = require("../react-template").sendPage;
-var SynctubePage = require('../../ps/Synctube.Client.Page/index.js');
+var sendPage = require("./react-template").sendPage;
+var SynctubePage = require('../ps/Synctube.Client.Page/index.js');
 var SynctubeLoginPage =
   require('../ps/Synctube.Client.Page.Login/index.js');
 var SynctubeRegisterPage =
@@ -65,7 +65,7 @@ function handleLogin(req, res) {
 
             var signInStatus = SynctubeLoginPage
               .NotLoggedIn.create(Maybe.Just(err));
-            var redirect = Maybe.Nothing.create();
+            var redirect = Maybe.Nothing.value;
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
             var page = SynctubePage.Login.create({
@@ -79,7 +79,7 @@ function handleLogin(req, res) {
             if (err) {
                 var signInStatus = SynctubeLoginPage
                   .NotLoggedIn.create(Maybe.Just(err));
-                var redirect = Maybe.Nothing.create();
+                var redirect = Maybe.Nothing.value;
                 var csrfToken = typeof res.req.csrfToken === 'function'
                   ? res.req.csrfToken() : '';
                 var page = SynctubePage.Login.create({
@@ -112,7 +112,7 @@ function handleLogin(req, res) {
                 res.user = user;
                 var signInStatus = SynctubeLoginPage
                   .LoggedIn.create(user);
-                var redirect = Maybe.Nothing.create();
+                var redirect = Maybe.Nothing.value;
                 var csrfToken = typeof res.req.csrfToken === 'function'
                   ? res.req.csrfToken() : '';
                 var page = SynctubePage.Login.create({
@@ -136,7 +136,7 @@ function handleLoginPage(req, res) {
     if (req.user) {
         var signInStatus = SynctubeLoginPage
           .WasAlreadyLoggedIn.create(req.user);
-        var redirect = Maybe.Nothing.create();
+        var redirect = Maybe.Nothing.value;
         var csrfToken = typeof res.req.csrfToken === 'function'
           ? res.req.csrfToken() : '';
         var page = SynctubePage.Login.create({
@@ -147,13 +147,13 @@ function handleLoginPage(req, res) {
     }
 
     var redirect = req.query.dest || req.header("referer");
-    var redirectValue = Maybe.Nothing.create();
+    var redirectValue = Maybe.Nothing.value;
     if (!/\/register/.test(redirect)) {
         redirectValue = Maybe.Just.create(redirect);
     }
 
     var signInStatus = SynctubeLoginPage
-      .NotLoggedIn.create(Maybe.Nothing.create());
+      .NotLoggedIn.create(Maybe.Nothing.value);
     var csrfToken = typeof res.req.csrfToken === 'function'
       ? res.req.csrfToken() : '';
     var page = SynctubePage.Login.create({
@@ -184,7 +184,7 @@ function handleLogout(req, res) {
         res.redirect(dest);
     } else {
         var page = SynctubePage.Logout.create({
-            redirect: Maybe.Nothing.create()
+            redirect: Maybe.Nothing.value
         });
 
         return sendPage(res, page);
@@ -202,7 +202,7 @@ function handleRegisterPage(req, res) {
     if (req.user) {
         var csrfToken = typeof res.req.csrfToken === 'function'
           ? res.req.csrfToken() : '';
-        var registrationStatus = SynctubeRegisterPage.LoggedIn.create();
+        var registrationStatus = SynctubeRegisterPage.LoggedIn.value;
         var page = SynctubePage.Logout.create({
             registrationStatus, csrfToken
         });
@@ -213,7 +213,7 @@ function handleRegisterPage(req, res) {
     var csrfToken = typeof res.req.csrfToken === 'function'
       ? res.req.csrfToken() : '';
     var registrationStatus = SynctubeRegisterPage
-      .NotRegistered.create(Maybe.Nothing.create());
+      .NotRegistered.create(Maybe.Nothing.value);
     var page = SynctubePage.Logout.create({
         registrationStatus, csrfToken
     });

@@ -131,7 +131,7 @@ function initializeErrorHandlers(app) {
                 }
                 case HTTPStatus.NOT_FOUND: {
                   var errorMessage = message
-                    ? Maybe.Just.create(message) : Maybe.Nothing.create();
+                    ? Maybe.Just.create(message) : Maybe.Nothing.value;
                   error = SynctubeHttpErrorPage.NotFound.create(errorMessage);
                   break;
                 }
