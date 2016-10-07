@@ -16,6 +16,17 @@ function wildcardSimilarChars(name) {
     return name.replace(/_/g, "\\_").replace(/[Il1oO0]/g, "_");
 }
 
+function parseProfile(data) {
+    try {
+        var profile = JSON.parse(data.profile);
+        profile.image = profile.image || "";
+        profile.text = profile.text || "";
+        data.profile = profile;
+    } catch (error) {
+        data.profile = { image: "", text: "" };
+    }
+}
+
 module.exports = {
     init: function () {
     },
@@ -83,6 +94,7 @@ module.exports = {
                 return callback("User does not exist");
             }
 
+            parseProfile(rows[0]);
             callback(null, rows[0]);
         });
     },
@@ -207,7 +219,7 @@ module.exports = {
            the hashes match.
         */
 
-        db.query("SELECT name,password,global_rank,time FROM `users` WHERE name=?",
+        db.query("SELECT * FROM `users` WHERE name=?",
                  [name],
         function (err, rows) {
             if (err) {
@@ -226,6 +238,7 @@ module.exports = {
                 } else if (!match) {
                     callback("Invalid username/password combination", null);
                 } else {
+                    parseProfile(rows[0]);
                     callback(null, rows[0]);
                 }
             });
