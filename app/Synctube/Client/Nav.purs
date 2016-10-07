@@ -54,6 +54,7 @@ view page state siteTitle =
     ]
     [ header siteTitle
     , controls page state
+    , scripts
     ]
 
 
@@ -66,6 +67,49 @@ controls page state =
     [ navLinks page state
     , navLoginLogout state "/"
     ]
+
+
+scripts :: ReactElement
+scripts =
+  R.script
+    [ RP._type "text/javascript"
+    , RP.dangerouslySetInnerHTML { __html: scriptBody }
+    ]
+    []
+
+  where
+
+  scriptBody =
+    """
+    document.querySelectorAll("._tempClass_showUserOptions")
+    .forEach(function (btn) {
+      btn.addEventListener('click',
+        function() {
+          showUserOptions();
+        });
+    });
+    document.querySelectorAll("._tempClass_chatOnly")
+    .forEach(function (btn) {
+      btn.addEventListener('click',
+        function() {
+          chatOnly();
+        });
+    });
+    document.querySelectorAll("._tempClass_showChannelSettings")
+    .forEach(function (btn) {
+      btn.addEventListener('click',
+        function() {
+          showChannelSettings();
+        });
+    });
+    document.querySelectorAll("._tempClass_removeVideo")
+    .forEach(function (btn) {
+      btn.addEventListener('click',
+        function(e) {
+          removeVideo(e);
+        });
+    });
+    """
 
 
 type NavLink =
@@ -128,7 +172,7 @@ pageSpecificLinks (Channel _) state =
   [ R.li []
       [ R.a
           [ RP.href "javascript:void(0)"
-          , RP.unsafeMkProps "onclick" "javascript:showUserOptions()"
+          , RP.className "_tempClass_showUserOptions"
           ]
           [ R.text "Options" ]
       ]
@@ -136,7 +180,7 @@ pageSpecificLinks (Channel _) state =
       [ R.a
           [ RP._id "showchansettings"
           , RP.href "javascript:void(0)"
-          , RP.unsafeMkProps "onclick" "javascript:showChannelSettings()"
+          , RP.className "_tempClass_showChannelSettings"
           ]
           [ R.text "Channel Settings" ]
       ]
@@ -153,14 +197,14 @@ pageSpecificLinks (Channel _) state =
           [ R.li []
               [ R.a
                   [ RP.href "#"
-                  , RP.unsafeMkProps "onclick" "javascript:chatOnly()"
+                  , RP.className "_tempClass_chatOnly"
                   ]
                   [ R.text "Chat Only" ]
               ]
           , R.li []
               [ R.a
                   [ RP.href "#"
-                  , RP.unsafeMkProps "onclick" "javascript:removeVideo(event)"
+                  , RP.className "_tempClass_removeVideo"
                   ]
                   [ R.text "Remove Video" ]
               ]

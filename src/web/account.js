@@ -363,7 +363,7 @@ function handleNewChannel(req, res) {
 
         if (name.match(Config.get("reserved-names.channels"))) {
             var loggedIn = !!res.user;
-            var channels = [];
+            channels = [];
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
             var newChannelError = Maybe.Just.create("That channel name is reserved");
@@ -379,7 +379,7 @@ function handleNewChannel(req, res) {
         if (channels.length >= Config.get("max-channels-per-user") &&
                 req.user.global_rank < 255) {
             var loggedIn = !!res.user;
-            var channels = [];
+            channels = [];
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
             var newChannelErrorMessage = "You are not allowed to register more than " +
@@ -417,7 +417,6 @@ function handleNewChannel(req, res) {
             }
 
             var loggedIn = !!res.user;
-            var channels = [];
             var csrfToken = typeof res.req.csrfToken === 'function'
               ? res.req.csrfToken() : '';
             var newChannelError = err ? Maybe.Just.create(err) : Maybe.Nothing.value;

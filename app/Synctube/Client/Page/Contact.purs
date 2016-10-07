@@ -72,7 +72,14 @@ scripts =
         .text(email)
         .insertBefore(btn);
       $(btn).remove();
-    }"""
+    }
+    document.querySelectorAll("._tempClass_showEmail")
+    .forEach(function (btn) {
+      btn.addEventListener('click',
+        function() {
+          showEmail(btn, btn.dataset.tempDataEmail, btn.dataset.tempDataKey);
+        });
+    });"""
 
 
 contacts :: Array Contact -> Array ReactElement
@@ -92,8 +99,7 @@ contacts contactList = concatMap showContact contactList
 email :: String -> String -> ReactElement
 email e k =
   R.button
-    [ RP.className "btn btn-xs btn-default"
-    , RP.unsafeMkProps "onclick" $
-        "showEmail(this, '" <> e <> "', '" <> k <> "')"
+    [ RP._data { "temp-data-email": e, "temp-data-key": k }
+    , RP.className "btn btn-xs btn-default _tempClass_showEmail"
     ]
     [ R.text "Show Email" ]
