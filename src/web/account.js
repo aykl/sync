@@ -14,6 +14,7 @@ var Server = require("../server");
 var session = require("../session");
 var csrf = require("./csrf");
 var Maybe = require('../ps/Data.Maybe/index.js');
+var Either = require('../ps/Data.Either/index.js');
 var SynctubePage = require('../ps/Synctube.Client.Page/index.js');
 var SynctubeAccountChannelsPage =
   require('../ps/Synctube.Client.Page.AccountChannels/index.js');
@@ -105,17 +106,29 @@ function handleChangePassword(req, res) {
 
     db.users.verifyLogin(name, oldpassword, function (err, user) {
         if (err) {
-            sendPug(res, "account-edit", {
-                errorMessage: err
+            var editResult = Maybe.Just
+              .create(Either.Left.create(err));
+            loginName = Maybe.Nothing.create();
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var page = SynctubePage.AccountEdit.create({
+              csrfToken, loginName, editResult
             });
+            sendPage(res, page);
             return;
         }
 
         db.users.setPassword(name, newpassword, function (err, dbres) {
             if (err) {
-                sendPug(res, "account-edit", {
-                    errorMessage: err
+                var editResult = Maybe.Just
+                  .create(Either.Left.create(err));
+                loginName = Maybe.Nothing.create();
+                var csrfToken = typeof res.req.csrfToken === 'function'
+                  ? res.req.csrfToken() : '';
+                var page = SynctubePage.AccountEdit.create({
+                  csrfToken, loginName, editResult
                 });
+                sendPage(res, page);
                 return;
             }
 
@@ -124,18 +137,32 @@ function handleChangePassword(req, res) {
 
             db.users.getUser(name, function (err, user) {
                 if (err) {
-                    return sendPug(res, "account-edit", {
-                        errorMessage: err
+                    var editResult = Maybe.Just
+                      .create(Either.Left.create(err));
+                    loginName = Maybe.Nothing.create();
+                    var csrfToken = typeof res.req.csrfToken === 'function'
+                      ? res.req.csrfToken() : '';
+                    var page = SynctubePage.AccountEdit.create({
+                      csrfToken, loginName, editResult
                     });
+                    sendPage(res, page);
+                    return;
                 }
 
                 res.user = user;
                 var expiration = new Date(parseInt(req.signedCookies.auth.split(":")[1]));
                 session.genSession(user, expiration, function (err, auth) {
                     if (err) {
-                        return sendPug(res, "account-edit", {
-                            errorMessage: err
+                        var editResult = Maybe.Just
+                          .create(Either.Left.create(err));
+                        loginName = Maybe.Nothing.create();
+                        var csrfToken = typeof res.req.csrfToken === 'function'
+                          ? res.req.csrfToken() : '';
+                        var page = SynctubePage.AccountEdit.create({
+                          csrfToken, loginName, editResult
                         });
+                        sendPage(res, page);
+                        return;
                     }
 
                     if (req.hostname.indexOf(Config.get("http.root-domain")) >= 0) {
@@ -153,9 +180,16 @@ function handleChangePassword(req, res) {
                         });
                     }
 
-                    sendPug(res, "account-edit", {
-                        successMessage: "Password changed."
+                    var editResult = Maybe.Just
+                      .create(Either.Right.create("Password changed."));
+                    loginName = Maybe.Nothing.create();
+                    var csrfToken = typeof res.req.csrfToken === 'function'
+                      ? res.req.csrfToken() : '';
+                    var page = SynctubePage.AccountEdit.create({
+                      csrfToken, loginName, editResult
                     });
+                    sendPage(res, page);
+                    return;
                 });
             });
         });
@@ -169,6 +203,8 @@ function handleChangeEmail(req, res) {
     var name = req.body.name;
     var password = req.body.password;
     var email = req.body.email;
+    var csrfToken = typeof res.req.csrfToken === 'function'
+      ? res.req.csrfToken() : '';
 
     if (typeof name !== "string" ||
         typeof password !== "string" ||
@@ -181,8 +217,6 @@ function handleChangeEmail(req, res) {
       var editResult = Maybe.Just
         .create(Either.Left.create("Invalid email address"));
       var loginName = Maybe.Nothing.create();
-      var csrfToken = typeof res.req.csrfToken === 'function'
-        ? res.req.csrfToken() : '';
       var page = SynctubePage.AccountEdit.create({
         csrfToken, loginName, editResult
       });
@@ -192,25 +226,38 @@ function handleChangeEmail(req, res) {
 
     db.users.verifyLogin(name, password, function (err, user) {
         if (err) {
-            sendPug(res, "account-edit", {
-                errorMessage: err
+            var editResult = Maybe.Just
+              .create(Either.Left.create(err));
+            var loginName = Maybe.Nothing.create();
+            var page = SynctubePage.AccountEdit.create({
+              csrfToken, loginName, editResult
             });
+            sendPage(res, page);
             return;
         }
 
         db.users.setEmail(name, email, function (err, dbres) {
             if (err) {
-                sendPug(res, "account-edit", {
-                    errorMessage: err
+                var editResult = Maybe.Just
+                  .create(Either.Left.create(err));
+                var loginName = Maybe.Nothing.create();
+                var page = SynctubePage.AccountEdit.create({
+                  csrfToken, loginName, editResult
                 });
+                sendPage(res, page);
                 return;
             }
             Logger.eventlog.log("[account] " + req.realIP +
                                 " changed email for " + name +
                                 " to " + email);
-            sendPug(res, "account-edit", {
-                successMessage: "Email address changed."
+
+            var editResult = Maybe.Just
+              .create(Either.Right.create("Email address changed."));
+            var loginName = Maybe.Just.create(name);
+            var page = SynctubePage.AccountEdit.create({
+              csrfToken, loginName, editResult
             });
+            sendPage(res, page);
         });
     });
 }
@@ -239,9 +286,17 @@ function handleAccountChannelPage(req, res) {
     }
 
     db.channels.listUserChannels(req.user.name, function (err, channels) {
-        sendPug(res, "account-channels", {
-            channels: channels
+        var loggedIn = !!res.user;
+        var csrfToken = typeof res.req.csrfToken === 'function'
+          ? res.req.csrfToken() : '';
+        var newChannelError = Maybe.Nothing.create();
+        var deleteChannelError = Maybe.Nothing.create();
+        var page = SynctubePage.AccountChannels.create({
+          csrfToken, loggedIn, channels
+          , newChannelError, deleteChannelError
         });
+
+        return sendPage(res, page);
     });
 }
 
@@ -293,29 +348,50 @@ function handleNewChannel(req, res) {
 
     db.channels.listUserChannels(req.user.name, function (err, channels) {
         if (err) {
-            sendPug(res, "account-channels", {
-                channels: [],
-                newChannelError: err
+            var loggedIn = !!res.user;
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var newChannelError = Maybe.Just.create(err);
+            var deleteChannelError = Maybe.Nothing.create();
+            var page = SynctubePage.AccountChannels.create({
+              csrfToken, loggedIn, channels: []
+              , newChannelError, deleteChannelError
             });
-            return;
+
+            return sendPage(res, page);
         }
 
         if (name.match(Config.get("reserved-names.channels"))) {
-            sendPug(res, "account-channels", {
-                channels: channels,
-                newChannelError: "That channel name is reserved"
+            var loggedIn = !!res.user;
+            var channels = [];
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var newChannelError = Maybe.Just.create("That channel name is reserved");
+            var deleteChannelError = Maybe.Nothing.create();
+            var page = SynctubePage.AccountChannels.create({
+              csrfToken, loggedIn, channels
+              , newChannelError, deleteChannelError
             });
-            return;
+
+            return sendPage(res, page);
         }
 
         if (channels.length >= Config.get("max-channels-per-user") &&
                 req.user.global_rank < 255) {
-            sendPug(res, "account-channels", {
-                channels: channels,
-                newChannelError: "You are not allowed to register more than " +
-                                 Config.get("max-channels-per-user") + " channels."
+            var loggedIn = !!res.user;
+            var channels = [];
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var newChannelErrorMessage = "You are not allowed to register more than " +
+                             Config.get("max-channels-per-user") + " channels.";
+            var newChannelError = Maybe.Just.create(newChannelErrorMessage);
+            var deleteChannelError = Maybe.Nothing.create();
+            var page = SynctubePage.AccountChannels.create({
+              csrfToken, loggedIn, channels
+              , newChannelError, deleteChannelError
             });
-            return;
+
+            return sendPage(res, page);
         }
 
         db.channels.register(name, req.user.name, function (err, channel) {
@@ -340,11 +416,18 @@ function handleNewChannel(req, res) {
                 });
             }
 
-
-            sendPug(res, "account-channels", {
-                channels: channels,
-                newChannelError: err ? err : undefined
+            var loggedIn = !!res.user;
+            var channels = [];
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var newChannelError = err ? Maybe.Just.create(err) : Maybe.Nothing.create();
+            var deleteChannelError = Maybe.Nothing.create();
+            var page = SynctubePage.AccountChannels.create({
+              csrfToken, loggedIn, channels
+              , newChannelError, deleteChannelError
             });
+
+            return sendPage(res, page);
         });
     });
 }
@@ -377,19 +460,36 @@ function handleDeleteChannel(req, res) {
 
     db.channels.lookup(name, function (err, channel) {
         if (err) {
-            sendPug(res, "account-channels", {
-                channels: [],
-                deleteChannelError: err
+            var loggedIn = !!res.user;
+            var channels = [];
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var newChannelError = Maybe.Nothing.create();
+            var deleteChannelError = Maybe.Just.create(err);
+            var page = SynctubePage.AccountChannels.create({
+              csrfToken, loggedIn, channels
+              , newChannelError, deleteChannelError
             });
-            return;
+
+            return sendPage(res, page);
         }
 
         if (channel.owner !== req.user.name && req.user.global_rank < 255) {
             db.channels.listUserChannels(req.user.name, function (err2, channels) {
-                sendPug(res, "account-channels", {
-                    channels: err2 ? [] : channels,
-                    deleteChannelError: "You do not have permission to delete this channel"
+                var loggedIn = !!res.user;
+                if (err2) {
+                  channels = [];
+                }
+                var csrfToken = typeof res.req.csrfToken === 'function'
+                  ? res.req.csrfToken() : '';
+                var newChannelError = Maybe.Nothing.create();
+                var deleteChannelError = Maybe.Just.create("You do not have permission to delete this channel");
+                var page = SynctubePage.AccountChannels.create({
+                  csrfToken, loggedIn, channels
+                  , newChannelError, deleteChannelError
                 });
+
+                return sendPage(res, page);
             });
             return;
         }
@@ -414,10 +514,23 @@ function handleDeleteChannel(req, res) {
                 }
             }
             db.channels.listUserChannels(req.user.name, function (err2, channels) {
-                sendPug(res, "account-channels", {
-                    channels: err2 ? [] : channels,
-                    deleteChannelError: err ? err : undefined
+                var loggedIn = !!res.user;
+                if (err2) {
+                  channels = [];
+                }
+                var csrfToken = typeof res.req.csrfToken === 'function'
+                  ? res.req.csrfToken() : '';
+                var newChannelError = Maybe.Nothing.create();
+                var deleteChannelError = Maybe.Nothing.create();
+                if (err) {
+                  deleteChannelError = Maybe.Just.create(err);
+                }
+                var page = SynctubePage.AccountChannels.create({
+                  csrfToken, loggedIn, channels
+                  , newChannelError, deleteChannelError
                 });
+
+                return sendPage(res, page);
             });
         });
     });
@@ -444,19 +557,28 @@ function handleAccountProfilePage(req, res) {
 
     db.users.getProfile(req.user.name, function (err, profile) {
         if (err) {
-            sendPug(res, "account-profile", {
-                profileError: err,
-                profileImage: "",
-                profileText: ""
+            var error = Maybe.Just.create(err);
+            var profile = Maybe.Nothing.create();
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var page = SynctubePage.AccountProfile.create({
+              csrfToken, profile, error
             });
-            return;
+            return sendPage(res, page);
         }
 
-        sendPug(res, "account-profile", {
-            profileImage: profile.image,
-            profileText: profile.text,
-            profileError: false
+        var error = Maybe.Nothing.create();
+        var profile = Maybe.Just.create({
+          image: profile.image,
+          text: profile.text,
+          login: req.user.name
         });
+        var csrfToken = typeof res.req.csrfToken === 'function'
+          ? res.req.csrfToken() : '';
+        var page = SynctubePage.AccountProfile.create({
+          csrfToken, profile, error
+        });
+        return sendPage(res, page);
     });
 }
 
@@ -482,19 +604,27 @@ function handleAccountProfile(req, res) {
 
     db.users.setProfile(req.user.name, { image: image, text: text }, function (err) {
         if (err) {
-            sendPug(res, "account-profile", {
-                profileImage: "",
-                profileText: "",
-                profileError: err
+            var error = Maybe.Just.create(err);
+            var profile = Maybe.Nothing.create();
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var page = SynctubePage.AccountProfile.create({
+              csrfToken, profile, error
             });
-            return;
+            return sendPage(res, page);
         }
 
-        sendPug(res, "account-profile", {
-            profileImage: image,
-            profileText: text,
-            profileError: false
+
+        var error = Maybe.Nothing.create();
+        var profile = Maybe.Just.create({
+          image, text, login: req.user.name
         });
+        var csrfToken = typeof res.req.csrfToken === 'function'
+          ? res.req.csrfToken() : '';
+        var page = SynctubePage.AccountProfile.create({
+          csrfToken, profile, error
+        });
+        return sendPage(res, page);
     });
 }
 
@@ -538,29 +668,28 @@ function handlePasswordReset(req, res) {
 
     db.users.getEmail(name, function (err, actualEmail) {
         if (err) {
-            sendPug(res, "account-passwordreset", {
-                reset: false,
-                resetEmail: "",
-                resetErr: err
-            });
-            return;
+            var reset = SynctubeAccountPasswordResetPage.ResetError.create(err);
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var page = SynctubePage.AccountPasswordReset.create({ csrfToken, reset });
+            return sendPage(res, page);
         }
 
         if (actualEmail !== email.trim()) {
-            sendPug(res, "account-passwordreset", {
-                reset: false,
-                resetEmail: "",
-                resetErr: "Provided email does not match the email address on record for " + name
-            });
-            return;
+            var reset = SynctubeAccountPasswordResetPage
+              .ResetError.create(name + " doesn't have an email address on record.  Please contact an " +
+                        "administrator to manually reset your password.");
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var page = SynctubePage.AccountPasswordReset.create({ csrfToken, reset });
+            return sendPage(res, page);
         } else if (actualEmail === "") {
-            sendPug(res, "account-passwordreset", {
-                reset: false,
-                resetEmail: "",
-                resetErr: name + " doesn't have an email address on record.  Please contact an " +
-                          "administrator to manually reset your password."
-            });
-            return;
+            var reset = SynctubeAccountPasswordResetPage
+              .ResetError.create("Provided email does not match the email address on record for " + name);
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var page = SynctubePage.AccountPasswordReset.create({ csrfToken, reset });
+            return sendPage(res, page);
         }
 
         var hash = $util.sha1($util.randomSalt(64));
@@ -576,25 +705,25 @@ function handlePasswordReset(req, res) {
             expire: expire
         }, function (err, dbres) {
             if (err) {
-                sendPug(res, "account-passwordreset", {
-                    reset: false,
-                    resetEmail: "",
-                    resetErr: err
-                });
-                return;
+                var reset = SynctubeAccountPasswordResetPage
+                  .ResetError.create(err);
+                var csrfToken = typeof res.req.csrfToken === 'function'
+                  ? res.req.csrfToken() : '';
+                var page = SynctubePage.AccountPasswordReset.create({ csrfToken, reset });
+                return sendPage(res, page);
             }
 
             Logger.eventlog.log("[account] " + ip + " requested password recovery for " +
                                 name + " <" + email + ">");
 
             if (!Config.get("mail.enabled")) {
-                sendPug(res, "account-passwordreset", {
-                    reset: false,
-                    resetEmail: email,
-                    resetErr: "This server does not have mail support enabled.  Please " +
-                              "contact an administrator for assistance."
-                });
-                return;
+                var reset = SynctubeAccountPasswordResetPage
+                  .ResetError.create("This server does not have mail support enabled.  Please " +
+                            "contact an administrator for assistance.");
+                var csrfToken = typeof res.req.csrfToken === 'function'
+                  ? res.req.csrfToken() : '';
+                var page = SynctubePage.AccountPasswordReset.create({ csrfToken, reset });
+                return sendPage(res, page);
             }
 
             var msg = "A password reset request was issued for your " +
@@ -615,18 +744,20 @@ function handlePasswordReset(req, res) {
             Config.get("mail.nodemailer").sendMail(mail, function (err, response) {
                 if (err) {
                     Logger.errlog.log("mail fail: " + err);
-                    sendPug(res, "account-passwordreset", {
-                        reset: false,
-                        resetEmail: email,
-                        resetErr: "Sending reset email failed.  Please contact an " +
-                                  "administrator for assistance."
-                    });
+                    var reset = SynctubeAccountPasswordResetPage
+                      .ResetError.create("Sending reset email failed.  Please contact an " +
+                                "administrator for assistance.");
+                    var csrfToken = typeof res.req.csrfToken === 'function'
+                      ? res.req.csrfToken() : '';
+                    var page = SynctubePage.AccountPasswordReset.create({ csrfToken, reset });
+                    return sendPage(res, page);
                 } else {
-                    sendPug(res, "account-passwordreset", {
-                        reset: true,
-                        resetEmail: email,
-                        resetErr: false
-                    });
+                    var reset = SynctubeAccountPasswordResetPage
+                      .ResetSent.create(email);
+                    var csrfToken = typeof res.req.csrfToken === 'function'
+                      ? res.req.csrfToken() : '';
+                    var page = SynctubePage.AccountPasswordReset.create({ csrfToken, reset });
+                    return sendPage(res, page);
                 }
             });
         });
@@ -647,21 +778,20 @@ function handlePasswordRecover(req, res) {
 
     db.lookupPasswordReset(hash, function (err, row) {
         if (err) {
-            sendPug(res, "account-passwordrecover", {
-                recovered: false,
-                recoverErr: err
-            });
-            return;
+            var recoveredPassword = Either.Left.create(err);
+            var page = SynctubePage
+              .AccountPasswordRecover.create({ recoveredPassword });
+            return sendPage(res, page);
         }
 
         if (Date.now() >= row.expire) {
-            sendPug(res, "account-passwordrecover", {
-                recovered: false,
-                recoverErr: "This password recovery link has expired.  Password " +
-                            "recovery links are valid only for 24 hours after " +
-                            "submission."
-            });
-            return;
+            var errorMessage = "This password recovery link has expired.  Password " +
+              "recovery links are valid only for 24 hours after " +
+              "submission.";
+            var recoveredPassword = Either.Left.create(errorMessage);
+            var page = SynctubePage
+              .AccountPasswordRecover.create({ recoveredPassword });
+            return sendPage(res, page);
         }
 
         var newpw = "";
@@ -671,22 +801,21 @@ function handlePasswordRecover(req, res) {
         }
         db.users.setPassword(row.name, newpw, function (err) {
             if (err) {
-                sendPug(res, "account-passwordrecover", {
-                    recovered: false,
-                    recoverErr: "Database error.  Please contact an administrator if " +
-                                "this persists."
-
-                });
-                return;
+                var errorMessage = "Database error.  Please contact an administrator if " +
+                  "this persists.";
+                var recoveredPassword = Either.Left.create(errorMessage);
+                var page = SynctubePage
+                  .AccountPasswordRecover.create({ recoveredPassword });
+                return sendPage(res, page);
             }
 
             db.deletePasswordReset(hash);
             Logger.eventlog.log("[account] " + ip + " recovered password for " + row.name);
 
-            sendPug(res, "account-passwordrecover", {
-                recovered: true,
-                recoverPw: newpw
-            });
+            var recoveredPassword = Either.Right.create(newpw);
+            var page = SynctubePage
+              .AccountPasswordRecover.create({ recoveredPassword });
+            return sendPage(res, page);
         });
     });
 }

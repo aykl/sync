@@ -1,7 +1,10 @@
-import { sendPug } from '../pug';
+var sendPage = require("../react-template").sendPage;
+var SynctubePage = require('../../ps/Synctube.Client.Page/index.js');
 
 export default function initialize(app) {
     app.get('/google_drive_userscript', (req, res) => {
-        return sendPug(res, 'google_drive_userscript')
+        var page = SynctubePage.GoogleDriveUserscript.create({});
+
+        return sendPage(res, page);
     });
 }

@@ -1,5 +1,6 @@
 import CyTubeUtil from '../../utilities';
-import { sendPug } from '../pug';
+var sendPage = require("../react-template").sendPage;
+var SynctubePage = require('../../ps/Synctube.Client.Page/index.js');
 
 export default function initialize(app, webConfig) {
     app.get('/contact', (req, res) => {
@@ -19,8 +20,8 @@ export default function initialize(app, webConfig) {
             return contact;
         });
 
-        return sendPug(res, 'contact', {
-            contacts: contacts
-        });
+        var page = SynctubePage.Contact.create({ contacts });
+
+        return sendPage(res, page);
     });
 }

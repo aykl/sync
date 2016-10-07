@@ -1,7 +1,8 @@
 var path = require("path");
 var fs = require("fs");
 var webserver = require("./webserver");
-var sendPug = require("./pug").sendPug;
+var sendPage = require("../react-template").sendPage;
+var SynctubePage = require('../../ps/Synctube.Client.Page/index.js');
 var Logger = require("../logger");
 var db = require("../database");
 var Config = require("../config");
@@ -35,9 +36,9 @@ function handleAcp(req, res, user) {
     }
     sio += "/socket.io/socket.io.js";
 
-    sendPug(res, "acp", {
-        sioSource: sio
-    });
+    var page = SynctubePage.Acp.create({ sioSource: sio });
+
+    return sendPage(res, page);
 }
 
 /**

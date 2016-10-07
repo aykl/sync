@@ -8,7 +8,13 @@ var pug = require("pug");
 var path = require("path");
 var webserver = require("./webserver");
 var cookieall = webserver.cookieall;
-var sendPug = require("./pug").sendPug;
+var sendPage = require("../react-template").sendPage;
+var SynctubePage = require('../../ps/Synctube.Client.Page/index.js');
+var SynctubeLoginPage =
+  require('../ps/Synctube.Client.Page.Login/index.js');
+var SynctubeRegisterPage =
+  require('../ps/Synctube.Client.Page.Register/index.js');
+var Maybe = require('../ps/Data.Maybe/index.js');
 var Logger = require("../logger");
 var $util = require("../utilities");
 var db = require("../database");
@@ -56,20 +62,31 @@ function handleLogin(req, res) {
                 Logger.eventlog.log("[loginfail] Login failed (bad password): " + name
                                   + "@" + req.realIP);
             }
-            sendPug(res, "login", {
-                loggedIn: false,
-                loginError: err
+
+            var signInStatus = SynctubeLoginPage
+              .NotLoggedIn.create(Maybe.Just(err));
+            var redirect = Maybe.Nothing.create();
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var page = SynctubePage.Login.create({
+              signInStatus, redirect, csrfToken
             });
-            return;
+
+            return sendPage(res, page);
         }
 
         session.genSession(user, expiration, function (err, auth) {
             if (err) {
-                sendPug(res, "login", {
-                    loggedIn: false,
-                    loginError: err
+                var signInStatus = SynctubeLoginPage
+                  .NotLoggedIn.create(Maybe.Just(err));
+                var redirect = Maybe.Nothing.create();
+                var csrfToken = typeof res.req.csrfToken === 'function'
+                  ? res.req.csrfToken() : '';
+                var page = SynctubePage.Login.create({
+                  signInStatus, redirect, csrfToken
                 });
-                return;
+
+                return sendPage(res, page);
             }
 
             if (req.hostname.indexOf(Config.get("http.root-domain")) >= 0) {
@@ -93,7 +110,16 @@ function handleLogin(req, res) {
                 res.redirect(dest);
             } else {
                 res.user = user;
-                sendPug(res, "login", {});
+                var signInStatus = SynctubeLoginPage
+                  .LoggedIn.create(user);
+                var redirect = Maybe.Nothing.create();
+                var csrfToken = typeof res.req.csrfToken === 'function'
+                  ? res.req.csrfToken() : '';
+                var page = SynctubePage.Login.create({
+                  signInStatus, redirect, csrfToken
+                });
+
+                return sendPage(res, page);
             }
         });
     });
@@ -108,18 +134,33 @@ function handleLoginPage(req, res) {
     }
 
     if (req.user) {
-        return sendPug(res, "login", {
-            wasAlreadyLoggedIn: true
+        var signInStatus = SynctubeLoginPage
+          .WasAlreadyLoggedIn.create(req.user);
+        var redirect = Maybe.Nothing.create();
+        var csrfToken = typeof res.req.csrfToken === 'function'
+          ? res.req.csrfToken() : '';
+        var page = SynctubePage.Login.create({
+          signInStatus, redirect, csrfToken
         });
+
+        return sendPage(res, page);
     }
 
     var redirect = req.query.dest || req.header("referer");
-    var locals = {};
+    var redirectValue = Maybe.Nothing.create();
     if (!/\/register/.test(redirect)) {
-        locals.redirect = redirect;
+        redirectValue = Maybe.Just.create(redirect);
     }
 
-    sendPug(res, "login", locals);
+    var signInStatus = SynctubeLoginPage
+      .NotLoggedIn.create(Maybe.Nothing.create());
+    var csrfToken = typeof res.req.csrfToken === 'function'
+      ? res.req.csrfToken() : '';
+    var page = SynctubePage.Login.create({
+      signInStatus, redirect: redirectValue, csrfToken
+    });
+
+    return sendPage(res, page);
 }
 
 /**
@@ -142,7 +183,11 @@ function handleLogout(req, res) {
     if (dest) {
         res.redirect(dest);
     } else {
-        sendPug(res, "logout", {});
+        var page = SynctubePage.Logout.create({
+            redirect: Maybe.Nothing.create()
+        });
+
+        return sendPage(res, page);
     }
 }
 
@@ -155,14 +200,25 @@ function handleRegisterPage(req, res) {
     }
 
     if (req.user) {
-        sendPug(res, "register", {});
-        return;
+        var csrfToken = typeof res.req.csrfToken === 'function'
+          ? res.req.csrfToken() : '';
+        var registrationStatus = SynctubeRegisterPage.LoggedIn.create();
+        var page = SynctubePage.Logout.create({
+            registrationStatus, csrfToken
+        });
+
+        return sendPage(res, page);
     }
 
-    sendPug(res, "register", {
-        registered: false,
-        registerError: false
+    var csrfToken = typeof res.req.csrfToken === 'function'
+      ? res.req.csrfToken() : '';
+    var registrationStatus = SynctubeRegisterPage
+      .NotRegistered.create(Maybe.Nothing.create());
+    var page = SynctubePage.Logout.create({
+        registrationStatus, csrfToken
     });
+
+    return sendPage(res, page);
 }
 
 /**
@@ -185,48 +241,79 @@ function handleRegister(req, res) {
     }
 
     if (name.length === 0) {
-        sendPug(res, "register", {
-            registerError: "Username must not be empty"
+        var csrfToken = typeof res.req.csrfToken === 'function'
+          ? res.req.csrfToken() : '';
+        var registrationStatus = SynctubeRegisterPage
+          .NotRegistered.create(Maybe.Just.create("Username must not be empty"));
+        var page = SynctubePage.Logout.create({
+            registrationStatus, csrfToken
         });
-        return;
+
+        return sendPage(res, page);
     }
 
     if (name.match(Config.get("reserved-names.usernames"))) {
-        sendPug(res, "register", {
-            registerError: "That username is reserved"
+        var csrfToken = typeof res.req.csrfToken === 'function'
+          ? res.req.csrfToken() : '';
+        var registrationStatus = SynctubeRegisterPage
+          .NotRegistered.create(Maybe.Just.create("That username is reserved"));
+        var page = SynctubePage.Logout.create({
+            registrationStatus, csrfToken
         });
-        return;
+
+        return sendPage(res, page);
     }
 
     if (password.length === 0) {
-        sendPug(res, "register", {
-            registerError: "Password must not be empty"
+        var csrfToken = typeof res.req.csrfToken === 'function'
+          ? res.req.csrfToken() : '';
+        var registrationStatus = SynctubeRegisterPage
+          .NotRegistered.create(Maybe.Just.create("Password must not be empty"));
+        var page = SynctubePage.Logout.create({
+            registrationStatus, csrfToken
         });
-        return;
+
+        return sendPage(res, page);
     }
 
     password = password.substring(0, 100);
 
     if (email.length > 0 && !$util.isValidEmail(email)) {
-        sendPug(res, "register", {
-            registerError: "Invalid email address"
+        var csrfToken = typeof res.req.csrfToken === 'function'
+          ? res.req.csrfToken() : '';
+        var registrationStatus = SynctubeRegisterPage
+          .NotRegistered.create(Maybe.Just.create("Invalid email address"));
+        var page = SynctubePage.Logout.create({
+            registrationStatus, csrfToken
         });
-        return;
+
+        return sendPage(res, page);
     }
 
     db.users.register(name, password, email, ip, function (err) {
         if (err) {
-            sendPug(res, "register", {
-                registerError: err
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var registrationStatus = SynctubeRegisterPage
+              .NotRegistered.create(Maybe.Just.create(err));
+            var page = SynctubePage.Logout.create({
+                registrationStatus, csrfToken
             });
+
+            return sendPage(res, page);
         } else {
             Logger.eventlog.log("[register] " + ip + " registered account: " + name +
                              (email.length > 0 ? " <" + email + ">" : ""));
-            sendPug(res, "register", {
-                registered: true,
-                registerName: name,
-                redirect: req.body.redirect
+
+            var csrfToken = typeof res.req.csrfToken === 'function'
+              ? res.req.csrfToken() : '';
+            var registrationStatus = SynctubeRegisterPage
+              .RegistrationSuccess.create(name);
+            var page = SynctubePage.Logout.create({
+                registrationStatus, csrfToken
             });
+
+            return sendPage(res, page);
         }
     });
 }
