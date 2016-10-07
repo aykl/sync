@@ -66,7 +66,12 @@ scripts =
     function submitEmail() {
       $("#username2").attr("disabled", false);
       return true;
-    }"""
+    }
+
+    document.querySelector("._tempClass_changePasswordForm")
+      .onsubmit = function () { return validatePasswordChange(); };
+    document.querySelector("._tempClass_changeEmailForm")
+      .onsubmit = function () { return submitEmail(); };"""
 
 
 content :: State -> ReactElement
@@ -112,7 +117,7 @@ changePasswordForm csrfToken loginName =
   R.form
     [ RP.action "/account/edit"
     , RP.method "post"
-    , RP.unsafeMkProps "onsubmit" "return validatePasswordChange()"
+    , RP.className "_tempClass_changePasswordForm"
     ]
     [ R.input [ RP._type "hidden", RP.name "_csrf", RP.value csrfToken ]
         []
@@ -170,7 +175,7 @@ changeEmailForm :: String -> String -> ReactElement
 changeEmailForm csrfToken loginName =
   R.form
     [ RP.action "/account/edit", RP.method "post"
-    , RP.unsafeMkProps "onsubmit" "return submitEmail()"
+    , RP.className "_tempClass_changeEmailForm"
     ]
     [ R.input [ RP._type "hidden", RP.name "_csrf", RP.value csrfToken ]
         []

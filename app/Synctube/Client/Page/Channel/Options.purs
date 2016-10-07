@@ -55,7 +55,7 @@ header =
                 [ R.li'
                     [ R.a
                         [ RP.href "#cs-chatfilters", RP._data {toggle: "tab"}
-                        , RP.unsafeMkProps "onclick" "javascript:socket.emit('requestChatFilters')"
+                        , RP.className "_tempClass_requestChatFilters"
                         ]
                         [ R.text "Chat Filters" ]
                     ]
@@ -95,8 +95,7 @@ header =
                     [ R.a
                         [ RP.href "#cs-chanranks", RP._data {toggle: "tab"}
                         , RP.tabIndex "-1"
-                        , RP.unsafeMkProps "onclick"
-                            "javascript:socket.emit('requestChannelRanks')"
+                        , RP.className "_tempClass_requestChannelRanks"
                         ]
                         [ R.text "Moderators" ]
                     ]
@@ -105,15 +104,14 @@ header =
         , R.li'
             [ R.a
                 [ RP.href "#cs-banlist", RP._data {toggle: "tab"}, RP.tabIndex "-1"
-                , RP.unsafeMkProps "onclick" "javascript:socket.emit('requestBanlist')"
+                , RP.className "_tempClass_requestBanlist"
                 ]
                 [ R.text "Ban list" ]
             ]
         , R.li'
             [ R.a
                 [ RP.href "#cs-chanlog", RP._data {toggle: "tab"}
-                , RP.unsafeMkProps "onclick"
-                    "javascript:socket.emit('readChanLog')"
+                , RP.className "_tempClass_readChanLog"
                 ]
                 [ R.text "Log" ]
             ]

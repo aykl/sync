@@ -122,6 +122,9 @@ scripts :: SyncPage.Page -> ReactElement
 scripts (SyncPage.Index _) =
   R.div [] Index.scripts
 
+scripts (SyncPage.AccountChannels _) =
+  R.div [] AccountChannels.scripts
+
 scripts (SyncPage.AccountEdit _) =
   R.div [] AccountEdit.scripts
 

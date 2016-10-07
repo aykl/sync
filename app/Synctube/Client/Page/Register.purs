@@ -95,7 +95,13 @@ scripts =
             .addClass("has-success");
         }
       }
-    }"""
+    }
+    document.querySelector("._tempClass_registerForm")
+      .onsubmit = function () { return verify(); };
+    document.querySelector("._tempClass_registerForm_password")
+        .onkeyup = checkPasswords;
+    document.querySelector("._tempClass_registerForm_confirmPassword")
+      .onkeyup = checkPasswords;"""
 
 
 content :: State -> ReactElement
@@ -121,7 +127,7 @@ content state@{ registrationStatus: NotRegistered error } =
     , R.h2 [] [ R.text "Register" ]
     , R.form
         [ RP.role "form", RP.action "/register", RP.method "post"
-        , RP.unsafeMkProps "onsubmit" "return verify()"
+        , RP.className "_tempClass_registerForm"
         ]
         [ R.input [ RP._type "hidden", RP.name "_csrf"
                   , RP.value state.csrfToken ] []
@@ -141,10 +147,9 @@ content state@{ registrationStatus: NotRegistered error } =
                 [ R.text "Password" ]
             , R.input
                 [ RP._id "password"
-                , RP.className "form-control"
+                , RP.className "form-control _tempClass_registerForm_password"
                 , RP._type "password"
                 , RP.name "password"
-                , RP.unsafeMkProps "onkeyup" "checkPasswords()"
                 ] []
             ]
         , R.div [ RP.className "form-group" ]
@@ -155,9 +160,8 @@ content state@{ registrationStatus: NotRegistered error } =
                 [ R.text "Confirm Password" ]
             , R.input
                 [ RP._id "password_confirm"
-                , RP.className "form-control"
+                , RP.className "form-control _tempClass_registerForm_confirmPassword"
                 , RP._type "password"
-                , RP.unsafeMkProps "onkeyup" "checkPasswords()"
                 ] []
             ]
         , R.div [ RP.className "form-group" ]

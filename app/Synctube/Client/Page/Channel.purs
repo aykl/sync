@@ -67,7 +67,26 @@ scripts state =
       [ RP.defer "true", RP.src "/js/videojs-contrib-hls.min.js" ] []
   , R.script
       [ RP.defer "true", RP.src "https://player.twitch.tv/js/embed/v1.js" ] []
+  , R.script
+      [ RP._type "text/javascript"
+      , RP.dangerouslySetInnerHTML { __html: scriptBody }
+      ]
+      []
   ]
+
+  where
+
+  scriptBody =
+    """document.querySelector("._tempClass_requestChatFilters")
+      .onclick = function () { socket.emit('requestChatFilters'); };
+    document.querySelector("._tempClass_requestChannelRanks")
+      .onclick = function () { socket.emit('requestChannelRanks'); };
+    document.querySelector("._tempClass_requestBanlist")
+      .onclick = function () { socket.emit('requestBanlist'); };
+    document.querySelector("._tempClass_readChanLog")
+      .onclick = function () { socket.emit('readChanLog'); };
+    document.querySelector("._tempClass_saveUserOptions")
+      .onclick = function () { saveUserOptions(); };"""
 
 
 motd :: ReactElement

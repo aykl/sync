@@ -33,6 +33,29 @@ mainpageSection state =
         content state
     ]
 
+
+scripts :: Array ReactElement
+scripts =
+  [ R.script
+      [ RP._type "text/javascript"
+      , RP.dangerouslySetInnerHTML { __html: scriptBody }
+      ]
+      []
+  ]
+
+  where
+
+  scriptBody =
+    """document.querySelectorAll("._tempClass_channelForm")
+      .forEach(function (chan) {
+        var channelName = chan.dataset.tempDataChannelName;
+        chan.onsubmit = function () {
+          return confirm("Are you sure you want to delete " + channelName +
+            "?  This cannot be undone");
+        };
+      });"""
+
+
 content :: State -> Array ReactElement
 content state | not state.loggedIn =
   [ R.div [ RP.className "col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3" ]
@@ -129,12 +152,10 @@ channelRow csrfToken channel =
   R.tr []
     [ R.th []
         [ R.form
-            [ RP.className "form-inline pull-right"
+            [ RP.className "form-inline pull-right _tempClass_channelForm"
             , RP.action "/account/channels"
             , RP.method "post"
-            , RP.unsafeMkProps "onsubmit" $
-                "return confirm('Are you sure you want to delete ${chan}?  \
-                \This cannot be undone');" <^> [ "chan" /\ channel.name ]
+            , RP._data { "temp-data-channel-name": channel.name }
             ]
             [ R.input
                 [ RP._type "hidden"

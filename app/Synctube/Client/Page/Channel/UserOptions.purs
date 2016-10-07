@@ -77,9 +77,8 @@ footer :: ReactElement
 footer =
   R.div [ RP.className "modal-footer" ]
     [ R.button
-        [ RP.className "btn btn-primary"
+        [ RP.className "btn btn-primary _tempClass_saveUserOptions"
         , RP._type "button", RP._data {dismiss: "modal"}
-        , RP. unsafeMkProps "onclick" "javascript:saveUserOptions()"
         ]
         [ R.text "Save" ]
     , R.button
