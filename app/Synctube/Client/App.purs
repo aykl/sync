@@ -20,7 +20,7 @@ import Synctube.Client.Page.Login as Login
 import Synctube.Client.Page.Logout as Logout
 import Synctube.Client.Page.Register as Register
 import Synctube.Client.Page.Tos as Tos
-import Synctube.Client.Footer as Footer
+import Synctube.Client.Component.Footer as Footer
 
 import React (ReactElement)
 import React.DOM as R
