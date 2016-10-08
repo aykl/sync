@@ -11,6 +11,7 @@ import Data.TemplateString ((<^>))
 import React (ReactElement)
 import React.DOM as R
 import React.DOM.Props as RP
+import Synctube.Client.Component.Common.Input as I
 
 
 type State =
@@ -29,18 +30,16 @@ type Channel =
 mainpageSection :: State -> ReactElement
 mainpageSection state =
   R.section [ RP._id "mainpage" ]
-    [ R.div [ RP.className "container" ] $
-        content state
-    ]
+            [ R.div [ RP.className "container" ] $
+                    content state
+            ]
 
 
 scripts :: Array ReactElement
 scripts =
-  [ R.script
-      [ RP._type "text/javascript"
-      , RP.dangerouslySetInnerHTML { __html: scriptBody }
-      ]
-      []
+  [ R.script  [ RP._type "text/javascript"
+              , RP.dangerouslySetInnerHTML { __html: scriptBody }
+              ] []
   ]
 
   where
@@ -59,62 +58,57 @@ scripts =
 content :: State -> Array ReactElement
 content state | not state.loggedIn =
   [ R.div [ RP.className "col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3" ]
-      [ R.div [ RP.className "alert alert-danger messagebox center" ]
-          [ R.strong [] [ R.text "Authorization Required" ]
-          , R.p []
-              [ R.text "You must be "
-              , R.a [ RP.href "/login" ] [ R.text "logged in" ]
-              , R.text " to view this page."
-              ]
+          [ R.div [ RP.className "alert alert-danger messagebox center" ]
+                  [ R.strong' [ R.text "Authorization Required" ]
+                  , R.p'  [ R.text "You must be "
+                          , R.a [ RP.href "/login" ] [ R.text "logged in" ]
+                          , R.text " to view this page."
+                          ]
+                  ]
           ]
-      ]
   ]
 
 content state =
   [ R.div [ RP.className "col-lg-6 col-md-6" ]
-      [ R.h3 [] [ R.text "My Channels" ]
-      , showDeleteChannelError state.deleteChannelError
-      , showChannels state.csrfToken state.channels
-      ]
-  , R.div [ RP.className "col-lg-6 col-md-6" ]
-      [ R.h3 [] [ R.text "Register a new channel" ]
-      , showNewChannelError state.newChannelError
-      , R.form [ RP.action "/account/channels", RP.method "post" ]
-          [ R.input
-              [ RP._type "hidden", RP.name "_csrf", RP.value state.csrfToken ]
-              []
-          , R.input
-              [ RP._type "hidden", RP.name "action", RP.value "new_channel" ]
-              []
-          , R.div [ RP.className "form-group" ]
-              [ R.label
-                  [ RP.className "control-label"
-                  , RP.htmlFor "channelname"
-                  ]
-                  [ R.text "Channel Name" ]
-              , R.input
-                  [ RP._id "channelname"
-                  , RP.className "form-control"
-                  , RP._type "text"
-                  , RP.name "name"
-                  ] []
-              ]
-          , R.button
-              [ RP.className "btn btn-primary btn-block"
-              , RP._type "submit"
-              ]
-              [ R.text "Register" ]
+          [ R.h3' [ R.text "My Channels" ]
+          , showDeleteChannelError state.deleteChannelError
+          , showChannels state.csrfToken state.channels
           ]
-      ]
+  , R.div [ RP.className "col-lg-6 col-md-6" ]
+          [ R.h3' [ R.text "Register a new channel" ]
+          , showNewChannelError state.newChannelError
+          , newChannelForm state
+          ]
   ]
+
+
+newChannelForm :: State -> ReactElement
+newChannelForm state =
+  R.form  [ RP.action "/account/channels", RP.method "post" ]
+          [ I.hidden  [ RP.name "_csrf" ] state.csrfToken
+          , I.hidden  [ RP.name "action" ] "new_channel"
+          , R.div [ RP.className "form-group" ]
+                  [ R.label [ RP.className "control-label"
+                            , RP.htmlFor "channelname"
+                            ]
+                            [ R.text "Channel Name" ]
+                  , I.text' [ RP._id "channelname"
+                            , RP.className "form-control"
+                            , RP.name "name" ]
+                  ]
+          , R.button  [ RP.className "btn btn-primary btn-block"
+                      , RP._type "submit"
+                      ]
+                      [ R.text "Register" ]
+          ]
 
 
 showDeleteChannelError :: Maybe String -> ReactElement
 showDeleteChannelError (Just error) =
   R.div [ RP.className "alert alert-danger center messagebox" ]
-    [ R.strong [] [ R.text "Channel Deletion Failed" ]
-    , R.p [] [ R.text error ]
-    ]
+        [ R.strong' [ R.text "Channel Deletion Failed" ]
+        , R.p' [ R.text error ]
+        ]
 
 showDeleteChannelError Nothing =
   R.text ""
@@ -123,9 +117,9 @@ showDeleteChannelError Nothing =
 showNewChannelError :: Maybe String -> ReactElement
 showNewChannelError (Just error) =
   R.div [ RP.className "alert alert-danger messagebox center" ]
-    [ R.strong [] [ R.text "Channel Registration Failed" ]
-    , R.p [] [ R.text error ]
-    ]
+        [ R.strong' [ R.text "Channel Registration Failed" ]
+        , R.p' [ R.text error ]
+        ]
 
 showNewChannelError Nothing =
   R.text ""
@@ -134,53 +128,40 @@ showNewChannelError Nothing =
 showChannels :: String -> Array Channel -> ReactElement
 showChannels _csrfToken channels | A.length channels == 0 =
   R.div [ RP.className "center" ]
-    [ R.strong [] [ R.text "You haven't registered any channels" ] ]
+        [ R.strong' [ R.text "You haven't registered any channels" ] ]
 
 showChannels csrfToken channels =
   R.table [ RP.className "table table-bordered" ]
-    [ R.thead []
-        [ R.tr []
-            [ R.th [] [ R.text "Channel" ] ]
-        ]
-    , R.tbody [] $
-        map (channelRow csrfToken) channels
-    ]
+          [ R.thead' [ R.tr' [ R.th [] [ R.text "Channel" ] ] ]
+          , R.tbody' $ map (channelRow csrfToken) channels
+          ]
 
 
 channelRow :: String -> Channel -> ReactElement
 channelRow csrfToken channel =
-  R.tr []
-    [ R.th []
-        [ R.form
-            [ RP.className "form-inline pull-right _tempClass_channelForm"
+  R.tr' [ R.th' [ channelForm, channelLink ] ]
+
+  where
+
+  channelForm :: ReactElement
+  channelForm =
+    R.form  [ RP.className "form-inline pull-right _tempClass_channelForm"
             , RP.action "/account/channels"
             , RP.method "post"
             , RP._data { "temp-data-channel-name": channel.name }
             ]
-            [ R.input
-                [ RP._type "hidden"
-                , RP.name "_csrf"
-                , RP.value csrfToken ] []
-            , R.input
-                [ RP._type "hidden"
-                , RP.name "action"
-                , RP.value "delete_channel" ] []
-            , R.input
-                [ RP._type "hidden"
-                , RP.name "name"
-                , RP.value channel.name ] []
-            , R.button
-                [ RP.className "btn btn-xs btn-danger"
-                , RP._type "submit"
-                ]
-                [ R.text "Delete"
-                , R.span [ RP.className "glyphicon glyphicon-trash" ] []
-                ]
+            [ I.hidden  [ RP.name "_csrf" ] csrfToken
+            , I.hidden  [ RP.name "action" ] "delete_channel"
+            , I.hidden  [ RP.name "name" ] channel.name
+            , R.button  [ RP.className "btn btn-xs btn-danger"
+                        , RP._type "submit"
+                        ]
+                        [ R.text "Delete"
+                        , R.span [ RP.className "glyphicon glyphicon-trash" ] []
+                        ]
             ]
-        , R.a
-            [ RP.href $ "/r/" <> channel.name
-            , RP.style {"margin-left": "5px"}
-            ]
-            [ R.text channel.name ]
-        ]
-    ]
+
+  channelLink :: ReactElement
+  channelLink =
+    R.a [ RP.href $ "/r/" <> channel.name, RP.style { "margin-left": "5px" } ]
+        [ R.text channel.name ]

@@ -7,6 +7,7 @@ import Data.Maybe (Maybe(..))
 import React (ReactElement)
 import React.DOM as R
 import React.DOM.Props as RP
+import Synctube.Client.Component.Common.Input as I
 
 
 type State =
@@ -24,17 +25,15 @@ data RegistrationStatus
 mainpageSection :: State -> ReactElement
 mainpageSection state =
   R.section [ RP._id "mainpage", RP.className "container" ]
-    [ content state ]
+            [ content state ]
 
 
 scripts :: Array ReactElement
 scripts =
-  [ R.script [ RP.src "/js/jquery.js"] []
-  , R.script
-      [ RP._type "text/javascript"
-      , RP.dangerouslySetInnerHTML { __html: scriptBody }
-      ]
-      []
+  [ R.script  [ RP.src "/js/jquery.js"] []
+  , R.script  [ RP._type "text/javascript"
+              , RP.dangerouslySetInnerHTML { __html: scriptBody }
+              ] []
   ]
 
   where
@@ -107,114 +106,104 @@ scripts =
 content :: State -> ReactElement
 content state@{ registrationStatus: LoggedIn } =
   R.div [ RP.className "col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3" ]
-    [ R.div [ RP.className "alert alert-danger messagebox center" ]
-        [ R.strong [] [ R.text "Already logged in" ]
-        , R.p []
-            [ R.text $
-                "You are already logged in.  If you intend to register \
-                \a new account, please "
-            , R.a [ RP.href "/logout?redirect=/register" ]
-                [ R.text "Logout" ]
-            , R.text " first."
-            ]
-        --, TODO Link to My Account page
+        [ R.div [ RP.className "alert alert-danger messagebox center" ]
+                [ R.strong' [ R.text "Already logged in" ]
+                , R.p'
+                    [ R.text $
+                        "You are already logged in.  If you intend to register \
+                        \a new account, please "
+                    , R.a [ RP.href "/logout?redirect=/register" ]
+                          [ R.text "Logout" ]
+                    , R.text " first."
+                    ]
+                --, TODO Link to My Account page
+                ]
         ]
-    ]
 
 content state@{ registrationStatus: NotRegistered error } =
   R.div [ RP.className "col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3" ]
-    [ registrationError error
-    , R.h2 [] [ R.text "Register" ]
-    , R.form
-        [ RP.role "form", RP.action "/register", RP.method "post"
-        , RP.className "_tempClass_registerForm"
+        [ registrationError error
+        , R.h2' [ R.text "Register" ]
+        , registrationForm
         ]
-        [ R.input [ RP._type "hidden", RP.name "_csrf"
-                  , RP.value state.csrfToken ] []
-        , R.div [ RP.className "form-group" ]
-            [ R.label [ RP.className "control-label", RP.htmlFor "username" ]
-                [ R.text "Username" ]
-            , R.input
-                [ RP._id "username", RP.className "form-control"
-                , RP._type "text", RP.name "name"
-                ] []
-            ]
-        , R.div [ RP.className "form-group" ]
-            [ R.label
-                [ RP.className "control-label"
-                , RP.htmlFor "password"
-                ]
-                [ R.text "Password" ]
-            , R.input
-                [ RP._id "password"
-                , RP.className "form-control _tempClass_registerForm_password"
-                , RP._type "password"
-                , RP.name "password"
-                ] []
-            ]
-        , R.div [ RP.className "form-group" ]
-            [ R.label
-                [ RP.className "control-label"
-                , RP.htmlFor "password_confirm"
-                ]
-                [ R.text "Confirm Password" ]
-            , R.input
-                [ RP._id "password_confirm"
-                , RP.className "form-control _tempClass_registerForm_confirmPassword"
-                , RP._type "password"
-                ] []
-            ]
-        , R.div [ RP.className "form-group" ]
-            [ R.label
-                [ RP.className "control-label"
-                , RP.htmlFor "email"
-                ]
-                [ R.text "Email (optional)" ]
-            , R.input
-                [ RP._id "email"
-                , RP.className "form-control"
-                , RP._type "email"
-                , RP.name "email"
-                ] []
-            , R.p []
-                [ R.text $
-                    "Providing an email address is optional and will \
-                    \allow you to recover your account via email if you \
-                    \forget your password.  Your address will not be \
-                    \shared with anyone."
-                ]
-            ]
-        , R.button
-            [ RP._id "register"
-            , RP.className "btn btn btn-success btn-block"
-            , RP._type "submit"
-            ]
-            [ R.text "Register" ]
-        ]
-    ]
 
   where
 
   registrationError :: Maybe String -> ReactElement
   registrationError (Just error) =
     R.div [ RP.className "alert alert-danger messagebox center" ]
-      [ R.strong [] [ R.text "Registration Failed" ]
-      , R.p [] [ R.text error ]
-      ]
+          [ R.strong' [ R.text "Registration Failed" ]
+          , R.p' [ R.text error ]
+          ]
 
   registrationError Nothing =
     R.text ""
 
+  registrationForm :: ReactElement
+  registrationForm =
+    R.form  [ RP.role "form", RP.action "/register", RP.method "post"
+            , RP.className "_tempClass_registerForm"
+            ]
+            [ I.hidden [ RP.name "_csrf" ] state.csrfToken
+            , R.div [ RP.className "form-group" ]
+                    [ R.label [ RP.className "control-label"
+                              , RP.htmlFor "username"
+                              ]
+                              [ R.text "Username" ]
+                    , I.text' [ RP._id "username", RP.className "form-control"
+                              , RP.name "name" ]
+                    ]
+            , R.div [ RP.className "form-group" ]
+                    [ R.label [ RP.className "control-label"
+                              , RP.htmlFor "password"
+                              ]
+                              [ R.text "Password" ]
+                    , I.password' [ RP._id "password"
+                                  , RP.className "form-control _tempClass_registerForm_password"
+                                  , RP.name "password" ]
+                    ]
+            , R.div [ RP.className "form-group" ]
+                    [ R.label [ RP.className "control-label"
+                              , RP.htmlFor "password_confirm"
+                              ]
+                              [ R.text "Confirm Password" ]
+                    , I.password' [ RP._id "password_confirm"
+                                  , RP.className "form-control _tempClass_registerForm_confirmPassword" ]
+                    ]
+            , R.div [ RP.className "form-group" ]
+                    [ R.label [ RP.className "control-label"
+                              , RP.htmlFor "email"
+                              ]
+                              [ R.text "Email (optional)" ]
+                    , I.email'  [ RP._id "email"
+                                , RP.className "form-control"
+                                , RP.name "email" ]
+                    , R.p'
+                        [ R.text $
+                            "Providing an email address is optional and will \
+                            \allow you to recover your account via email if you \
+                            \forget your password.  Your address will not be \
+                            \shared with anyone."
+                        ]
+                    ]
+            , R.button  [ RP._id "register"
+                        , RP.className "btn btn btn-success btn-block"
+                        , RP._type "submit"
+                        ]
+                        [ R.text "Register" ]
+            ]
+
 content state@{ registrationStatus: RegistrationSuccess userName } =
   R.div [ RP.className "col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3" ]
-    [ R.div [ RP.className "alert alert-success messagebox center" ]
-        [ R.strong [] [ R.text "Registration Successful" ]
-        , R.p []
-            [ R.text $
-                "Thanks for registering, " <> userName <> "!  Now you can "
-            , R.a [ RP.href "/login" ]
-                [ R.text "Login" ]
-            , R.text " to use your account."
-            ]
+        [ R.div [ RP.className "alert alert-success messagebox center" ]
+                [ R.strong' [ R.text "Registration Successful" ]
+                , R.p'
+                    [ R.text $
+                        "Thanks for registering, " <> userName <>
+                        "!  Now you can "
+                    , R.a [ RP.href "/login" ]
+                          [ R.text "Login" ]
+                    , R.text " to use your account."
+                    ]
+                ]
         ]
-    ]

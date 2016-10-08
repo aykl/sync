@@ -7,6 +7,7 @@ import Synctube.Client.Page.Channel.Options (channelOptions)
 import React (ReactElement)
 import React.DOM as R
 import React.DOM.Props as RP
+import Synctube.Client.Component.Common.Input as I
 
 
 type State =
@@ -22,17 +23,17 @@ type Channel =
 mainpageSection :: State -> ReactElement
 mainpageSection state =
   R.section [ RP._id "mainpage" ]
-    [ R.div [ RP.className "container" ]
-        [ motd
-        , announcements
-        , drinkBar
-        , main
-        , controls
-        , playlist
-        , resize
-        , siteFooter
-        ]
-    ]
+            [ R.div [ RP.className "container" ]
+                    [ motd
+                    , announcements
+                    , drinkBar
+                    , main
+                    , controls
+                    , playlist
+                    , resize
+                    , siteFooter
+                    ]
+            ]
 
 
 otherSections :: State -> Array ReactElement
@@ -46,32 +47,25 @@ otherSections state =
 
 scripts :: State -> Array ReactElement
 scripts state =
-  [ R.script [ RP._id "socketio-js", RP.src state.sioSource ] []
-  , R.script [ RP.src "/js/data.js" ] []
-  , R.script [ RP.src "/js/util.js" ] []
-  , R.script [ RP.src "/js/player.js" ] []
-  , R.script [ RP.src "/js/paginator.js" ] []
-  , R.script [ RP.src "/js/ui.js" ] []
-  , R.script [ RP.src "/js/callbacks.js" ] []
-  , R.script
-      [ RP.defer "true", RP.src "https://www.youtube.com/iframe_api" ] []
-  , R.script
-      [ RP.defer "true", RP.src "https://api.dmcdn.net/all.js" ] []
-  , R.script
-      [ RP.defer "true", RP.src "/js/sc.js" ] []
-  , R.script
-      [ RP.defer "true", RP.src "/js/froogaloop.min.js" ] []
-  , R.script
-      [ RP.defer "true", RP.src "/js/video.js" ] []
-  , R.script
-      [ RP.defer "true", RP.src "/js/videojs-contrib-hls.min.js" ] []
-  , R.script
-      [ RP.defer "true", RP.src "https://player.twitch.tv/js/embed/v1.js" ] []
-  , R.script
-      [ RP._type "text/javascript"
-      , RP.dangerouslySetInnerHTML { __html: scriptBody }
-      ]
-      []
+  [ R.script  [ RP._id "socketio-js", RP.src state.sioSource ] []
+  , R.script  [ RP.src "/js/data.js" ] []
+  , R.script  [ RP.src "/js/util.js" ] []
+  , R.script  [ RP.src "/js/player.js" ] []
+  , R.script  [ RP.src "/js/paginator.js" ] []
+  , R.script  [ RP.src "/js/ui.js" ] []
+  , R.script  [ RP.src "/js/callbacks.js" ] []
+  , R.script  [ RP.defer "true"
+              , RP.src "https://www.youtube.com/iframe_api" ] []
+  , R.script  [ RP.defer "true", RP.src "https://api.dmcdn.net/all.js" ] []
+  , R.script  [ RP.defer "true", RP.src "/js/sc.js" ] []
+  , R.script  [ RP.defer "true", RP.src "/js/froogaloop.min.js" ] []
+  , R.script  [ RP.defer "true", RP.src "/js/video.js" ] []
+  , R.script  [ RP.defer "true", RP.src "/js/videojs-contrib-hls.min.js" ] []
+  , R.script  [ RP.defer "true"
+              , RP.src "https://player.twitch.tv/js/embed/v1.js" ] []
+  , R.script  [ RP._type "text/javascript"
+              , RP.dangerouslySetInnerHTML { __html: scriptBody }
+              ] []
   ]
 
   where
@@ -92,19 +86,24 @@ scripts state =
 motd :: ReactElement
 motd =
   R.div [ RP._id "motdrow", RP.className "row" ]
-    [ R.div [ RP.className "col-lg-12 col-md-12" ]
-        [ R.div [ RP._id "motdwrap", RP.className "well" ]
-            [ R.button
-                [ RP._id "togglemotd"
-                , RP.className "close pull-right"
-                , RP._type "button"
+        [ R.div [ RP.className "col-lg-12 col-md-12" ]
+                [ R.div [ RP._id "motdwrap", RP.className "well" ]
+                        [ toggleButton
+                        , R.div [ RP._id "motd" ] []
+                        , R.div [ RP.className "clear" ] []
+                        ]
                 ]
-                [ R.span [ RP.className "glyphicon glyphicon-minus" ] [] ]
-            , R.div [ RP._id "motd" ] []
-            , R.div [ RP.className "clear" ] []
-            ]
         ]
-    ]
+
+  where
+
+  toggleButton :: ReactElement
+  toggleButton =
+    R.button  [ RP._id "togglemotd"
+              , RP.className "close pull-right"
+              , RP._type "button"
+              ]
+              [ R.span [ RP.className "glyphicon glyphicon-minus" ] [] ]
 
 
 announcements :: ReactElement
@@ -115,51 +114,52 @@ announcements =
 drinkBar :: ReactElement
 drinkBar =
   R.div [ RP._id "drinkbarwrap", RP.className "row" ]
-    [ R.div [ RP._id "drinkbar", RP.className "col-lg-12 col-md-12" ]
-        [ R.h1 [ RP._id "drinkcount" ] [] ]
-    ]
+        [ R.div [ RP._id "drinkbar", RP.className "col-lg-12 col-md-12" ]
+                [ R.h1 [ RP._id "drinkcount" ] [] ]
+        ]
 
 
 main :: ReactElement
 main =
   R.div [ RP._id "main", RP.className "row" ]
-    [ chat
-    , video
-    ]
+        [ chat
+        , video
+        ]
 
   where
 
   chat :: ReactElement
   chat =
     R.div [ RP._id "chatwrap", RP.className "col-lg-5 col-md-5" ]
-      [ R.div [ RP._id "chatheader" ]
-          [ R.i
-              [ RP._id "userlisttoggle"
-              , RP.className "glyphicon glyphicon-chevron-down pull-left pointer"
-              , RP.title "Show/Hide Userlist"
-              ] []
-          , R.span [ RP._id "usercount", RP.className "pointer" ]
-              [ R.text "Not Connected" ]
-          , R.span
-              [ RP._id "modflair"
-              , RP.className "label label-default pull-right pointer"
-              ]
-              [ R.text "Name Color" ]
+          [ chatHeader
+          , R.div [ RP._id "userlist"] []
+          , R.div [ RP._id "messagebuffer", RP.className "linewrap" ] []
+          , I.text' [ RP._id "chatline", RP.className "form-control"
+                    , RP.maxLength "240", RP.style { "display": "none" }
+                    ]
+          , R.div [ RP._id "guestlogin", RP.className "input-group" ]
+                  [ R.span  [ RP.className "input-group-addon" ]
+                            [ R.text "Guest login" ]
+                  , I.text' [ RP._id "guestname", RP.className "form-control"
+                            , RP.placeholder "Name"
+                            ]
+                  ]
           ]
-      , R.div [ RP._id "userlist"] []
-      , R.div [ RP._id "messagebuffer", RP.className "linewrap" ] []
-      , R.input
-          [ RP._id "chatline", RP.className "form-control"
-          , RP._type "text", RP.maxLength "240", RP.style {"display": "none"}
-          ] []
-      , R.div [ RP._id "guestlogin", RP.className "input-group" ]
-          [ R.span [ RP.className "input-group-addon" ] [ R.text "Guest login" ]
-          , R.input
-              [ RP._id "guestname", RP.className "form-control"
-              , RP._type "text", RP.placeholder "Name"
-              ] []
+
+  chatHeader :: ReactElement
+  chatHeader =
+    R.div [ RP._id "chatheader" ]
+          [ R.i [ RP._id "userlisttoggle"
+                , RP.className "glyphicon glyphicon-chevron-down pull-left pointer"
+                , RP.title "Show/Hide Userlist"
+                ] []
+          , R.span  [ RP._id "usercount", RP.className "pointer" ]
+                    [ R.text "Not Connected" ]
+          , R.span  [ RP._id "modflair"
+                    , RP.className "label label-default pull-right pointer"
+                    ]
+                    [ R.text "Name Color" ]
           ]
-      ]
 
   video :: ReactElement
   video =
@@ -363,14 +363,18 @@ playlist =
               [ RP._id "customembed-title", RP.className "form-control"
               , RP._type "text", RP.placeholder "Title (optional)"
               ] []
-          , R.span [ RP.className "input-group-btn" ]
-              [ R.button [ RP._id "ce_queue_next", RP.className "btn btn-default" ]
-                  [ R.text "Next" ]
-              ]
-          , R.span [ RP.className "input-group-btn" ]
-              [ R.button [ RP._id "ce_queue_end", RP.className "btn btn-default" ]
-                  [ R.text "At End" ]
-              ]
+          , R.span  [ RP.className "input-group-btn" ]
+                    [ R.button  [ RP._id "ce_queue_next"
+                                , RP.className "btn btn-default"
+                                ]
+                                [ R.text "Next" ]
+                    ]
+          , R.span  [ RP.className "input-group-btn" ]
+                    [ R.button  [ RP._id "ce_queue_end"
+                                , RP.className "btn btn-default"
+                                ]
+                                [ R.text "At End" ]
+                    ]
           ]
       , R.div [ RP.className "checkbox" ]
           [ R.label'
@@ -385,11 +389,10 @@ playlist =
       , R.code' [ R.text "<object>" ]
       , R.text " tags.  "
       , R.strong' [ R.text "CUSTOM EMBEDS CANNOT BE SYNCHRONIZED." ]
-      , R.textarea
-          [ RP._id "customembed-content"
-          , RP.className "input-block-level form-control"
-          , RP.rows "3"
-          ] []
+      , R.textarea  [ RP._id "customembed-content"
+                    , RP.className "input-block-level form-control"
+                    , RP.rows "3"
+                    ] []
       ]
 
   playlistManager :: ReactElement
@@ -400,49 +403,49 @@ playlist =
       ]
       [ R.div [ RP.className "vertical-spacer" ] []
       , R.div [ RP.className "input-group" ]
-          [ R.input
-              [ RP._id "userpl_name", RP.className "form-control"
-              , RP._type "text", RP.placeholder "Playlist Name"
-              ] []
-          , R.span [ RP.className "input-group-btn" ]
-              [ R.button [ RP._id "userpl_save", RP.className "btn btn-default" ]
-                  [ R.text "Save" ]
+              [ I.text' [ RP._id "userpl_name", RP.className "form-control"
+                        , RP.placeholder "Playlist Name" ]
+              , R.span  [ RP.className "input-group-btn" ]
+                        [ R.button  [ RP._id "userpl_save"
+                                    , RP.className "btn btn-default"
+                                    ]
+                                    [ R.text "Save" ]
+                        ]
               ]
-          ]
       , R.div [ RP.className "checkbox" ]
-          [ R.label'
-              [ R.input [ RP.className "add-temp", RP._type "checkbox" ] []
-              , R.text "Add as temporary"
+              [ R.label'
+                  [ R.input [ RP.className "add-temp", RP._type "checkbox" ] []
+                  , R.text "Add as temporary"
+                  ]
               ]
-          ]
       , R.ul [ RP._id "userpl_list", RP.className "videolist" ] []
       ]
+
 
   queueFail :: ReactElement
   queueFail =
     R.div [ RP._id "queuefail", RP.className "col-lg-12 col-md-12" ]
-      [ R.div [ RP.className "" ] [] ]
+          [ R.div [ RP.className "" ] [] ]
 
 
   videoList :: ReactElement
   videoList =
     R.div [ RP.className "col-lg-12 col-md-12" ]
-      [ R.ul [ RP._id "queue", RP.className "videolist" ] []
-      , R.div [ RP._id "plmeta" ]
-          [ R.span [ RP._id "plcount" ] [ R.text "0 items" ]
-          , R.span [ RP._id "pllength" ] [ R.text "00:00:00" ]
+          [ R.ul [ RP._id "queue", RP.className "videolist" ] []
+          , R.div [ RP._id "plmeta" ]
+                  [ R.span [ RP._id "plcount" ] [ R.text "0 items" ]
+                  , R.span [ RP._id "pllength" ] [ R.text "00:00:00" ]
+                  ]
           ]
-      ]
 
 
 resize :: ReactElement
 resize =
   R.div [ RP._id "resizewrap", RP.className "row" ]
-    [ R.div [ RP.className "col-lg-5 col-md-5" ] []
-    , R.div [ RP._id "videowidth", RP.className "col-lg-7 col-md-7" ] []
-    ]
+        [ R.div [ RP.className "col-lg-5 col-md-5" ] []
+        , R.div [ RP._id "videowidth", RP.className "col-lg-7 col-md-7" ] []
+        ]
 
 
 siteFooter :: ReactElement
-siteFooter =
-  R.div [ RP._id "sitefooter" ] []
+siteFooter = R.div [ RP._id "sitefooter" ] []

@@ -98,9 +98,6 @@ mainpageSection (SyncPage.Login pageState) =
 mainpageSection (SyncPage.Logout pageState) =
   Logout.mainpageSection pageState
 
--- mainpageSection (SyncPage.PrivacyPolicy pageState) =
---   PrivacyPolicy.mainpageSection pageState
-
 mainpageSection (SyncPage.Register pageState) =
   Register.mainpageSection pageState
 

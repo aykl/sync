@@ -35,7 +35,6 @@ data Page
   | HttpError PageHttpError.State
   | Login PageLogin.State
   | Logout PageLogout.State
-  | PrivacyPolicy
   | Register PageRegister.State
   | Tos PageTos.State
 
@@ -56,6 +55,5 @@ defaultLinksUrl = case _ of
   HttpError _ -> "CURRENT_PAGE"
   Login _ -> "/login"
   Logout _ -> "/logout"
-  PrivacyPolicy -> "/policies/privacy"
   Register _ -> "/register"
   Tos _ -> "/useragreement"
