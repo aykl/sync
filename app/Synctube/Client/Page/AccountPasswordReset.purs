@@ -26,15 +26,18 @@ data Reset
 mainpageSection :: State -> ReactElement
 mainpageSection state =
   R.section [ RP._id "mainpage" ]
-    [ R.div [ RP.className "container" ]
-        [ R.div
-            [ RP.className "col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3" ]
-            [ R.h3' [ R.text "Reset Password" ]
-            , resetStatus state.reset
-            , passwordResetForm state.csrfToken
+            [ R.div [ RP.className "container" ]
+                    [ passwordResetPanel state ]
             ]
+
+
+passwordResetPanel :: State -> ReactElement
+passwordResetPanel state =
+  R.div [ RP.className "col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3" ]
+        [ R.h3' [ R.text "Reset Password" ]
+        , resetStatus state.reset
+        , passwordResetForm state.csrfToken
         ]
-    ]
 
 
 resetStatus :: Reset -> ReactElement

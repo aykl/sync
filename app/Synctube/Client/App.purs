@@ -3,7 +3,6 @@ module Synctube.Client.App where
 import Prelude
 
 import Synctube.Client.Page as SyncPage
-import Synctube.Client.Nav as Nav
 import Synctube.Client.Page.Index as Index
 import Synctube.Client.Page.AccountChannels as AccountChannels
 import Synctube.Client.Page.AccountEdit as AccountEdit
@@ -20,6 +19,8 @@ import Synctube.Client.Page.Login as Login
 import Synctube.Client.Page.Logout as Logout
 import Synctube.Client.Page.Register as Register
 import Synctube.Client.Page.Tos as Tos
+
+import Synctube.Client.Component.Nav as Nav
 import Synctube.Client.Component.Footer as Footer
 
 import React (ReactElement)
@@ -103,9 +104,6 @@ mainpageSection (SyncPage.Register pageState) =
 
 mainpageSection (SyncPage.Tos pageState) =
   Tos.mainpageSection pageState
-
-mainpageSection _ =
-  R.div [] [ R.text "Not implemented" ]
 
 
 otherSections :: SyncPage.Page -> Array ReactElement

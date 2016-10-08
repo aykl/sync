@@ -18,37 +18,43 @@ type State =
 mainpageSection :: State -> ReactElement
 mainpageSection state =
   R.section [ RP._id "mainpage", RP.className "container" ]
-    [ content state ]
+            [ content state ]
+
 
 content :: State -> ReactElement
 content state =
   R.div [ RP.className "col-md-12" ]
-    [ R.div [ RP.className "alert alert-danger" ]
-        [ R.h1 [] [ R.text "Invalid Session" ]
-        , R.p []
-            [ R.text "Your browser attempted to submit form data to "
-            , R.code [] [ R.text state.path ]
-            , R.text " with an invalid authentication token.  This may be because:"
-            , R.ul []
-                [ R.li []
-                    [ R.text "Your session has expired" ]
-                , R.li []
-                    [ R.text "Your request was missing the authentication token" ]
-                , R.li []
-                    [ R.text
-                        "A malicious user has attempted to tamper with your session"
-                    ]
-                , R.li []
-                    [ R.text $
-                        "Your browser does not support cookies, \
-                        \or they are not enabled"
-                    ]
+        [ R.div [ RP.className "alert alert-danger" ]
+                [ R.h1' [ R.text "Invalid Session" ]
+                , errorPanel state
+                , refererLink state.referer
                 ]
-            , R.text "If the problem persists, please contact an administrator."
-            ]
-        , refererLink state.referer
         ]
-    ]
+
+
+errorPanel :: State -> ReactElement
+errorPanel state =
+  R.p'
+      [ R.text "Your browser attempted to submit form data to "
+      , R.code' [ R.text state.path ]
+      , R.text " with an invalid authentication token.  This may be because:"
+      , R.ul'
+          [ R.li'
+              [ R.text "Your session has expired" ]
+          , R.li'
+              [ R.text "Your request was missing the authentication token" ]
+          , R.li'
+              [ R.text
+                  "A malicious user has attempted to tamper with your session"
+              ]
+          , R.li'
+              [ R.text $
+                  "Your browser does not support cookies, \
+                  \or they are not enabled"
+              ]
+          ]
+      , R.text "If the problem persists, please contact an administrator."
+      ]
 
 
 refererLink :: Maybe String -> ReactElement

@@ -24,28 +24,32 @@ type Contact =
 mainpageSection :: State -> ReactElement
 mainpageSection state =
   R.section [ RP._id "mainpage" ]
-    [ R.div [ RP.className "container" ]
-        [ R.div [ RP.className "col-md-8 col-md-offset-2" ] $
-            [ R.h1' [ R.text "Contact" ]
-            , R.h3' [ R.text "Email" ]
-            ] <> contacts state.contacts <>
-            [ R.h3' [ R.text "IRC" ]
-            , R.p'
-                [ R.text
-                    """The developer and other knowledgeable people are usually
-                    available on IRC for quick questions or comments.
-                    Official support can be provided for cytu.be
-                    and synchtube.6irc.net at """
-                , R.a [ RP.href "http://webchat.6irc.net/?channels=cytube" ]
-                    [ R.text "irc.6irc.net#cytube" ]
-                , R.text
-                    """.  These people can also address general questions
-                    about the software, but cannot provide technical support
-                    for third-party websites using this code."""
-                ]
+            [ R.div [ RP.className "container" ]
+                    [ contactPanel state ]
+            ]
+
+
+contactPanel :: State -> ReactElement
+contactPanel state =
+  R.div [ RP.className "col-md-8 col-md-offset-2" ] $
+        [ R.h1' [ R.text "Contact" ]
+        , R.h3' [ R.text "Email" ]
+        ] <> contacts state.contacts <>
+        [ R.h3' [ R.text "IRC" ]
+        , R.p'
+            [ R.text
+                """The developer and other knowledgeable people are usually
+                available on IRC for quick questions or comments.
+                Official support can be provided for cytu.be
+                and synchtube.6irc.net at """
+            , R.a [ RP.href "http://webchat.6irc.net/?channels=cytube" ]
+                [ R.text "irc.6irc.net#cytube" ]
+            , R.text
+                """.  These people can also address general questions
+                about the software, but cannot provide technical support
+                for third-party websites using this code."""
             ]
         ]
-    ]
 
 
 scripts :: Array ReactElement
