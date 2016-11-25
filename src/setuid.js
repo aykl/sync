@@ -1,3 +1,5 @@
+// @flow
+
 import Config from './config';
 import fs from 'fs';
 import path from 'path';
@@ -9,7 +11,7 @@ var needPermissionsFixed = [
     path.join(__dirname, "..", "google-drive-subtitles")
 ];
 
-function fixPermissions(user, group) {
+function fixPermissions(user: any, group: any): void {
     var uid = resolveUid(user);
     var gid = resolveGid(group);
     needPermissionsFixed.forEach(function (dir) {
@@ -30,13 +32,21 @@ function resolveGid(group) {
 if (Config.get("setuid.enabled")) {
     setTimeout(function() {
         try {
+            // $FlowIgnore
+            let uid : string = process.getuid();
+            // $FlowIgnore
+            let gid : string = process.getgid();
             fixPermissions(Config.get("setuid.user"), Config.get("setuid.group"));
-            console.log("Old User ID: " + process.getuid() + ", Old Group ID: " +
-                    process.getgid());
-            process.setgid(Config.get("setuid.group"));
-            process.setuid(Config.get("setuid.user"));
-            console.log("New User ID: " + process.getuid() + ", New Group ID: "
-                    + process.getgid());
+            console.log(`Old User ID: ${uid}, Old Group ID: ${gid}`);
+
+            gid = Config.get("setuid.group");
+            // $FlowIgnore
+            process.setgid(gid);
+            uid = Config.get("setuid.user");
+            // $FlowIgnore
+            process.setuid(uid);
+            
+            console.log(`New User ID: ${uid}, New Group ID: ${gid}`);
         } catch (err) {
             console.log("Error setting uid: " + err.stack);
             process.exit(1);

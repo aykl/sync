@@ -1,35 +1,35 @@
-// @flow weak
+// @flow
 
-function ChannelModule(channel) {
-    this.channel = channel;
-}
+class ChannelModule {
+    channel: any;
 
-ChannelModule.prototype = {
+    constructor(channel: any) {
+      this.channel = channel;
+    }
+
     /**
      * Called when the channel is loading its data from a JSON object.
      */
-    load: function (data) {
-    },
+    load(data: any): void {
+    }
 
     /**
      * Called when the channel is saving its state to a JSON object.
      */
-    save: function (data) {
-    },
+    save(data: any): void {
+    }
 
     /**
      * Called when the channel is being unloaded
      */
-    unload: function () {
-
-    },
+    unload(): void {
+    }
 
     /**
      * Called to pack info, e.g. for channel detail view
      */
-    packInfo: function (data, isAdmin) {
-
-    },
+    packInfo(data: any, isAdmin: bool): void {
+    }
 
     /**
      * Called when a user is attempting to join a channel.
@@ -37,47 +37,46 @@ ChannelModule.prototype = {
      * data is the data sent by the client with the joinChannel
      * packet.
      */
-    onUserPreJoin: function (user, data, cb) {
+    onUserPreJoin(user: any, data: any, cb: any): void {
         cb(null, ChannelModule.PASSTHROUGH);
-    },
+    }
 
     /**
      * Called after a user has been accepted to the channel.
      */
-    onUserPostJoin: function (user) {
-    },
+    onUserPostJoin(user: any): void {
+    }
 
     /**
      * Called after a user has been disconnected from the channel.
      */
-    onUserPart: function (user) {
-    },
+    onUserPart(user: any): void {
+    }
 
     /**
      * Called when a chatMsg event is received
      */
-    onUserPreChat: function (user, data, cb) {
+    onUserPreChat(user: any, data: any, cb: any): void {
         cb(null, ChannelModule.PASSTHROUGH);
-    },
+    }
 
     /**
      * Called before a new video begins playing
      */
-    onPreMediaChange: function (data, cb) {
+    onPreMediaChange(data: any, cb: any): void {
         cb(null, ChannelModule.PASSTHROUGH);
-    },
+    }
 
     /**
      * Called when a new video begins playing
      */
-    onMediaChange: function (data) {
+    onMediaChange(data: any): void {
+    }
 
-    },
+    /* Channel module callback return codes */
+    static ERROR = -1;
+    static PASSTHROUGH = 0;
+    static DENY = 1;
 };
-
-/* Channel module callback return codes */
-ChannelModule.ERROR = -1;
-ChannelModule.PASSTHROUGH = 0;
-ChannelModule.DENY = 1;
 
 export default ChannelModule;

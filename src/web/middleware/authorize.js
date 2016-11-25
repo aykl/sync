@@ -1,8 +1,8 @@
-// @flow weak
+// @flow
 
 const STATIC_RESOURCE = /\..+$/;
 
-export default function initialize(app, session) {
+export default function initialize(app: any, session: any): void {
     app.use((req, res, next) => {
         if (STATIC_RESOURCE.test(req.path)) {
             return next();

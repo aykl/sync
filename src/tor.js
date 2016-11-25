@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import https from 'https';
 import path from 'path';
@@ -6,7 +6,7 @@ import fs from 'fs';
 import domain from 'domain';
 import Logger from './logger';
 
-function retrieveIPs(cb) {
+function retrieveIPs(cb: any): void {
     var options = {
         host: "www.dan.me.uk",
         port: 443,
@@ -59,6 +59,7 @@ function getTorIPs(cb) {
                 return;
             }
 
+            // $FlowIgnore
             data = (""+data).split("\n");
             cb(false, data);
         });
@@ -76,6 +77,7 @@ getTorIPs(function (err, ips) {
     _ipList = ips;
 });
 
-export function isTorExit(ip) {
+export function isTorExit(ip: any): bool {
+    // $FlowIgnore
     return _ipList.indexOf(ip) >= 0;
 };

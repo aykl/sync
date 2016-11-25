@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import { PartitionModule } from './partitionmodule';
 import { PartitionMap } from './partitionmap';

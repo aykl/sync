@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import { FileStore } from './filestore';
 import { DatabaseStore } from './dbstore';
@@ -11,7 +11,7 @@ export function init() {
     CHANNEL_STORE = loadChannelStore();
 }
 
-export function load(id, channelName) {
+export function load(id: any, channelName: any): Promise<any> {
     if (CHANNEL_STORE === null) {
         return Promise.reject(new Error('ChannelStore not initialized yet'));
     }
@@ -19,7 +19,7 @@ export function load(id, channelName) {
     return CHANNEL_STORE.load(id, channelName);
 }
 
-export function save(id, channelName, data) {
+export function save(id: any, channelName: any, data: any): Promise<any> {
     if (CHANNEL_STORE === null) {
         return Promise.reject(new Error('ChannelStore not initialized yet'));
     }

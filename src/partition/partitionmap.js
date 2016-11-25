@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import crypto from 'crypto';
 import fs from 'fs';
@@ -10,10 +10,14 @@ function sha256(input) {
     return hash.digest('base64');
 }
 
+type Partitions = { [key: string]: mixed };
+type Pool = string[];
+type Overrides = { [key: string]: string };
+
 class PartitionMap {
-    partitions: { [key: string]: mixed };
-    pool: Array<string>;
-    overrides: { [key: string]: string };
+    partitions: Partitions;
+    pool: Pool;
+    overrides: Overrides;
     _hash: any;
 
     /**
@@ -21,7 +25,7 @@ class PartitionMap {
      * @param {Array<string>} pool List of available nodes
      * @param {Map<string, string>} overrides Overrides for node assignment
      */
-    constructor(partitions, pool, overrides) {
+    constructor(partitions: Partitions, pool: Pool, overrides: Overrides) {
         this.partitions = partitions;
         this.pool = pool;
         this.overrides = overrides || {};

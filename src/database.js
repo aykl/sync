@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import mysql from 'mysql';
 import bcrypt from 'bcrypt';
@@ -52,7 +52,7 @@ function init() {
 /**
  * Execute a database query
  */
-function runQuery(query, sub, callback) {
+function runQuery(query: string, sub: any, callback: any): void {
     const timer = Metrics.startTimer('db:queryTime');
     // 2nd argument is optional
     if (typeof sub === "function") {
@@ -64,6 +64,7 @@ function runQuery(query, sub, callback) {
         callback = blackHole;
     }
 
+    //  $FlowIgnore
     pool.getConnection(function (err, conn) {
         if (err) {
             Logger.errlog.log("! DB connection failed: " + err);
@@ -109,7 +110,7 @@ function blackHole() {
 /**
  * Check if an IP address is globally banned
  */
-function isGlobalIPBanned(ip, callback) {
+function isGlobalIPBanned(ip: any, callback: any): bool {
     var range = util.getIPRange(ip);
     var wrange = util.getWideIPRange(ip);
     var banned = ip in global_ipbans ||
@@ -126,7 +127,7 @@ function isGlobalIPBanned(ip, callback) {
  * Retrieve all global bans from the database.
  * Cache locally in global_bans
  */
-function listGlobalBans(callback) {
+function listGlobalBans(callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -149,7 +150,7 @@ function listGlobalBans(callback) {
 /**
  * Globally ban by IP
  */
-function globalBanIP(ip, reason, callback) {
+function globalBanIP(ip: any, reason: any, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -170,7 +171,7 @@ function globalBanIP(ip, reason, callback) {
 /**
  * Remove a global IP ban
  */
-function globalUnbanIP(ip, callback) {
+function globalUnbanIP(ip: any, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -195,7 +196,7 @@ function globalUnbanIP(ip, callback) {
 /**
  * Deletes recovery rows older than the given time
  */
-function cleanOldPasswordResets(callback) {
+function cleanOldPasswordResets(callback: any): void {
     if (typeof callback === "undefined") {
         callback = blackHole;
     }
@@ -204,7 +205,7 @@ function cleanOldPasswordResets(callback) {
     runQuery(query, [Date.now() - 24*60*60*1000], callback);
 };
 
-function addPasswordReset(data, cb) {
+function addPasswordReset(data: any, cb: any): void {
     if (typeof cb !== "function") {
         cb = blackHole;
     }
@@ -225,7 +226,7 @@ function addPasswordReset(data, cb) {
                          [ip, name, email, hash, expire, ip, hash, email, expire], cb);
 };
 
-function lookupPasswordReset(hash, cb) {
+function lookupPasswordReset(hash: any, cb: any): void {
     if (typeof cb !== "function") {
         return;
     }
@@ -242,7 +243,7 @@ function lookupPasswordReset(hash, cb) {
     });
 };
 
-function deletePasswordReset(hash) {
+function deletePasswordReset(hash: any): void {
     runQuery("DELETE FROM `password_reset` WHERE hash=?", [hash]);
 };
 
@@ -359,7 +360,7 @@ function resetUserPassword(name, callback) {
 /**
  * Retrieve all of a user's playlists
  */
-function listUserPlaylists(name, callback) {
+function listUserPlaylists(name: string, callback: any): void {
     if (typeof callback !== "function") {
         return;
     }
@@ -371,7 +372,7 @@ function listUserPlaylists(name, callback) {
 /**
  * Retrieve a user playlist by (user, name) pair
  */
-function getUserPlaylist(username, plname, callback) {
+function getUserPlaylist(username: string, plname: string, callback: any): void {
     if (typeof callback !== "function") {
         return;
     }
@@ -405,7 +406,7 @@ function getUserPlaylist(username, plname, callback) {
  * Saves a user playlist.  Overwrites if the playlist keyed by
  * (user, name) already exists
  */
-function saveUserPlaylist(pl, username, plname, callback) {
+function saveUserPlaylist(pl: any, username: string, plname: string, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -442,7 +443,7 @@ function saveUserPlaylist(pl, username, plname, callback) {
 /**
  * Deletes a user playlist
  */
-function deleteUserPlaylist(username, plname, callback) {
+function deleteUserPlaylist(username: string, plname: string, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -456,7 +457,7 @@ function deleteUserPlaylist(username, plname, callback) {
 /**
  * Records a user or guest login in the aliases table
  */
-function recordVisit(ip, name, callback) {
+function recordVisit(ip: any, name: string, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -471,7 +472,7 @@ function recordVisit(ip, name, callback) {
 /**
  * Deletes alias rows older than the given time
  */
-function cleanOldAliases(expiration, callback) {
+function cleanOldAliases(expiration: any, callback: any): void {
     if (typeof callback === "undefined") {
         callback = blackHole;
     }
@@ -483,7 +484,7 @@ function cleanOldAliases(expiration, callback) {
 /**
  * Retrieves a list of aliases for an IP address
  */
-function getAliases(ip, callback) {
+function getAliases(ip: any, callback: any): void {
     if (typeof callback !== "function") {
         return;
     }
@@ -516,7 +517,7 @@ function getAliases(ip, callback) {
 /**
  * Retrieves a list of IPs that a name as logged in from
  */
-function getIPs(name, callback) {
+function getIPs(name: string, callback: any): void {
     if (typeof callback !== "function") {
         return;
     }
@@ -535,7 +536,7 @@ function getIPs(name, callback) {
 
 /* REGION stats */
 
-function addStatPoint(time, ucount, ccount, mem, callback) {
+function addStatPoint(time: any, ucount: any, ccount: any, mem: any, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -544,7 +545,7 @@ function addStatPoint(time, ucount, ccount, mem, callback) {
     runQuery(query, [time, ucount, ccount, mem], callback);
 };
 
-function pruneStats(before, callback) {
+function pruneStats(before: any, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -553,7 +554,7 @@ function pruneStats(before, callback) {
     runQuery(query, [before], callback);
 };
 
-function listStats(callback) {
+function listStats(callback: any): void {
     if (typeof callback !== "function") {
         return;
     }
@@ -599,7 +600,7 @@ function loadAnnouncement() {
     });
 };
 
-function setAnnouncement(data) {
+function setAnnouncement(data: any): void {
     var query = "INSERT INTO `meta` (`key`, `value`) VALUES ('announcement', ?) " +
                 "ON DUPLICATE KEY UPDATE `value`=?";
     var repl = JSON.stringify(data);

@@ -10,6 +10,7 @@ import LegacyConfig from '../config';
 import path from 'path';
 import { AnnouncementRefresher } from './announcementrefresher';
 import { RedisPartitionMapReloader } from './redispartitionmapreloader';
+import Server from '../server';
 
 const PARTITION_CONFIG_PATH = path.resolve(__dirname, '..', '..', 'conf',
                                            'partitions.toml');
@@ -76,7 +77,7 @@ class PartitionModule {
             reloader.on('partitionMapChange', newMap => {
                 this.partitionDecider.setPartitionMap(newMap);
                 if (!this.cliMode) {
-                    require('../server').getServer().handlePartitionMapChange();
+                    Server.getServer().handlePartitionMapChange();
                 }
             });
         }

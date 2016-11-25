@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import Server from 'cytube-common/lib/proxy/server';
 import ProxyInterceptor from './proxyinterceptor';
@@ -18,7 +18,7 @@ export default class IOBackend {
     proxyListener: any;
     poolEntryUpdater: any;
 
-    constructor(proxyListenerConfig, socketEmitter, poolRedisClient) {
+    constructor(proxyListenerConfig: any, socketEmitter: any, poolRedisClient: any) {
         this.proxyListenerConfig = proxyListenerConfig;
         this.socketEmitter = socketEmitter;
         this.poolRedisClient = poolRedisClient;

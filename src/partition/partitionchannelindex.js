@@ -5,6 +5,7 @@ import uuid from 'uuid';
 import { runLuaScript } from 'cytube-common/lib/redis/lualoader';
 import path from 'path';
 import Logger from '../logger';
+import Server from '../server';
 
 var SERVER = null;
 const CHANNEL_INDEX = 'publicChannelList';
@@ -17,8 +18,8 @@ class PartitionChannelIndex {
     uid: any;
     cachedList: any;
     redisClient: any;
-    
-    constructor(redisClient) {
+
+    constructor(redisClient: any) {
         this.redisClient = redisClient;
         this.uid = uuid.v4();
         this.cachedList = [];
@@ -27,13 +28,13 @@ class PartitionChannelIndex {
         });
 
         process.nextTick(() => {
-            SERVER = require('../server').getServer();
+            SERVER = Server.getServer();
             this.refreshCache();
             setInterval(this.refreshCache.bind(this), CACHE_REFRESH_INTERVAL);
         });
     }
 
-    refreshCache() {
+    refreshCache(): void {
         this.publishLocalChannels();
         runLuaScript(this.redisClient, READ_CHANNEL_LIST, [
             0,
@@ -45,7 +46,7 @@ class PartitionChannelIndex {
         });
     }
 
-    publishLocalChannels() {
+    publishLocalChannels(): void {
         const channels = SERVER.packChannelList(true).map(channel => {
             return {
                 name: channel.name,

@@ -39,7 +39,7 @@ function queryAsync(query, substitutions) {
     });
 }
 
-function fixOldChandump(data) {
+function fixOldChandump(data: { [key: string]: any }) {
     const converted = {};
     EXPECTED_KEYS.forEach(key => {
         converted[key] = data[key];

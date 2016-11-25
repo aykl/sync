@@ -5,6 +5,31 @@ import * as ChannelStore from './channel-storage/channelstore';
 import events from 'events';
 const EventEmitter = events.EventEmitter;
 
+
+import path from 'path';
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
+import express from 'express';
+import Logger from './logger';
+import Channel from './channel/channel';
+import User from './user';
+import $util from './utilities';
+import db from './database';
+import Flags from './flags';
+import sio from 'socket.io';
+import LocalChannelIndex from './web/localchannelindex';
+import { PartitionChannelIndex } from './partition/partitionchannelindex';
+import IOConfiguration from './configuration/ioconfig';
+import WebConfiguration from './configuration/webconfig';
+import NullClusterClient from './io/cluster/nullclusterclient';
+import session from './session';
+import { LegacyModule } from './legacymodule';
+import { PartitionModule } from './partition/partitionmodule';
+import * as Switches from './switches';
+import Database from './database';
+
+
 var singleton = null;
 
 export default {
@@ -33,28 +58,6 @@ export default {
     }
 };
 
-var path = require("path");
-var fs = require("fs");
-var http = require("http");
-var https = require("https");
-var express = require("express");
-var Logger = require("./logger");
-var Channel = require("./channel/channel");
-var User = require("./user");
-var $util = require("./utilities");
-var db = require("./database");
-var Flags = require("./flags");
-var sio = require("socket.io");
-import LocalChannelIndex from './web/localchannelindex';
-import { PartitionChannelIndex } from './partition/partitionchannelindex';
-import IOConfiguration from './configuration/ioconfig';
-import WebConfiguration from './configuration/webconfig';
-import NullClusterClient from './io/cluster/nullclusterclient';
-import session from './session';
-import { LegacyModule } from './legacymodule';
-import { PartitionModule } from './partition/partitionmodule';
-import * as Switches from './switches';
-
 var Server = function () {
     var self = this;
     self.channels = [],
@@ -81,7 +84,6 @@ var Server = function () {
     }
 
     // database init ------------------------------------------------------
-    var Database = require("./database");
     self.db = Database;
     self.db.init();
     ChannelStore.init();

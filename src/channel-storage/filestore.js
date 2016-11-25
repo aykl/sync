@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import * as Promise from 'bluebird';
 import { stat } from 'fs';
@@ -14,11 +14,11 @@ const SIZE_LIMIT = 1048576;
 const CHANDUMP_DIR = path.resolve(__dirname, '..', '..', 'chandump');
 
 export class FileStore {
-    filenameForChannel(channelName) {
+    filenameForChannel(channelName: string): string {
         return path.join(CHANDUMP_DIR, channelName);
     }
 
-    load(id, channelName) {
+    load(id: any, channelName: string): Promise<any> {
         const filename = this.filenameForChannel(channelName);
         return statAsync(filename).then(stats => {
             if (stats.size > SIZE_LIMIT) {
@@ -38,7 +38,7 @@ export class FileStore {
         });
     }
 
-    save(id, channelName, data) {
+    save(id: any, channelName: string, data: any): void {
         const filename = this.filenameForChannel(channelName);
         const fileContents = new Buffer(JSON.stringify(data), 'utf8');
         if (fileContents.length > SIZE_LIMIT) {

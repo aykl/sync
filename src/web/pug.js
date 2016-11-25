@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import pug from 'pug';
 import fs from 'fs';
@@ -10,7 +10,7 @@ var cache = {};
 /**
  * Merges locals with globals for pug rendering
  */
-function merge(locals, res) {
+function merge(locals: any, res: any): any {
     var _locals = {
         siteTitle: Config.get("html-template.title"),
         siteDescription: Config.get("html-template.description"),
@@ -37,7 +37,7 @@ function getBaseUrl(res) {
 /**
  * Renders and serves a pug template
  */
-export function sendPug(res, view, locals) {
+export function sendPug(res: any, view: any, locals: any): void {
     if (!locals) {
         locals = {};
     }

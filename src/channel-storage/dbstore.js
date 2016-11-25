@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import Promise from 'bluebird';
 import { ChannelStateSizeError,
@@ -10,7 +10,7 @@ const SIZE_LIMIT = 1048576;
 const QUERY_CHANNEL_ID_FOR_NAME = 'SELECT id FROM channels WHERE name = ?';
 const QUERY_CHANNEL_DATA = 'SELECT `key`, `value` FROM channel_data WHERE channel_id = ?';
 
-function queryAsync(query, substitutions) {
+function queryAsync(query: any, substitutions: any): Promise<any> {
     return new Promise((resolve, reject) => {
         db.query(query, substitutions, (err, res) => {
             if (err) {
@@ -36,7 +36,7 @@ function buildUpdateQuery(numEntries: number) : string {
 }
 
 export class DatabaseStore {
-    load(id, channelName) {
+    load(id: any, channelName: any): void {
         if (!id || id === 0) {
             return Promise.reject(new Error(`Cannot load state for [${channelName}]: ` +
                                             `id was passed as [${id}]`));
@@ -57,7 +57,7 @@ export class DatabaseStore {
         });
     }
 
-    save(id, channelName, data) {
+    save(id: any, channelName: string, data: any): void {
         if (!id || id === 0) {
             return Promise.reject(new Error(`Cannot save state for [${channelName}]: ` +
                                             `id was passed as [${id}]`));

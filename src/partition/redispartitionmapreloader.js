@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import { PartitionMap } from './partitionmap';
 import logger from 'cytube-common/lib/logger';
@@ -11,7 +11,7 @@ class RedisPartitionMapReloader extends EventEmitter {
     subClient: any;
     partitionMap: any;
 
-    constructor(config, redisClient, subClient) {
+    constructor(config: any, redisClient: any, subClient: any) {
         super();
         this.config = config;
         this.redisClient = redisClient;
@@ -21,7 +21,7 @@ class RedisPartitionMapReloader extends EventEmitter {
         subClient.once('ready', () => this.subscribe());
     }
 
-    subscribe() {
+    subscribe(): void {
         this.subClient.subscribe(this.config.getPublishChannel());
         this.subClient.on('message', (channel, message) => {
             if (channel !== this.config.getPublishChannel()) {
@@ -35,7 +35,7 @@ class RedisPartitionMapReloader extends EventEmitter {
         });
     }
 
-    reload() {
+    reload(): void {
         this.redisClient.getAsync(this.config.getPartitionMapKey()).then(result => {
             var newMap = null;
             try {
@@ -56,7 +56,7 @@ class RedisPartitionMapReloader extends EventEmitter {
         });
     }
 
-    getPartitionMap() {
+    getPartitionMap(): void {
         return this.partitionMap;
     }
 }

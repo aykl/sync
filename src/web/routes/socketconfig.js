@@ -1,11 +1,11 @@
-// @flow weak
+// @flow
 
 import Config from '../../config';
 import CyTubeUtil from '../../utilities';
 import Logger from '../../logger';
 import * as HTTPStatus from '../httpstatus';
 
-export default function initialize(app, clusterClient) {
+export default function initialize(app: any, clusterClient: any): void {
     app.get('/socketconfig/:channel.json', (req, res) => {
         if (!req.params.channel || !CyTubeUtil.isValidChannelName(req.params.channel)) {
             return res.status(HTTPStatus.NOT_FOUND).json({

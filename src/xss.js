@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import sanitizeHtml from 'sanitize-html';
 
@@ -72,7 +72,7 @@ const SETTINGS = {
     allowedAttributes: ATTRIBUTE_MAP
 };
 
-export function sanitizeText(str) {
+export function sanitizeText(str: string): string {
     str = str.replace(/&/g, "&amp;")
              .replace(/</g, "&lt;")
              .replace(/>/g, "&gt;")
@@ -83,7 +83,7 @@ export function sanitizeText(str) {
     return str;
 }
 
-export function decodeText(str) {
+export function decodeText(str: string): string {
     str = str.replace(/&#([0-9]{2,7});?/g, function (m, p1) {
         return String.fromCharCode(parseInt(p1));
     });
@@ -97,7 +97,7 @@ export function decodeText(str) {
     return str;
 }
 
-export function sanitizeHTML(html) {
+export function sanitizeHTML(html: string): string {
   return sanitizeHtml(html, SETTINGS);
 }
 

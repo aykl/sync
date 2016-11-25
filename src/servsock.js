@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 var fs = require('fs');
 var net = require('net');
@@ -13,7 +13,7 @@ export default class ServiceSocket {
         this.connections = {};
     }
 
-    init(handler, socket){
+    init(handler: any, socket: any): void {
         this.handler = handler;
         this.socket = socket;
 

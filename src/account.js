@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import db from './database';
 import Q from 'q';
@@ -17,7 +17,7 @@ class Account {
     lowername: any;
     profile: any;
 
-    constructor(ip, user, aliases) {
+    constructor(ip: any, user: any, aliases: any) {
         this.ip = ip;
         this.user = user;
         this.aliases = aliases;
@@ -27,7 +27,7 @@ class Account {
         this.update();
     }
 
-    update() {
+    update(): void {
         if (this.user !== null) {
             this.name = this.user.name;
             this.globalRank = this.user.global_rank;
@@ -44,7 +44,7 @@ class Account {
     }
 }
 
-function rankForName(name, opts, cb) {
+function rankForName(name: string, opts: any, cb: any): void {
     if (!cb) {
         cb = opts;
         opts = {};
@@ -69,7 +69,7 @@ function rankForName(name, opts, cb) {
     }).done();
 };
 
-function rankForIP(ip, opts, cb) {
+function rankForIP(ip: any, opts: any, cb: any): void {
     if (!cb) {
         cb = opts;
         opts = {};

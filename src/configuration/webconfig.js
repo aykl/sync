@@ -1,3 +1,5 @@
+// @flow
+
 import clone from 'clone';
 
 const DEFAULT_TRUSTED_PROXIES = Object.freeze([
@@ -8,23 +10,23 @@ const DEFAULT_TRUSTED_PROXIES = Object.freeze([
 export default class WebConfiguration {
     config: any;
 
-    constructor(config) {
+    constructor(config: any) {
         this.config = config;
     }
 
-    getEmailContacts() {
+    getEmailContacts(): any {
         return clone(this.config.contacts);
     }
 
-    getTrustedProxies() {
+    getTrustedProxies(): any {
         return DEFAULT_TRUSTED_PROXIES;
     }
 
-    getCookieSecret() {
+    getCookieSecret(): any {
         return this.config.authCookie.cookieSecret;
     }
 
-    getCookieDomain() {
+    getCookieDomain(): any {
         return this.config.authCookie.cookieDomain;
     }
 
@@ -32,26 +34,25 @@ export default class WebConfiguration {
         return this.config.gzip.enabled;
     }
 
-    getGzipThreshold() {
+    getGzipThreshold(): any {
         return this.config.gzip.threshold;
     }
 
-    getEnableMinification() {
+    getEnableMinification(): any {
         return this.config.enableMinification;
     }
 
-    getCacheTTL() {
+    getCacheTTL(): any {
         return this.config.cacheTTL;
     }
 
-    getMaxIndexEntries() {
+    getMaxIndexEntries(): any {
         return this.config.maxIndexEntries;
     }
 
-    static fromOldConfig(oldConfig) {
-        const config = {
-            contacts: []
-        };
+    static fromOldConfig(oldConfig: any): WebConfiguration {
+        const config = {};
+        config.contacts = [];
 
         oldConfig.get('contacts').forEach(contact => {
             config.contacts.push({

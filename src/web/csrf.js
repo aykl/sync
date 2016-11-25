@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 /*
  * Adapted from https://github.com/expressjs/csurf
  */
@@ -9,8 +9,8 @@ import csrf from 'csrf';
 
 var tokens = csrf();
 
-function init(domain) {
-    return function (req, res, next) {
+function init(domain: any) {
+    return function (req: any, res: any, next: any): void {
         var secret = req.signedCookies._csrf;
         if (!secret) {
             secret = tokens.secretSync();
@@ -36,7 +36,7 @@ function init(domain) {
     };
 };
 
-function verify(req) {
+function verify(req: any): void {
     var secret = req.signedCookies._csrf;
     var token = req.body._csrf || req.query._csrf;
 

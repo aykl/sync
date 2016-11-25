@@ -1,8 +1,8 @@
-// @flow weak
+// @flow
 
 import net from 'net';
 
-export default function initialize(app, webConfig) {
+export default function initialize(app: any, webConfig: any): void {
     function isTrustedProxy(ip) {
         return webConfig.getTrustedProxies().indexOf(ip) >= 0;
     }

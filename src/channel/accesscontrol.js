@@ -1,68 +1,68 @@
-// @flow weak
+// @flow
 
 import Account from '../account';
 import ChannelModule from './module';
 import Flags from '../flags';
 
-function AccessControlModule(channel) {
-    ChannelModule.apply(this, arguments);
-}
+class AccessControlModule extends ChannelModule {
 
-AccessControlModule.prototype = Object.create(ChannelModule.prototype);
-
-var pending = 0;
-AccessControlModule.prototype.onUserPreJoin = function (user, data, cb) {
-    var chan = this.channel,
-        opts = this.channel.modules.options;
-    var self = this;
-    if (user.socket.disconnected) {
-        return cb("User disconnected", ChannelModule.DENY);
+    constructor(channel: any) {
+      super(channel);
     }
 
-    if (opts.get("password") !== false && data.pw !== opts.get("password")) {
-        user.socket.on("disconnect", function () {
-            if (!user.is(Flags.U_IN_CHANNEL)) {
-                cb("User disconnected", ChannelModule.DENY);
-            }
-        });
+    onUserPreJoin(user: any, data: any, cb: any): void {
+        var chan = this.channel,
+            opts = this.channel.modules.options;
+        var self = this;
+        if (user.socket.disconnected) {
+            return cb("User disconnected", ChannelModule.DENY);
+        }
 
-        if (user.is(Flags.U_LOGGED_IN) && user.account.effectiveRank >= 2) {
-            cb(null, ChannelModule.PASSTHROUGH);
-            user.socket.emit("cancelNeedPassword");
-        } else {
-            user.socket.emit("needPassword", typeof data.pw !== "undefined");
-            /* Option 1: log in as a moderator */
-            user.waitFlag(Flags.U_HAS_CHANNEL_RANK, function () {
-                if (user.is(Flags.U_IN_CHANNEL)) {
-                    return;
-                }
-
-                if (user.account.effectiveRank >= 2) {
-                    cb(null, ChannelModule.PASSTHROUGH);
-                    user.socket.emit("cancelNeedPassword");
+        if (opts.get("password") !== false && data.pw !== opts.get("password")) {
+            user.socket.on("disconnect", function () {
+                if (!user.is(Flags.U_IN_CHANNEL)) {
+                    cb("User disconnected", ChannelModule.DENY);
                 }
             });
 
-            /* Option 2: Enter correct password */
-            var pwListener = function (pw) {
-                if (chan.dead || user.is(Flags.U_IN_CHANNEL)) {
-                    return;
-                }
-
-                if (pw !== opts.get("password")) {
-                    user.socket.emit("needPassword", true);
-                    return;
-                }
-
-                user.socket.emit("cancelNeedPassword");
+            if (user.is(Flags.U_LOGGED_IN) && user.account.effectiveRank >= 2) {
                 cb(null, ChannelModule.PASSTHROUGH);
-            };
+                user.socket.emit("cancelNeedPassword");
+            } else {
+                user.socket.emit("needPassword", typeof data.pw !== "undefined");
+                /* Option 1: log in as a moderator */
+                user.waitFlag(Flags.U_HAS_CHANNEL_RANK, function () {
+                    if (user.is(Flags.U_IN_CHANNEL)) {
+                        return;
+                    }
 
-            user.socket.on("channelPassword", pwListener);
+                    if (user.account.effectiveRank >= 2) {
+                        cb(null, ChannelModule.PASSTHROUGH);
+                        user.socket.emit("cancelNeedPassword");
+                    }
+                });
+
+                /* Option 2: Enter correct password */
+                var pwListener = function (pw) {
+                    if (chan.dead || user.is(Flags.U_IN_CHANNEL)) {
+                        return;
+                    }
+
+                    if (pw !== opts.get("password")) {
+                        user.socket.emit("needPassword", true);
+                        return;
+                    }
+
+                    user.socket.emit("cancelNeedPassword");
+                    cb(null, ChannelModule.PASSTHROUGH);
+                };
+
+                user.socket.on("channelPassword", pwListener);
+            }
+        } else {
+            cb(null, ChannelModule.PASSTHROUGH);
         }
-    } else {
-        cb(null, ChannelModule.PASSTHROUGH);
     }
-};
+}
 
 export default AccessControlModule;

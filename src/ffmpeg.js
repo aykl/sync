@@ -38,7 +38,7 @@ function initFFLog() {
     fflog.initialized = true;
 }
 
-function fixRedirectIfNeeded(urldata, redirect) {
+function fixRedirectIfNeeded(urldata: any, redirect: string): string {
     if (!/^https?:/.test(redirect)) {
         redirect = urldata.protocol + "//" + urldata.host + redirect;
     }
@@ -46,7 +46,7 @@ function fixRedirectIfNeeded(urldata, redirect) {
     return redirect;
 }
 
-function translateStatusCode(statusCode) {
+function translateStatusCode(statusCode: number): string {
     switch (statusCode) {
         case 400:
             return "The request for the audio/video link was rejected as invalid.  " +
@@ -70,7 +70,7 @@ function translateStatusCode(statusCode) {
     }
 }
 
-function testUrl(url, cb, redirCount) {
+function testUrl(url, cb, redirCount: number): void {
     if (!redirCount) redirCount = 0;
     var data = urlparse.parse(url);
     if (!data.protocol || !/https?:/.test(data.protocol)) {
@@ -167,7 +167,7 @@ function isAlternateDisposition(stream) {
     return false;
 }
 
-function reformatData(data) {
+function reformatData(data: any): any {
     var reformatted = {};
 
     var duration = parseInt(data.format.duration, 10);
@@ -307,7 +307,7 @@ function ffprobe(filename, cb) {
     });
 }
 
-function query(filename, cb) {
+function query(filename: string, cb: any): void {
     if (Config.get("ffmpeg.log") && !fflog.initialized) {
         initFFLog();
     }

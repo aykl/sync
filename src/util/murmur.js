@@ -1,10 +1,10 @@
-// @flow weak
+// @flow
 
 const SEED = 0x1234;
 const M = 0xc6a4a793;
 const R = 16;
 
-export function murmurHash1(str) {
+export function murmurHash1(str: string): number {
     const buffer = new Buffer(str, 'utf8');
     var length = buffer.length;
     var h = SEED ^ (length * M);

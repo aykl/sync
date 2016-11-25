@@ -43,7 +43,7 @@ Logger.prototype.close = function () {
     }
 }
 
-function makeConsoleLogger(filename) {
+function makeConsoleLogger(filename: string): any & { log(): void } {
     var log = new Logger(filename);
     log._log = log.log;
     log.log = function () {

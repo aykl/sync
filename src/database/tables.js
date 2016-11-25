@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 import AsyncQueue from '../asyncqueue';
 
 const TBL_USERS = "" +
@@ -116,7 +116,7 @@ const TBL_CHANNEL_DATA = "" +
     "FOREIGN KEY (`channel_id`) REFERENCES `channels`(`id`) ON DELETE CASCADE" +
     ") CHARACTER SET utf8";
 
-function init(queryfn, cb) {
+function init(queryfn: any, cb: any): void {
     var tables = {
         users: TBL_USERS,
         channels: TBL_CHANNELS,

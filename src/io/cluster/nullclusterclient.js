@@ -1,15 +1,15 @@
-// @flow weak
+// @flow
 
 import Promise from 'bluebird';
 
 export default class NullClusterClient {
     ioConfig: any;
-    
-    constructor(ioConfig) {
+
+    constructor(ioConfig: any) {
         this.ioConfig = ioConfig;
     }
 
-    getSocketConfig(channel) {
+    getSocketConfig(channel: any): Promise<any> {
         const servers = this.ioConfig.getSocketEndpoints();
         return Promise.resolve({
             servers: servers

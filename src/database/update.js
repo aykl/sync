@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import db from '../database';
 import Logger from '../logger';
@@ -198,7 +198,7 @@ function mergeChannelBans(cb) {
     }).done(function () { cb(null); });
 }
 
-function deleteOldChannelTables(cb) {
+function deleteOldChannelTables(cb: any): void {
     Q.nfcall(db.query, "SHOW TABLES")
     .then(function (rows) {
         rows = rows.map(function (r) {

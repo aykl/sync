@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import ChannelModule from './module';
 import User from '../user';
@@ -46,349 +46,352 @@ const DEFAULT_PERMISSIONS = {
     exceedmaxitems: 2         // Exceed maximum items per user limit
 };
 
-function PermissionsModule(channel) {
-    ChannelModule.apply(this, arguments);
-    this.permissions = {};
-    this.openPlaylist = false;
-}
+class PermissionsModule extends ChannelModule {
+    permissions: any;
+    openPlaylist: any;
 
-PermissionsModule.prototype = Object.create(ChannelModule.prototype);
-
-PermissionsModule.prototype.load = function (data) {
-    this.permissions = {};
-    var preset = "permissions" in data ? data.permissions : {};
-    for (var key in DEFAULT_PERMISSIONS) {
-        if (key in preset) {
-            this.permissions[key] = preset[key];
-        } else {
-            this.permissions[key] = DEFAULT_PERMISSIONS[key];
-        }
+    constructor(channel: any) {
+        super(channel);
+        this.permissions = {};
+        this.openPlaylist = false;
     }
 
-    if ("openPlaylist" in data) {
-        this.openPlaylist = data.openPlaylist;
-    } else if ("playlistLock" in data) {
-        this.openPlaylist = !data.playlistLock;
-    }
-};
-
-PermissionsModule.prototype.save = function (data) {
-    data.permissions = this.permissions;
-    data.openPlaylist = this.openPlaylist;
-};
-
-PermissionsModule.prototype.hasPermission = function (account, node) {
-    if (account instanceof User) {
-        account = account.account;
-    }
-
-    if (node.indexOf("playlist") === 0 && this.openPlaylist &&
-        account.effectiveRank >= this.permissions["o"+node]) {
-        return true;
-    }
-
-    return account.effectiveRank >= this.permissions[node];
-};
-
-PermissionsModule.prototype.sendPermissions = function (users) {
-    var perms = this.permissions;
-    if (users === this.channel.users) {
-        this.channel.broadcastAll("setPermissions", perms);
-    } else {
-        users.forEach(function (u) {
-            u.socket.emit("setPermissions", perms);
-        });
-    }
-};
-
-PermissionsModule.prototype.sendPlaylistLock = function (users) {
-    if (users === this.channel.users) {
-        this.channel.broadcastAll("setPlaylistLocked", !this.openPlaylist);
-    } else {
-        var locked = !this.openPlaylist;
-        users.forEach(function (u) {
-            u.socket.emit("setPlaylistLocked", locked);
-        });
-    }
-};
-
-PermissionsModule.prototype.onUserPostJoin = function (user) {
-    user.socket.on("setPermissions", this.handleSetPermissions.bind(this, user));
-    user.socket.on("togglePlaylistLock", this.handleTogglePlaylistLock.bind(this, user));
-    this.sendPermissions([user]);
-    this.sendPlaylistLock([user]);
-};
-
-PermissionsModule.prototype.handleTogglePlaylistLock = function (user) {
-    if (!this.hasPermission(user, "playlistlock")) {
-        return;
-    }
-
-    this.openPlaylist = !this.openPlaylist;
-    if (this.openPlaylist) {
-        this.channel.logger.log("[playlist] " + user.getName() + " unlocked the playlist");
-    } else {
-        this.channel.logger.log("[playlist] " + user.getName() + " locked the playlist");
-    }
-
-    this.sendPlaylistLock(this.channel.users);
-};
-
-PermissionsModule.prototype.handleSetPermissions = function (user, perms) {
-    if (typeof perms !== "object") {
-        return;
-    }
-
-    if (!this.canSetPermissions(user)) {
-        user.kick("Attempted setPermissions as a non-admin");
-        return;
-    }
-
-    for (var key in perms) {
-        if (typeof perms[key] !== "number") {
-            perms[key] = parseFloat(perms[key]);
-            if (isNaN(perms[key])) {
-                delete perms[key];
+    load(data: any): void {
+        this.permissions = {};
+        var preset = "permissions" in data ? data.permissions : {};
+        for (var key in DEFAULT_PERMISSIONS) {
+            if (key in preset) {
+                this.permissions[key] = preset[key];
+            } else {
+                this.permissions[key] = DEFAULT_PERMISSIONS[key];
             }
         }
+
+        if ("openPlaylist" in data) {
+            this.openPlaylist = data.openPlaylist;
+        } else if ("playlistLock" in data) {
+            this.openPlaylist = !data.playlistLock;
+        }
     }
 
-    for (var key in perms) {
-        if (key in this.permissions) {
+    save(data: any): void {
+        data.permissions = this.permissions;
+        data.openPlaylist = this.openPlaylist;
+    }
+
+    hasPermission(account: any, node: any): bool {
+        if (account instanceof User) {
+            account = account.account;
+        }
+
+        if (node.indexOf("playlist") === 0 && this.openPlaylist &&
+            account.effectiveRank >= this.permissions["o"+node]) {
+            return true;
+        }
+
+        return account.effectiveRank >= this.permissions[node];
+    }
+
+    sendPermissions(users: any): void {
+        var perms = this.permissions;
+        if (users === this.channel.users) {
+            this.channel.broadcastAll("setPermissions", perms);
+        } else {
+            users.forEach(function (u) {
+                u.socket.emit("setPermissions", perms);
+            });
+        }
+    }
+
+    sendPlaylistLock(users: any): void {
+        if (users === this.channel.users) {
+            this.channel.broadcastAll("setPlaylistLocked", !this.openPlaylist);
+        } else {
+            var locked = !this.openPlaylist;
+            users.forEach(function (u) {
+                u.socket.emit("setPlaylistLocked", locked);
+            });
+        }
+    }
+
+    onUserPostJoin(user: any): void {
+        user.socket.on("setPermissions", this.handleSetPermissions.bind(this, user));
+        user.socket.on("togglePlaylistLock", this.handleTogglePlaylistLock.bind(this, user));
+        this.sendPermissions([user]);
+        this.sendPlaylistLock([user]);
+    }
+
+    handleTogglePlaylistLock(user: any): void {
+        if (!this.hasPermission(user, "playlistlock")) {
+            return;
+        }
+
+        this.openPlaylist = !this.openPlaylist;
+        if (this.openPlaylist) {
+            this.channel.logger.log("[playlist] " + user.getName() + " unlocked the playlist");
+        } else {
+            this.channel.logger.log("[playlist] " + user.getName() + " locked the playlist");
+        }
+
+        this.sendPlaylistLock(this.channel.users);
+    }
+
+    handleSetPermissions(user: any, perms: any): void {
+        if (typeof perms !== "object") {
+            return;
+        }
+
+        if (!this.canSetPermissions(user)) {
+            user.kick("Attempted setPermissions as a non-admin");
+            return;
+        }
+
+        for (var key in perms) {
+            if (typeof perms[key] !== "number") {
+                perms[key] = parseFloat(perms[key]);
+                if (isNaN(perms[key])) {
+                    delete perms[key];
+                }
+            }
+        }
+
+        for (var key in perms) {
+            if (key in this.permissions) {
+                this.permissions[key] = perms[key];
+            }
+        }
+
+        if ("seeplaylist" in perms) {
+            if (this.channel.modules.playlist) {
+                this.channel.modules.playlist.sendPlaylist(this.channel.users);
+            }
+        }
+
+        this.channel.logger.log("[mod] " + user.getName() + " updated permissions");
+        this.sendPermissions(this.channel.users);
+    }
+
+    canAddVideo(account: any): bool {
+        return this.hasPermission(account, "playlistadd");
+    }
+
+    canSetTemp(account: any): bool {
+        return this.hasPermission(account, "settemp");
+    }
+
+    canSeePlaylist(account: any): bool {
+        return this.hasPermission(account, "seeplaylist");
+    }
+
+    canAddList(account: any): bool {
+        return this.hasPermission(account, "playlistaddlist");
+    }
+
+    canAddNonTemp(account: any): bool {
+        return this.hasPermission(account, "addnontemp");
+    }
+
+    canAddNext(account: any): bool {
+        return this.hasPermission(account, "playlistnext");
+    }
+
+    canAddLive(account: any): bool {
+        return this.hasPermission(account, "playlistaddlive");
+    }
+
+    canAddCustom(account: any): bool {
+        return this.hasPermission(account, "playlistaddcustom");
+    }
+
+    canAddRawFile(account: any): bool {
+        return this.hasPermission(account, "playlistaddrawfile");
+    }
+
+    canMoveVideo(account: any): bool {
+        return this.hasPermission(account, "playlistmove");
+    }
+
+    canDeleteVideo(account: any): bool {
+        return this.hasPermission(account, "playlistdelete")
+    }
+
+    canSkipVideo(account: any): bool {
+        return this.hasPermission(account, "playlistjump");
+    }
+
+    canToggleTemporary(account: any): bool {
+        return this.hasPermission(account, "settemp");
+    }
+
+    canExceedMaxLength(account: any): bool {
+        return this.hasPermission(account, "exceedmaxlength");
+    }
+
+    canShufflePlaylist(account: any): bool {
+        return this.hasPermission(account, "playlistshuffle");
+    }
+
+    canClearPlaylist(account: any): bool {
+        return this.hasPermission(account, "playlistclear");
+    }
+
+    canLockPlaylist(account: any): bool {
+        return this.hasPermission(account, "playlistlock");
+    }
+
+    canAssignLeader(account: any): bool {
+        return this.hasPermission(account, "leaderctl");
+    }
+
+    canControlPoll(account: any): bool {
+        return this.hasPermission(account, "pollctl");
+    }
+
+    canVote(account: any): bool {
+        return this.hasPermission(account, "pollvote");
+    }
+
+    canViewHiddenPoll(account: any): bool {
+        return this.hasPermission(account, "viewhiddenpoll");
+    }
+
+    canVoteskip(account: any): bool {
+        return this.hasPermission(account, "voteskip");
+    }
+
+    canSeeVoteskipResults(actor: any): bool {
+        return this.hasPermission(actor, "viewvoteskip");
+    }
+
+    canMute(actor: any): bool {
+        return this.hasPermission(actor, "mute");
+    }
+
+    canKick(actor: any): bool {
+        return this.hasPermission(actor, "kick");
+    }
+
+    canBan(actor: any): bool {
+        return this.hasPermission(actor, "ban");
+    }
+
+    canEditMotd(actor: any): bool {
+        return this.hasPermission(actor, "motdedit");
+    }
+
+    canEditFilters(actor: any): bool {
+        return this.hasPermission(actor, "filteredit");
+    }
+
+    canImportFilters(actor: any): bool {
+        return this.hasPermission(actor, "filterimport");
+    }
+
+    canEditEmotes(actor: any): bool {
+        return this.hasPermission(actor, "emoteedit");
+    }
+
+    canImportEmotes(actor: any): bool {
+        return this.hasPermission(actor, "emoteimport");
+    }
+
+    canCallDrink(actor: any): bool {
+        return this.hasPermission(actor, "drink");
+    }
+
+    canChat(actor: any): bool {
+        return this.hasPermission(actor, "chat");
+    }
+
+    canClearChat(actor: any): bool {
+        return this.hasPermission(actor, "chatclear");
+    }
+
+    canSetOptions(actor: any): bool {
+        if (actor instanceof User) {
+            actor = actor.account;
+        }
+
+        return actor.effectiveRank >= 2;
+    }
+
+    canSetCSS(actor: any): bool {
+        if (actor instanceof User) {
+            actor = actor.account;
+        }
+
+        return actor.effectiveRank >= 3;
+    }
+
+    canSetJS(actor: any): bool {
+        if (actor instanceof User) {
+            actor = actor.account;
+        }
+
+        return actor.effectiveRank >= 3;
+    }
+
+    canSetPermissions(actor: any): bool {
+        if (actor instanceof User) {
+            actor = actor.account;
+        }
+
+        return actor.effectiveRank >= 3;
+    }
+
+    canUncache(actor: any): bool {
+        if (actor instanceof User) {
+            actor = actor.account;
+        }
+
+        return actor.effectiveRank >= 2;
+    }
+
+    canExceedMaxItemsPerUser(actor: any): bool {
+        return this.hasPermission(actor, "exceedmaxitems");
+    }
+
+    loadUnregistered(): any {
+        var perms = {
+            seeplaylist: -1,
+            playlistadd: -1,      // Add video to the playlist
+            playlistnext: 0,
+            playlistmove: 0,      // Move a video on the playlist
+            playlistdelete: 0,    // Delete a video from the playlist
+            playlistjump: 0,      // Start a different video on the playlist
+            playlistaddlist: 0,   // Add a list of videos to the playlist
+            oplaylistadd: -1,     // Same as above, but for open (unlocked) playlist
+            oplaylistnext: 0,
+            oplaylistmove: 0,
+            oplaylistdelete: 0,
+            oplaylistjump: 0,
+            oplaylistaddlist: 0,
+            playlistaddcustom: 0, // Add custom embed to the playlist
+            playlistaddlive: 0,   // Add a livestream to the playlist
+            exceedmaxlength: 0,   // Add a video longer than the maximum length set
+            addnontemp: 0,        // Add a permanent video to the playlist
+            settemp: 0,           // Toggle temporary status of a playlist item
+            playlistshuffle: 0,   // Shuffle the playlist
+            playlistclear: 0,     // Clear the playlist
+            pollctl: 0,           // Open/close polls
+            pollvote: -1,         // Vote in polls
+            viewhiddenpoll: 1.5,  // View results of hidden polls
+            voteskip: -1,         // Vote to skip the current video
+            viewvoteskip: 1.5,    // View voteskip results
+            playlistlock: 2,      // Lock/unlock the playlist
+            leaderctl: 0,         // Give/take leader
+            drink: 0,             // Use the /d command
+            chat: 0,              // Send chat messages
+            chatclear: 2,         // Use the /clear command
+            exceedmaxitems: 2     // Exceed max items per user
+        };
+
+        for (var key in perms) {
             this.permissions[key] = perms[key];
         }
+
+        this.openPlaylist = true;
     }
-
-    if ("seeplaylist" in perms) {
-        if (this.channel.modules.playlist) {
-            this.channel.modules.playlist.sendPlaylist(this.channel.users);
-        }
-    }
-
-    this.channel.logger.log("[mod] " + user.getName() + " updated permissions");
-    this.sendPermissions(this.channel.users);
-};
-
-PermissionsModule.prototype.canAddVideo = function (account) {
-    return this.hasPermission(account, "playlistadd");
-};
-
-PermissionsModule.prototype.canSetTemp = function (account) {
-    return this.hasPermission(account, "settemp");
-};
-
-PermissionsModule.prototype.canSeePlaylist = function (account) {
-    return this.hasPermission(account, "seeplaylist");
-};
-
-PermissionsModule.prototype.canAddList = function (account) {
-    return this.hasPermission(account, "playlistaddlist");
-};
-
-PermissionsModule.prototype.canAddNonTemp = function (account) {
-    return this.hasPermission(account, "addnontemp");
-};
-
-PermissionsModule.prototype.canAddNext = function (account) {
-    return this.hasPermission(account, "playlistnext");
-};
-
-PermissionsModule.prototype.canAddLive = function (account) {
-    return this.hasPermission(account, "playlistaddlive");
-};
-
-PermissionsModule.prototype.canAddCustom = function (account) {
-    return this.hasPermission(account, "playlistaddcustom");
-};
-
-PermissionsModule.prototype.canAddRawFile = function (account) {
-    return this.hasPermission(account, "playlistaddrawfile");
-};
-
-PermissionsModule.prototype.canMoveVideo = function (account) {
-    return this.hasPermission(account, "playlistmove");
-};
-
-PermissionsModule.prototype.canDeleteVideo = function (account) {
-    return this.hasPermission(account, "playlistdelete")
-};
-
-PermissionsModule.prototype.canSkipVideo = function (account) {
-    return this.hasPermission(account, "playlistjump");
-};
-
-PermissionsModule.prototype.canToggleTemporary = function (account) {
-    return this.hasPermission(account, "settemp");
-};
-
-PermissionsModule.prototype.canExceedMaxLength = function (account) {
-    return this.hasPermission(account, "exceedmaxlength");
-};
-
-PermissionsModule.prototype.canShufflePlaylist = function (account) {
-    return this.hasPermission(account, "playlistshuffle");
-};
-
-PermissionsModule.prototype.canClearPlaylist = function (account) {
-    return this.hasPermission(account, "playlistclear");
-};
-
-PermissionsModule.prototype.canLockPlaylist = function (account) {
-    return this.hasPermission(account, "playlistlock");
-};
-
-PermissionsModule.prototype.canAssignLeader = function (account) {
-    return this.hasPermission(account, "leaderctl");
-};
-
-PermissionsModule.prototype.canControlPoll = function (account) {
-    return this.hasPermission(account, "pollctl");
-};
-
-PermissionsModule.prototype.canVote = function (account) {
-    return this.hasPermission(account, "pollvote");
-};
-
-PermissionsModule.prototype.canViewHiddenPoll = function (account) {
-    return this.hasPermission(account, "viewhiddenpoll");
-};
-
-PermissionsModule.prototype.canVoteskip = function (account) {
-    return this.hasPermission(account, "voteskip");
-};
-
-PermissionsModule.prototype.canSeeVoteskipResults = function (actor) {
-    return this.hasPermission(actor, "viewvoteskip");
-};
-
-PermissionsModule.prototype.canMute = function (actor) {
-    return this.hasPermission(actor, "mute");
-};
-
-PermissionsModule.prototype.canKick = function (actor) {
-    return this.hasPermission(actor, "kick");
-};
-
-PermissionsModule.prototype.canBan = function (actor) {
-    return this.hasPermission(actor, "ban");
-};
-
-PermissionsModule.prototype.canEditMotd = function (actor) {
-    return this.hasPermission(actor, "motdedit");
-};
-
-PermissionsModule.prototype.canEditFilters = function (actor) {
-    return this.hasPermission(actor, "filteredit");
-};
-
-PermissionsModule.prototype.canImportFilters = function (actor) {
-    return this.hasPermission(actor, "filterimport");
-};
-
-PermissionsModule.prototype.canEditEmotes = function (actor) {
-    return this.hasPermission(actor, "emoteedit");
-};
-
-PermissionsModule.prototype.canImportEmotes = function (actor) {
-    return this.hasPermission(actor, "emoteimport");
-};
-
-PermissionsModule.prototype.canCallDrink = function (actor) {
-    return this.hasPermission(actor, "drink");
-};
-
-PermissionsModule.prototype.canChat = function (actor) {
-    return this.hasPermission(actor, "chat");
-};
-
-PermissionsModule.prototype.canClearChat = function (actor) {
-    return this.hasPermission(actor, "chatclear");
-};
-
-PermissionsModule.prototype.canSetOptions = function (actor) {
-    if (actor instanceof User) {
-        actor = actor.account;
-    }
-
-    return actor.effectiveRank >= 2;
-};
-
-PermissionsModule.prototype.canSetCSS = function (actor) {
-    if (actor instanceof User) {
-        actor = actor.account;
-    }
-
-    return actor.effectiveRank >= 3;
-};
-
-PermissionsModule.prototype.canSetJS = function (actor) {
-    if (actor instanceof User) {
-        actor = actor.account;
-    }
-
-    return actor.effectiveRank >= 3;
-};
-
-PermissionsModule.prototype.canSetPermissions = function (actor) {
-    if (actor instanceof User) {
-        actor = actor.account;
-    }
-
-    return actor.effectiveRank >= 3;
-};
-
-PermissionsModule.prototype.canUncache = function (actor) {
-    if (actor instanceof User) {
-        actor = actor.account;
-    }
-
-    return actor.effectiveRank >= 2;
-};
-
-PermissionsModule.prototype.canExceedMaxItemsPerUser = function (actor) {
-    return this.hasPermission(actor, "exceedmaxitems");
-};
-
-PermissionsModule.prototype.loadUnregistered = function () {
-    var perms = {
-        seeplaylist: -1,
-        playlistadd: -1,      // Add video to the playlist
-        playlistnext: 0,
-        playlistmove: 0,      // Move a video on the playlist
-        playlistdelete: 0,    // Delete a video from the playlist
-        playlistjump: 0,      // Start a different video on the playlist
-        playlistaddlist: 0,   // Add a list of videos to the playlist
-        oplaylistadd: -1,     // Same as above, but for open (unlocked) playlist
-        oplaylistnext: 0,
-        oplaylistmove: 0,
-        oplaylistdelete: 0,
-        oplaylistjump: 0,
-        oplaylistaddlist: 0,
-        playlistaddcustom: 0, // Add custom embed to the playlist
-        playlistaddlive: 0,   // Add a livestream to the playlist
-        exceedmaxlength: 0,   // Add a video longer than the maximum length set
-        addnontemp: 0,        // Add a permanent video to the playlist
-        settemp: 0,           // Toggle temporary status of a playlist item
-        playlistshuffle: 0,   // Shuffle the playlist
-        playlistclear: 0,     // Clear the playlist
-        pollctl: 0,           // Open/close polls
-        pollvote: -1,         // Vote in polls
-        viewhiddenpoll: 1.5,  // View results of hidden polls
-        voteskip: -1,         // Vote to skip the current video
-        viewvoteskip: 1.5,    // View voteskip results
-        playlistlock: 2,      // Lock/unlock the playlist
-        leaderctl: 0,         // Give/take leader
-        drink: 0,             // Use the /d command
-        chat: 0,              // Send chat messages
-        chatclear: 2,         // Use the /clear command
-        exceedmaxitems: 2     // Exceed max items per user
-    };
-
-    for (var key in perms) {
-        this.permissions[key] = perms[key];
-    }
-
-    this.openPlaylist = true;
-};
+}
 
 export default PermissionsModule;

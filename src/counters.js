@@ -7,6 +7,7 @@ import io from 'socket.io';
 import Socket from 'socket.io/lib/socket';
 import * as Metrics from 'cytube-common/lib/metrics/metrics';
 import { JSONFileMetricsReporter } from 'cytube-common/lib/metrics/jsonfilemetricsreporter';
+import Server from './server';
 
 
 const counterLog = new Logger.Logger(path.resolve(__dirname, '..', 'counters.log'));
@@ -33,7 +34,7 @@ function getConnectedSockets() {
 
 function setChannelCounts(metrics) {
     if (server === null) {
-        server = require('./server').getServer();
+        server = Server.getServer();
     }
 
     try {

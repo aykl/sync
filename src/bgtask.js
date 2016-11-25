@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 /*
     bgtask.js
@@ -77,7 +77,7 @@ function initChannelDumper(Server) {
     }, CHANNEL_SAVE_INTERVAL);
 }
 
-export default function (Server) {
+export default function (Server: any): void {
     if (init === Server) {
         Logger.errlog.log("WARNING: Attempted to re-init background tasks");
         return;

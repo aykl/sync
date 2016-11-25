@@ -1,7 +1,9 @@
+// @flow
+
 import CyTubeUtil from '../../utilities';
 import { sendPug } from '../pug';
 
-export default function initialize(app, webConfig) {
+export default function initialize(app: any, webConfig: any): void {
     app.get('/contact', (req, res) => {
         // Basic obfuscation of email addresses to prevent spambots
         // from picking them up.  Not real encryption.
@@ -14,6 +16,7 @@ export default function initialize(app, webConfig) {
                     contact.email.charCodeAt(i) ^ emkey.charCodeAt(i % emkey.length)
                 );
             }
+            // $FlowIgnore
             contact.email = escape(email.join(""));
             contact.emkey = escape(emkey);
             return contact;

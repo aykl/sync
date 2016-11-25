@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import logger from 'cytube-common/lib/logger';
 import events from 'events';
@@ -12,7 +12,7 @@ export default class ProxiedSocket extends EventEmitter {
     socketEmitter: any;
     frontendConnection: any;
 
-    constructor(socketID, socketIP, socketUser, socketEmitter, frontendConnection) {
+    constructor(socketID: any, socketIP: any, socketUser: any, socketEmitter: any, frontendConnection: any) {
         super();
         this.id = socketID;
         this.ip = socketIP;
@@ -27,9 +27,9 @@ export default class ProxiedSocket extends EventEmitter {
         this.frontendConnection = frontendConnection;
     }
 
-    emit() {
+    emit(): bool {
         const target = this.socketEmitter.to(this.id);
-        target.emit.apply(target, arguments);
+        return target.emit.apply(target, arguments);
     }
 
     onProxiedEventReceived() {
@@ -40,7 +40,7 @@ export default class ProxiedSocket extends EventEmitter {
         }
     }
 
-    join(channel) {
+    join(channel: any): void {
         this.frontendConnection.write(
                 this.frontendConnection.protocol.newSocketJoinRoomsEvent(
                         this.id, [channel]
@@ -48,7 +48,7 @@ export default class ProxiedSocket extends EventEmitter {
         );
     }
 
-    leave(room) {
+    leave(room: any): void {
         this.frontendConnection.write(
                 this.frontendConnection.protocol.newSocketLeaveRoomsEvent(
                         this.id, [room]

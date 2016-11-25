@@ -1,8 +1,8 @@
-// @flow weak
+// @flow
 
 import { sendPug } from '../pug';
 
-export default function initialize(app, channelIndex, maxEntries) {
+export default function initialize(app: any, channelIndex: any, maxEntries: any): void {
     app.get('/', (req, res) => {
         channelIndex.listPublicChannels().then((channels) => {
             channels.sort((a, b) => {

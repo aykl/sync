@@ -1,7 +1,8 @@
-// @flow weak
+// @flow
 
 import Logger from '../logger';
 import uuid from 'uuid';
+import Server from '../server';
 
 var SERVER;
 const SERVER_ANNOUNCEMENTS = 'serverAnnouncements';
@@ -11,15 +12,15 @@ class AnnouncementRefresher {
     subClient: any;
     uuid: any;
 
-    constructor(pubClient, subClient) {
+    constructor(pubClient: any, subClient: any) {
         this.pubClient = pubClient;
         this.subClient = subClient;
         this.uuid = uuid.v4();
         process.nextTick(this.init.bind(this));
     }
 
-    init() {
-        SERVER = require('../server').getServer();
+    init(): void {
+        SERVER = Server.getServer();
         SERVER.on('announcement', this.sendAnnouncement.bind(this));
 
         this.subClient.once('ready', () => {
@@ -28,7 +29,7 @@ class AnnouncementRefresher {
         });
     }
 
-    handleMessage(channel, message) {
+    handleMessage(channel: any, message: any): void {
         if (channel !== SERVER_ANNOUNCEMENTS) {
             return;
         }
@@ -49,7 +50,7 @@ class AnnouncementRefresher {
         SERVER.setAnnouncement(data.data);
     }
 
-    sendAnnouncement(data) {
+    sendAnnouncement(data: any): void {
         const message = JSON.stringify({
             data: data,
             partitionID: this.uuid

@@ -1,10 +1,12 @@
+// @flow
+
 import Promise from 'bluebird';
 
 import Config from '../config';
 import db from '../database';
 import { DatabaseStore } from './dbstore';
-import { syslog } from '../logger';
-syslog.log = () => undefined;
+import Logger from '../logger';
+Logger.syslog.log = () => undefined;
 
 function main() {
     Config.load('config.yaml');

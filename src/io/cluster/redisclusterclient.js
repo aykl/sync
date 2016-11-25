@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import Promise from 'bluebird';
 
@@ -8,11 +8,11 @@ const ERR_TIMEOUT = 'Timed out when retrieving server information';
 class RedisClusterClient {
     frontendPool: any;
 
-    constructor(frontendPool) {
+    constructor(frontendPool: any) {
         this.frontendPool = frontendPool;
     }
 
-    getSocketConfig(channel) {
+    getSocketConfig(channel: any): any {
         return this.frontendPool.getFrontends(channel).then(result => {
             if (!Array.isArray(result)) {
                 result = [];

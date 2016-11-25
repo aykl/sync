@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import ChannelModule from './module';
 import XSS from '../xss';
@@ -94,128 +94,130 @@ function validateEmote(f) {
     return f;
 };
 
-function EmoteModule(channel) {
-    ChannelModule.apply(this, arguments);
-    this.emotes = new EmoteList();
-}
+class EmoteModule extends ChannelModule {
+    emotes: any;
 
-EmoteModule.prototype = Object.create(ChannelModule.prototype);
+    constructor(channel: any) {
+        super(channel);
+        this.emotes = new EmoteList();
+    }
 
-EmoteModule.prototype.load = function (data) {
-    if ("emotes" in data) {
-        for (var i = 0; i < data.emotes.length; i++) {
-            this.emotes.updateEmote(data.emotes[i]);
+    load(data: any): void {
+        if ("emotes" in data) {
+            for (var i = 0; i < data.emotes.length; i++) {
+                this.emotes.updateEmote(data.emotes[i]);
+            }
         }
     }
-};
 
-EmoteModule.prototype.save = function (data) {
-    data.emotes = this.emotes.pack();
-};
-
-EmoteModule.prototype.packInfo = function (data, isAdmin) {
-    if (isAdmin) {
-        data.emoteCount = this.emotes.emotes.length;
-    }
-};
-
-EmoteModule.prototype.onUserPostJoin = function (user) {
-    user.socket.on("updateEmote", this.handleUpdateEmote.bind(this, user));
-    user.socket.on("importEmotes", this.handleImportEmotes.bind(this, user));
-    user.socket.on("moveEmote", this.handleMoveEmote.bind(this, user));
-    user.socket.on("removeEmote", this.handleRemoveEmote.bind(this, user));
-    this.sendEmotes([user]);
-};
-
-EmoteModule.prototype.sendEmotes = function (users) {
-    var f = this.emotes.pack();
-    var chan = this.channel;
-    users.forEach(function (u) {
-        u.socket.emit("emoteList", f);
-    });
-};
-
-EmoteModule.prototype.handleUpdateEmote = function (user, data) {
-    if (typeof data !== "object") {
-        return;
+    save(data: any): void {
+        data.emotes = this.emotes.pack();
     }
 
-    if (!this.channel.modules.permissions.canEditEmotes(user)) {
-        return;
-    }
-
-    var f = validateEmote(data);
-    if (!f) {
-        var message = "Unable to update emote '" + JSON.stringify(data) + "'.  " +
-                "Please contact an administrator for assistance.";
-        if (!data.image || !data.name) {
-            message = "Emote names and images must not be blank.";
+    packInfo(data: any, isAdmin: bool): void {
+        if (isAdmin) {
+            data.emoteCount = this.emotes.emotes.length;
         }
+    }
 
-        user.socket.emit("errorMsg", {
-            msg: message,
-            alert: true
+    onUserPostJoin(user: any): void {
+        user.socket.on("updateEmote", this.handleUpdateEmote.bind(this, user));
+        user.socket.on("importEmotes", this.handleImportEmotes.bind(this, user));
+        user.socket.on("moveEmote", this.handleMoveEmote.bind(this, user));
+        user.socket.on("removeEmote", this.handleRemoveEmote.bind(this, user));
+        this.sendEmotes([user]);
+    }
+
+    sendEmotes(users: any): void {
+        var f = this.emotes.pack();
+        var chan = this.channel;
+        users.forEach(function (u) {
+            u.socket.emit("emoteList", f);
         });
-        return;
     }
 
-    this.emotes.updateEmote(f);
-    var chan = this.channel;
-    chan.broadcastAll("updateEmote", f);
+    handleUpdateEmote(user: any, data: any): void {
+        if (typeof data !== "object") {
+            return;
+        }
 
-    chan.logger.log("[mod] " + user.getName() + " updated emote: " + f.name + " -> " +
-                    f.image);
-};
+        if (!this.channel.modules.permissions.canEditEmotes(user)) {
+            return;
+        }
 
-EmoteModule.prototype.handleImportEmotes = function (user, data) {
-    if (!(data instanceof Array)) {
-        return;
+        var f = validateEmote(data);
+        if (!f) {
+            var message = "Unable to update emote '" + JSON.stringify(data) + "'.  " +
+                    "Please contact an administrator for assistance.";
+            if (!data.image || !data.name) {
+                message = "Emote names and images must not be blank.";
+            }
+
+            user.socket.emit("errorMsg", {
+                msg: message,
+                alert: true
+            });
+            return;
+        }
+
+        this.emotes.updateEmote(f);
+        var chan = this.channel;
+        chan.broadcastAll("updateEmote", f);
+
+        chan.logger.log("[mod] " + user.getName() + " updated emote: " + f.name + " -> " +
+                        f.image);
     }
 
-    /* Note: importing requires a different permission node than simply
-       updating/removing */
-    if (!this.channel.modules.permissions.canImportEmotes(user)) {
-        return;
+    handleImportEmotes(user: any, data: any): void {
+        if (!(data instanceof Array)) {
+            return;
+        }
+
+        /* Note: importing requires a different permission node than simply
+           updating/removing */
+        if (!this.channel.modules.permissions.canImportEmotes(user)) {
+            return;
+        }
+
+        this.emotes.importList(data.map(validateEmote).filter(function (f) {
+            return f !== false;
+        }));
+        this.sendEmotes(this.channel.users);
     }
 
-    this.emotes.importList(data.map(validateEmote).filter(function (f) {
-        return f !== false;
-    }));
-    this.sendEmotes(this.channel.users);
-};
+    handleRemoveEmote(user: any, data: any): void {
+        if (typeof data !== "object") {
+            return;
+        }
 
-EmoteModule.prototype.handleRemoveEmote = function (user, data) {
-    if (typeof data !== "object") {
-        return;
+        if (!this.channel.modules.permissions.canEditEmotes(user)) {
+            return;
+        }
+
+        if (typeof data.name !== "string") {
+            return;
+        }
+
+        this.emotes.removeEmote(data);
+        this.channel.logger.log("[mod] " + user.getName() + " removed emote: " + data.name);
+        this.channel.broadcastAll("removeEmote", data);
     }
 
-    if (!this.channel.modules.permissions.canEditEmotes(user)) {
-        return;
+    handleMoveEmote(user: any, data: any): void {
+        if (typeof data !== "object") {
+            return;
+        }
+
+        if (!this.channel.modules.permissions.canEditEmotes(user)) {
+            return;
+        }
+
+        if (typeof data.to !== "number" || typeof data.from !== "number") {
+            return;
+        }
+
+        this.emotes.moveEmote(data.from, data.to);
     }
-
-    if (typeof data.name !== "string") {
-        return;
-    }
-
-    this.emotes.removeEmote(data);
-    this.channel.logger.log("[mod] " + user.getName() + " removed emote: " + data.name);
-    this.channel.broadcastAll("removeEmote", data);
-};
-
-EmoteModule.prototype.handleMoveEmote = function (user, data) {
-    if (typeof data !== "object") {
-        return;
-    }
-
-    if (!this.channel.modules.permissions.canEditEmotes(user)) {
-        return;
-    }
-
-    if (typeof data.to !== "number" || typeof data.from !== "number") {
-        return;
-    }
-
-    this.emotes.moveEmote(data.from, data.to);
-};
+}
 
 export default EmoteModule;

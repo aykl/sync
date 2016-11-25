@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import { RedisClusterClient } from '../io/cluster/redisclusterclient';
 import { DualClusterClient } from '../io/cluster/dualclusterclient';
@@ -18,7 +18,7 @@ import IOBackend from './iobackend';
 const BACKEND_CONFIG_PATH = path.resolve(__dirname, '..', '..', 'backend.toml');
 
 class BackendModule {
-    backendConfig: any;
+    backendConfig: BackendConfiguration;
     redisAdapter: any;
     sioEmitter: any;
     ioBackend: any;
@@ -32,7 +32,7 @@ class BackendModule {
         this.initConfig();
     }
 
-    initConfig() {
+    initConfig(): void {
         logger.initialize(null, null, LegacyConfig.get('debug'));
         try {
             this.backendConfig = loadFromToml(BackendConfiguration, BACKEND_CONFIG_PATH);
@@ -47,7 +47,7 @@ class BackendModule {
         }
     }
 
-    onReady() {
+    onReady(): void {
         const redisClientProvider = this.getRedisClientProvider();
         this.redisAdapter = redisAdapter({
             pubClient: redisClientProvider.get(),

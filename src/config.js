@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import fs from 'fs';
 import path from 'path';
@@ -145,7 +145,7 @@ var cfg = defaults;
 /**
  * Initializes the configuration from the given YAML file
  */
-function load(file) {
+function load(file: string): void {
     try {
         cfg = YAML.load(path.join(__dirname, "..", file));
     } catch (e) {
@@ -400,7 +400,7 @@ function preprocessConfig(cfg) {
  * Accepts a dot-separated key for nested values, e.g. "http.port"
  * Throws an error if a nonexistant key is requested
  */
-function get(key) {
+function get(key: string): any {
     var obj = cfg;
     var keylist = key.split(".");
     var current = keylist.shift();

@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import FilterList from 'cytubefilters';
 import ChannelModule from './module';
@@ -65,238 +65,240 @@ const DEFAULT_FILTERS = [
         "<span class=\"spoiler\">\\1</span>")
 ];
 
-function ChatFilterModule(channel) {
-    ChannelModule.apply(this, arguments);
-    this.filters = new FilterList();
-}
+class ChatFilterModule extends ChannelModule {
+    filters: any;
 
-ChatFilterModule.prototype = Object.create(ChannelModule.prototype);
+    constructor(channel: any) {
+        super(channel);
+        this.filters = new FilterList();
+    }
 
-ChatFilterModule.prototype.load = function (data) {
-    if ("filters" in data) {
-        var filters = data.filters.map(validateFilter).filter(function (f) {
-            return f !== null;
+    load(data: any): void {
+        if ("filters" in data) {
+            var filters = data.filters.map(validateFilter).filter(function (f) {
+                return f !== null;
+            });
+            try {
+                this.filters = new FilterList(filters);
+            } catch (e) {
+                Logger.errlog.log("Filter load failed: " + e + " (channel:" +
+                    this.channel.name);
+                this.channel.logger.log("Failed to load filters: " + e);
+            }
+        } else {
+            this.filters = new FilterList(DEFAULT_FILTERS);
+        }
+    }
+
+    save(data: any): void {
+        data.filters = this.filters.pack();
+    }
+
+    packInfo(data: any, isAdmin: any): void {
+        if (isAdmin) {
+            data.chatFilterCount = this.filters.length;
+        }
+    }
+
+    onUserPostJoin(user: any): void {
+        user.socket.on("addFilter", this.handleAddFilter.bind(this, user));
+        user.socket.on("updateFilter", this.handleUpdateFilter.bind(this, user));
+        user.socket.on("importFilters", this.handleImportFilters.bind(this, user));
+        user.socket.on("moveFilter", this.handleMoveFilter.bind(this, user));
+        user.socket.on("removeFilter", this.handleRemoveFilter.bind(this, user));
+        user.socket.on("requestChatFilters", this.handleRequestChatFilters.bind(this, user));
+    }
+
+    sendChatFilters(users: any): void {
+        var f = this.filters.pack();
+        var chan = this.channel;
+        users.forEach(function (u) {
+            if (chan.modules.permissions.canEditFilters(u)) {
+                u.socket.emit("chatFilters", f);
+            }
         });
+    }
+
+    handleAddFilter(user: any, data: any): void {
+        if (typeof data !== "object") {
+            return;
+        }
+
+        if (!this.channel.modules.permissions.canEditFilters(user)) {
+            return;
+        }
+
         try {
-            this.filters = new FilterList(filters);
+            FilterList.checkValidRegex(data.source);
         } catch (e) {
-            Logger.errlog.log("Filter load failed: " + e + " (channel:" +
-                this.channel.name);
-            this.channel.logger.log("Failed to load filters: " + e);
+            user.socket.emit("errorMsg", {
+                msg: "Invalid regex: " + e.message,
+                alert: true
+            });
+            return;
         }
-    } else {
-        this.filters = new FilterList(DEFAULT_FILTERS);
-    }
-};
 
-ChatFilterModule.prototype.save = function (data) {
-    data.filters = this.filters.pack();
-};
-
-ChatFilterModule.prototype.packInfo = function (data, isAdmin) {
-    if (isAdmin) {
-        data.chatFilterCount = this.filters.length;
-    }
-};
-
-ChatFilterModule.prototype.onUserPostJoin = function (user) {
-    user.socket.on("addFilter", this.handleAddFilter.bind(this, user));
-    user.socket.on("updateFilter", this.handleUpdateFilter.bind(this, user));
-    user.socket.on("importFilters", this.handleImportFilters.bind(this, user));
-    user.socket.on("moveFilter", this.handleMoveFilter.bind(this, user));
-    user.socket.on("removeFilter", this.handleRemoveFilter.bind(this, user));
-    user.socket.on("requestChatFilters", this.handleRequestChatFilters.bind(this, user));
-};
-
-ChatFilterModule.prototype.sendChatFilters = function (users) {
-    var f = this.filters.pack();
-    var chan = this.channel;
-    users.forEach(function (u) {
-        if (chan.modules.permissions.canEditFilters(u)) {
-            u.socket.emit("chatFilters", f);
+        data = validateFilter(data);
+        if (!data) {
+            return;
         }
-    });
-};
 
-ChatFilterModule.prototype.handleAddFilter = function (user, data) {
-    if (typeof data !== "object") {
-        return;
-    }
-
-    if (!this.channel.modules.permissions.canEditFilters(user)) {
-        return;
-    }
-
-    try {
-        FilterList.checkValidRegex(data.source);
-    } catch (e) {
-        user.socket.emit("errorMsg", {
-            msg: "Invalid regex: " + e.message,
-            alert: true
-        });
-        return;
-    }
-
-    data = validateFilter(data);
-    if (!data) {
-        return;
-    }
-
-    try {
-        this.filters.addFilter(data);
-    } catch (e) {
-        user.socket.emit("errorMsg", {
-            msg: "Filter add failed: " + e.message,
-            alert: true
-        });
-        return;
-    }
-
-    user.socket.emit("addFilterSuccess");
-
-    var chan = this.channel;
-    chan.users.forEach(function (u) {
-        if (chan.modules.permissions.canEditFilters(u)) {
-            u.socket.emit("updateChatFilter", data);
+        try {
+            this.filters.addFilter(data);
+        } catch (e) {
+            user.socket.emit("errorMsg", {
+                msg: "Filter add failed: " + e.message,
+                alert: true
+            });
+            return;
         }
-    });
 
-    chan.logger.log("[mod] " + user.getName() + " added filter: " + data.name + " -> " +
-                    "s/" + data.source + "/" + data.replace + "/" + data.flags +
-                    " active: " + data.active + ", filterlinks: " + data.filterlinks);
-};
+        user.socket.emit("addFilterSuccess");
 
-ChatFilterModule.prototype.handleUpdateFilter = function (user, data) {
-    if (typeof data !== "object") {
-        return;
-    }
-
-    if (!this.channel.modules.permissions.canEditFilters(user)) {
-        return;
-    }
-
-    try {
-        FilterList.checkValidRegex(data.source);
-    } catch (e) {
-        user.socket.emit("errorMsg", {
-            msg: "Invalid regex: " + e.message,
-            alert: true
+        var chan = this.channel;
+        chan.users.forEach(function (u) {
+            if (chan.modules.permissions.canEditFilters(u)) {
+                u.socket.emit("updateChatFilter", data);
+            }
         });
-        return;
+
+        chan.logger.log("[mod] " + user.getName() + " added filter: " + data.name + " -> " +
+                        "s/" + data.source + "/" + data.replace + "/" + data.flags +
+                        " active: " + data.active + ", filterlinks: " + data.filterlinks);
     }
 
-    data = validateFilter(data);
-    if (!data) {
-        return;
-    }
-
-    try {
-        this.filters.updateFilter(data);
-    } catch (e) {
-        user.socket.emit("errorMsg", {
-            msg: "Filter update failed: " + e.message,
-            alert: true
-        });
-        return;
-    }
-
-    var chan = this.channel;
-    chan.users.forEach(function (u) {
-        if (chan.modules.permissions.canEditFilters(u)) {
-            u.socket.emit("updateChatFilter", data);
+    handleUpdateFilter(user: any, data: any): void {
+        if (typeof data !== "object") {
+            return;
         }
-    });
 
-    chan.logger.log("[mod] " + user.getName() + " updated filter: " + data.name + " -> " +
-                    "s/" + data.source + "/" + data.replace + "/" + data.flags +
-                    " active: " + data.active + ", filterlinks: " + data.filterlinks);
-};
-
-ChatFilterModule.prototype.handleImportFilters = function (user, data) {
-    if (!(data instanceof Array)) {
-        return;
-    }
-
-    /* Note: importing requires a different permission node than simply
-       updating/removing */
-    if (!this.channel.modules.permissions.canImportFilters(user)) {
-        return;
-    }
-
-    try {
-        this.filters = new FilterList(data.map(validateFilter).filter(function (f) {
-            return f !== null;
-        }));
-    } catch (e) {
-        user.socket.emit("errorMsg", {
-            msg: "Filter import failed: " + e.message,
-            alert: true
-        });
-        return;
-    }
-
-    this.channel.logger.log("[mod] " + user.getName() + " imported the filter list");
-    this.sendChatFilters(this.channel.users);
-};
-
-ChatFilterModule.prototype.handleRemoveFilter = function (user, data) {
-    if (typeof data !== "object") {
-        return;
-    }
-
-    if (!this.channel.modules.permissions.canEditFilters(user)) {
-        return;
-    }
-
-    if (typeof data.name !== "string") {
-        return;
-    }
-
-    try {
-        this.filters.removeFilter(data);
-    } catch (e) {
-        user.socket.emit("errorMsg", {
-            msg: "Filter removal failed: " + e.message,
-            alert: true
-        });
-        return;
-    }
-    var chan = this.channel;
-    chan.users.forEach(function (u) {
-        if (chan.modules.permissions.canEditFilters(u)) {
-            u.socket.emit("deleteChatFilter", data);
+        if (!this.channel.modules.permissions.canEditFilters(user)) {
+            return;
         }
-    });
 
-    this.channel.logger.log("[mod] " + user.getName() + " removed filter: " + data.name);
-};
+        try {
+            FilterList.checkValidRegex(data.source);
+        } catch (e) {
+            user.socket.emit("errorMsg", {
+                msg: "Invalid regex: " + e.message,
+                alert: true
+            });
+            return;
+        }
 
-ChatFilterModule.prototype.handleMoveFilter = function (user, data) {
-    if (typeof data !== "object") {
-        return;
-    }
+        data = validateFilter(data);
+        if (!data) {
+            return;
+        }
 
-    if (!this.channel.modules.permissions.canEditFilters(user)) {
-        return;
-    }
+        try {
+            this.filters.updateFilter(data);
+        } catch (e) {
+            user.socket.emit("errorMsg", {
+                msg: "Filter update failed: " + e.message,
+                alert: true
+            });
+            return;
+        }
 
-    if (typeof data.to !== "number" || typeof data.from !== "number") {
-        return;
-    }
-
-    try {
-        this.filters.moveFilter(data.from, data.to);
-    } catch (e) {
-        user.socket.emit("errorMsg", {
-            msg: "Filter move failed: " + e.message,
-            alert: true
+        var chan = this.channel;
+        chan.users.forEach(function (u) {
+            if (chan.modules.permissions.canEditFilters(u)) {
+                u.socket.emit("updateChatFilter", data);
+            }
         });
-        return;
-    }
-};
 
-ChatFilterModule.prototype.handleRequestChatFilters = function (user) {
-    this.sendChatFilters([user]);
-};
+        chan.logger.log("[mod] " + user.getName() + " updated filter: " + data.name + " -> " +
+                        "s/" + data.source + "/" + data.replace + "/" + data.flags +
+                        " active: " + data.active + ", filterlinks: " + data.filterlinks);
+    }
+
+    handleImportFilters(user: any, data: any): void {
+        if (!(data instanceof Array)) {
+            return;
+        }
+
+        /* Note: importing requires a different permission node than simply
+           updating/removing */
+        if (!this.channel.modules.permissions.canImportFilters(user)) {
+            return;
+        }
+
+        try {
+            this.filters = new FilterList(data.map(validateFilter).filter(function (f) {
+                return f !== null;
+            }));
+        } catch (e) {
+            user.socket.emit("errorMsg", {
+                msg: "Filter import failed: " + e.message,
+                alert: true
+            });
+            return;
+        }
+
+        this.channel.logger.log("[mod] " + user.getName() + " imported the filter list");
+        this.sendChatFilters(this.channel.users);
+    }
+
+    handleRemoveFilter(user: any, data: any): void {
+        if (typeof data !== "object") {
+            return;
+        }
+
+        if (!this.channel.modules.permissions.canEditFilters(user)) {
+            return;
+        }
+
+        if (typeof data.name !== "string") {
+            return;
+        }
+
+        try {
+            this.filters.removeFilter(data);
+        } catch (e) {
+            user.socket.emit("errorMsg", {
+                msg: "Filter removal failed: " + e.message,
+                alert: true
+            });
+            return;
+        }
+        var chan = this.channel;
+        chan.users.forEach(function (u) {
+            if (chan.modules.permissions.canEditFilters(u)) {
+                u.socket.emit("deleteChatFilter", data);
+            }
+        });
+
+        this.channel.logger.log("[mod] " + user.getName() + " removed filter: " + data.name);
+    }
+
+    handleMoveFilter(user: any, data: any): void {
+        if (typeof data !== "object") {
+            return;
+        }
+
+        if (!this.channel.modules.permissions.canEditFilters(user)) {
+            return;
+        }
+
+        if (typeof data.to !== "number" || typeof data.from !== "number") {
+            return;
+        }
+
+        try {
+            this.filters.moveFilter(data.from, data.to);
+        } catch (e) {
+            user.socket.emit("errorMsg", {
+                msg: "Filter move failed: " + e.message,
+                alert: true
+            });
+            return;
+        }
+    }
+
+    handleRequestChatFilters(user: any): void {
+        this.sendChatFilters([user]);
+    }
+}
 
 export default ChatFilterModule;

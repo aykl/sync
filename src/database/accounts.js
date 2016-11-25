@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import $util from '../utilities';
 import bcrypt from 'bcrypt';
@@ -33,7 +33,7 @@ function parseProfile(data) {
 /**
  * Check if a username is taken
  */
-function isUsernameTaken(name, callback) {
+function isUsernameTaken(name: string, callback: any): void {
     db.query("SELECT name FROM `users` WHERE name LIKE ? ESCAPE '\\\\'",
              [wildcardSimilarChars(name)],
     function (err, rows) {
@@ -54,7 +54,7 @@ export default {
     /**
      * Search for a user by name
      */
-    search: function (name, fields, callback) {
+    search: function (name: string, fields: any, callback: any): void {
         /* This bit allows it to accept varargs
            Function can be called as (name, callback) or
            (name, fields, callback)
@@ -84,7 +84,7 @@ export default {
         });
     },
 
-    getUser: function (name, callback) {
+    getUser: function (name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -107,7 +107,7 @@ export default {
     /**
      * Registers a new user account
      */
-    register: function (name, pw, email, ip, callback) {
+    register: function (name: string, pw: string, email: string, ip: any, callback: any): void {
         // Start off with a boatload of error checking
         if (typeof callback !== "function") {
             callback = blackHole;
@@ -203,7 +203,7 @@ export default {
     /**
      * Verify a username/password pair
      */
-    verifyLogin: function (name, pw, callback) {
+    verifyLogin: function (name: string, pw: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -253,7 +253,7 @@ export default {
     /**
      * Change a user's password
      */
-    setPassword: function (name, pw, callback) {
+    setPassword: function (name: string, pw: string, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -286,7 +286,7 @@ export default {
     /**
      * Lookup a user's global rank
      */
-    getGlobalRank: function (name, callback) {
+    getGlobalRank: function (name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -316,7 +316,7 @@ export default {
     /**
      * Updates a user's global rank
      */
-    setGlobalRank: function (name, rank, callback) {
+    setGlobalRank: function (name: string, rank: number, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -340,7 +340,7 @@ export default {
     /**
      * Lookup multiple users' global rank in one query
      */
-    getGlobalRanks: function (names, callback) {
+    getGlobalRanks: function (names: string[], callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -371,7 +371,7 @@ export default {
     /**
      * Lookup a user's email
      */
-    getEmail: function (name, callback) {
+    getEmail: function (name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -396,7 +396,7 @@ export default {
     /**
      * Updates a user's email
      */
-    setEmail: function (name, email, callback) {
+    setEmail: function (name: string, email: string, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -420,7 +420,7 @@ export default {
     /**
      * Lookup a user's profile
      */
-    getProfile: function (name, callback) {
+    getProfile: function (name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -464,7 +464,7 @@ export default {
     /**
      * Updates a user's profile
      */
-    setProfile: function (name, profile, callback) {
+    setProfile: function (name: string, profile: any, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -499,7 +499,7 @@ export default {
         });
     },
 
-    generatePasswordReset: function (ip, name, email, callback) {
+    generatePasswordReset: function (ip: any, name: any, email: any, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -507,7 +507,7 @@ export default {
         callback("generatePasswordReset is not implemented", null);
     },
 
-    recoverPassword: function (hash, callback) {
+    recoverPassword: function (hash: any, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -518,7 +518,7 @@ export default {
     /**
      * Retrieve a list of channels owned by a user
      */
-    getChannels: function (name, callback) {
+    getChannels: function (name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -529,7 +529,7 @@ export default {
     /**
      * Retrieves all names registered from a given IP
      */
-    getAccounts: function (ip, callback) {
+    getAccounts: function (ip: any, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }

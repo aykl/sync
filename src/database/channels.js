@@ -11,7 +11,7 @@ import util from '../utilities';
 
 var blackHole = function () { };
 
-function dropTable(name, callback) {
+function dropTable(name: string, callback: any): void {
     db.query("DROP TABLE `" + name + "`", callback);
 }
 
@@ -27,7 +27,7 @@ function initTables(name, owner, callback) {
 /**
  * Checks if the given channel name is registered
  */
-function isChannelTaken(name, callback) {
+function isChannelTaken(name: string, callback: any): void {
     if (typeof callback !== "function") {
         return;
     }
@@ -52,7 +52,7 @@ function isChannelTaken(name, callback) {
 /**
  * Updates a user's rank
  */
-function setRank(chan, name, rank, callback) {
+function setRank(chan: any, name: string, rank: number, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -378,7 +378,7 @@ export default {
     /**
      * Looks up a user's rank
      */
-    getRank: function (chan, name, callback) {
+    getRank: function (chan: any, name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -408,7 +408,7 @@ export default {
     /**
      * Looks up multiple users' ranks at once
      */
-    getRanks: function (chan, names, callback) {
+    getRanks: function (chan: any, names: any[], callback: any): void {
         if (typeof callback !== "function") {
             return;
         }

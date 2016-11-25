@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import Logger from '../logger';
 import ChannelModule from './module';
@@ -83,7 +83,7 @@ class ReferenceCounter {
     }
 }
 
-function Channel(name) {
+function Channel(name: string) {
     this.name = name;
     this.uniqueName = name.toLowerCase();
     this.modules = {};

@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import fs from 'fs';
 import path from 'path';
@@ -20,10 +20,12 @@ import googleDriveUserscript from './routes/google_drive_userscript';
 import socketConfig from './routes/socketconfig';
 import indexRoute from './routes/index';
 import channelRoute from './routes/channel';
+import contactRoute from './routes/contact';
 import authorizationMiddleware from './middleware/authorize';
 import google2Vtt from '../google2vtt';
 import auth from './auth';
 import acp from './acp';
+import Account from './account';
 
 
 function initializeLog(app) {
@@ -42,7 +44,7 @@ function initializeLog(app) {
 /**
  * Redirects a request to HTTPS if the server supports it
  */
-function redirectHttps(req, res) {
+function redirectHttps(req: any, res: any) {
     if (req.realProtocol !== 'https' && Config.get('https.enabled') &&
             Config.get('https.redirect')) {
         var ssldomain = Config.get('https.full-address');
@@ -142,7 +144,7 @@ export default {
     /**
      * Initializes webserver callbacks
      */
-    init: function (app, webConfig, ioConfig, clusterClient, channelIndex, session) {
+    init: function (app: any, webConfig: any, ioConfig: any, clusterClient: any, channelIndex: any, session: any): void {
         app.use((req, res, next) => {
             counters.add("http:request", 1);
             next();
@@ -192,9 +194,9 @@ export default {
         app.get('/sioconfig(.json)?', handleLegacySocketConfig);
         socketConfig(app, clusterClient);
         app.get('/useragreement', handleUserAgreement);
-        require('./routes/contact')(app, webConfig);
+        contactRoute(app, webConfig);
         auth.init(app);
-        require('./account').init(app);
+        Account.init(app);
         acp.init(app);
         google2Vtt.attach(app);
         googleDriveUserscript(app);

@@ -1,17 +1,22 @@
-// @flow weak
+// @flow
+
+type BackendConfig = {
+  redis: any,
+  proxy: any
+};
 
 class BackendConfiguration {
-    config: any;
+    config: BackendConfig;
 
-    constructor(config) {
+    constructor(config: BackendConfig) {
         this.config = config;
     }
 
-    getRedisConfig() {
+    getRedisConfig(): void {
         return this.config.redis;
     }
 
-    getListenerConfig() {
+    getListenerConfig(): any[] {
         return this.config.proxy.listeners.map(listener => ({
             getHost() {
                 return listener.host;

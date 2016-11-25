@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import dbAccounts from './database/accounts';
 import util from './utilities';
@@ -10,7 +10,7 @@ function sha256(input) {
     return hash.digest("base64");
 }
 
-function genSession(account, expiration, cb) {
+function genSession(account: any, expiration: any, cb: any): void {
     if (expiration instanceof Date) {
         expiration = Date.parse(expiration);
     }
@@ -22,7 +22,7 @@ function genSession(account, expiration, cb) {
     cb(null, [account.name, expiration, salt, hash].join(":"));
 };
 
-function verifySession(input, cb) {
+function verifySession(input: string, cb: any): void {
     if (typeof input !== "string") {
         return cb("Invalid auth string");
     }

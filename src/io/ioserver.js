@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import sio from 'socket.io';
 import Logger from '../logger';
@@ -201,7 +201,7 @@ function ipForwardingMiddleware(webConfig) {
 /**
  * Called after a connection is accepted
  */
-function handleConnection(sock) {
+function handleConnection(sock: any): void {
     var ip = sock._realip;
     if (!ip) {
         sock.emit("kick", {
@@ -264,7 +264,7 @@ function handleConnection(sock) {
 }
 
 export default {
-    init: function (srv, webConfig) {
+    init: function (srv: any, webConfig: any): void {
         var bound = {};
         const ioOptions = {
             perMessageDeflate: Config.get("io.per-message-deflate")

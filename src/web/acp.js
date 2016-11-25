@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import path from 'path';
 import fs from 'fs';
@@ -105,7 +105,7 @@ function handleReadChanlog(req, res) {
 }
 
 export default {
-    init: function (app) {
+    init: function (app: any): void {
         app.get("/acp", checkAdmin(handleAcp));
         app.get("/acp/syslog", checkAdmin(handleReadSyslog));
         app.get("/acp/errlog", checkAdmin(handleReadErrlog));

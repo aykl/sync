@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import http from 'http';
 import https from 'https';
@@ -84,7 +84,7 @@ function convertMedia(media) {
 
 var Getters = {
     /* youtube.com */
-    yt: function (id, callback) {
+    yt(id: any, callback: any): void {
         if (!Config.get("youtube-v3-key")) {
             return callback("The YouTube API now requires an API key.  Please see the " +
                             "documentation for youtube-v3-key in config.template.yaml");
@@ -105,7 +105,7 @@ var Getters = {
     },
 
     /* youtube.com playlists */
-    yp: function (id, callback) {
+    yp(id: any, callback: any): void {
         if (!Config.get("youtube-v3-key")) {
             return callback("The YouTube API now requires an API key.  Please see the " +
                             "documentation for youtube-v3-key in config.template.yaml");
@@ -128,7 +128,7 @@ var Getters = {
     },
 
     /* youtube.com search */
-    ytSearch: function (query, callback) {
+    ytSearch(query: any, callback: any): void {
         if (!Config.get("youtube-v3-key")) {
             return callback("The YouTube API now requires an API key.  Please see the " +
                             "documentation for youtube-v3-key in config.template.yaml");
@@ -154,7 +154,7 @@ var Getters = {
     },
 
     /* vimeo.com */
-    vi: function (id, callback) {
+    vi(id: any, callback: any): void {
         var m = id.match(/([\w-]+)/);
         if (m) {
             id = m[1];
@@ -175,7 +175,7 @@ var Getters = {
         });
     },
 
-    vi_oauth: function (id, callback) {
+    vi_oauth(id: any, callback: any): void {
         var OAuth = require("oauth");
         var oa = new OAuth.OAuth(
             "https://vimeo.com/oauth/request_token",
@@ -220,7 +220,7 @@ var Getters = {
     },
 
     /* dailymotion.com */
-    dm: function (id, callback) {
+    dm(id: any, callback: any): void {
         var m = id.match(/([\w-]+)/);
         if (m) {
             id = m[1].split("_")[0];
@@ -275,7 +275,7 @@ var Getters = {
     },
 
     /* soundcloud.com */
-    sc: function (id, callback) {
+    sc(id: any, callback: any): void {
         /* TODO: require server owners to register their own API key, put in config */
         const SC_CLIENT = "2e0c82ab5a020f3a7509318146128abd";
 
@@ -373,7 +373,7 @@ var Getters = {
     },
 
     /* livestream.com */
-    li: function (id, callback) {
+    li(id: any, callback: any): void {
         var m = id.match(/([\w-]+)/);
         if (m) {
             id = m[1];
@@ -387,7 +387,7 @@ var Getters = {
     },
 
     /* twitch.tv */
-    tw: function (id, callback) {
+    tw(id: any, callback: any): void {
         var m = id.match(/([\w-]+)/);
         if (m) {
             id = m[1];
@@ -401,7 +401,7 @@ var Getters = {
     },
 
     /* twitch VOD */
-    tv: function (id, callback) {
+    tv(id: any, callback: any): void {
         var m = id.match(/([cv]\d+)/);
         if (m) {
             id = m[1];
@@ -420,7 +420,7 @@ var Getters = {
     },
 
     /* ustream.tv */
-    us: function (id, callback) {
+    us(id: any, callback: any): void {
         /**
          *2013-09-17
          * They couldn't fucking decide whether channels should
@@ -470,28 +470,28 @@ var Getters = {
     },
 
     /* JWPlayer */
-    jw: function (id, callback) {
+    jw(id: any, callback: any): void {
         var title = "JWPlayer - " + id;
         var media = new Media(id, title, "--:--", "jw");
         callback(false, media);
     },
 
     /* rtmp stream */
-    rt: function (id, callback) {
+    rt(id: any, callback: any): void {
         var title = "Livestream";
         var media = new Media(id, title, "--:--", "rt");
         callback(false, media);
     },
 
     /* HLS stream */
-    hl: function (id, callback) {
+    hl(id: any, callback: any): void {
         var title = "Livestream";
         var media = new Media(id, title, "--:--", "hl");
         callback(false, media);
     },
 
     /* imgur.com albums */
-    im: function (id, callback) {
+    im(id: any, callback: any): void {
         /**
          * TODO: Consider deprecating this in favor of custom embeds
          */
@@ -508,7 +508,7 @@ var Getters = {
     },
 
     /* custom embed */
-    cu: function (id, callback) {
+    cu(id: any, callback: any): void {
         var media;
         try {
             media = CustomEmbedFilter(id);
@@ -524,7 +524,7 @@ var Getters = {
     },
 
     /* google docs */
-    gd: function (id, callback) {
+    gd(id: any, callback: any): void {
         GoogleDrive.setHTML5HackEnabled(Config.get("google-drive.html5-hack-enabled"));
         var data = {
             type: "googledrive",
@@ -540,7 +540,7 @@ var Getters = {
     },
 
     /* Google+ videos */
-    gp: function (id, callback) {
+    gp(id: any, callback: any): void {
         var data = {
             type: "google+",
             kind: "single",
@@ -555,7 +555,7 @@ var Getters = {
     },
 
     /* ffmpeg for raw files */
-    fi: function (id, cb) {
+    fi(id: any, cb: any): void {
         ffmpeg.query(id, function (err, data) {
             if (err) {
                 return cb(err);
@@ -570,7 +570,7 @@ var Getters = {
     },
 
     /* hitbox.tv */
-    hb: function (id, callback) {
+    hb(id: any, callback: any): void {
         var m = id.match(/([\w-]+)/);
         if (m) {
             id = m[1];
@@ -584,7 +584,7 @@ var Getters = {
     },
 
     /* vid.me */
-    vm: function (id, callback) {
+    vm(id: any, callback: any): void {
         if (!/^[\w-]+$/.test(id)) {
             process.nextTick(callback, "Invalid vid.me ID");
             return;
@@ -600,7 +600,7 @@ var Getters = {
     },
 
     /* streamable */
-    sb: function (id, callback) {
+    sb(id: any, callback: any): void {
         if (!/^[\w-]+$/.test(id)) {
             process.nextTick(callback, "Invalid streamable.com ID");
             return;
@@ -618,7 +618,7 @@ var Getters = {
 
 export default {
     Getters: Getters,
-    getMedia: function (id, type, callback) {
+    getMedia: function (id: any, type: any, callback: any): void {
         if(type in this.Getters) {
             this.Getters[type](id, callback);
         } else {

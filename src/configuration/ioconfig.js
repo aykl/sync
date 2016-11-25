@@ -1,17 +1,17 @@
-// @flow weak
+// @flow
 
 export default class IOConfiguration {
     config: any;
 
-    constructor(config) {
+    constructor(config: any) {
         this.config = config;
     }
 
-    getSocketEndpoints() {
+    getSocketEndpoints(): any {
         return this.config.endpoints.slice();
     }
 
-    static fromOldConfig(oldConfig) {
+    static fromOldConfig(oldConfig: any): IOConfiguration {
         const config = {
             endpoints: []
         };

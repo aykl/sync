@@ -1,16 +1,16 @@
-// @flow weak
+// @flow
 
 import cheerio from 'cheerio';
 import crypto from 'crypto';
 import Media from './media';
 
-function sha256(input) {
+function sha256(input: string): string {
     var hash = crypto.createHash("sha256");
     hash.update(input);
     return hash.digest("base64");
 }
 
-function filter(input) {
+function filter(input: string): Media {
     var $ = cheerio.load(input, {
         lowerCaseTags: true,
         lowerCaseAttributeNames: true

@@ -1,8 +1,6 @@
-// @flow weak
-
 import util from './utilities';
 
-function Media(id, title, seconds, type, meta) {
+function Media(id: any, title: any, seconds: any, type: any, meta: any) {
     if (!meta) {
         meta = {};
     }

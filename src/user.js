@@ -12,7 +12,7 @@ import Flags from './flags';
 import events from 'events';
 const EventEmitter = events.EventEmitter;
 
-function User(socket) {
+function User(socket: any) {
     var self = this;
     self.flags = 0;
     self.socket = socket;

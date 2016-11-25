@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import cheerio from 'cheerio';
 import https from 'https';
@@ -74,7 +74,7 @@ function convertSubtitles(subtitles) {
     return 'WEBVTT\n\n' + lines.join('\n');
 };
 
-function attach(app) {
+function attach(app: any): void {
     app.get('/gdvtt/:id/:lang/(:name)?.vtt', handleGetSubtitles);
 };
 
@@ -123,6 +123,7 @@ function fetchSubtitles(id, lang, name, vid, file, cb) {
     var url = 'https://drive.google.com/timedtext?' + querystring.stringify(query);
     https.get(url, function (res) {
         if (res.statusCode !== 200) {
+            // $FlowIgnore
             return cb(new Error(res.statusMessage));
         }
 

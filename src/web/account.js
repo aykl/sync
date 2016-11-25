@@ -1,3 +1,4 @@
+// @flow
 /**
  * web/account.js - Webserver details for account management
  *
@@ -13,6 +14,7 @@ import Config from '../config';
 import Server from '../server';
 import session from '../session';
 import csrf from './csrf';
+import Flags from '../flags';
 
 /**
  * Handles a GET request for /account/edit
@@ -343,7 +345,7 @@ function handleDeleteChannel(req, res) {
             var sv = Server.getServer();
             if (sv.isChannelLoaded(name)) {
                 var chan = sv.getChannel(name);
-                chan.clearFlag(require("../flags").C_REGISTERED);
+                chan.clearFlag(Flags.C_REGISTERED);
                 var users = Array.prototype.slice.call(chan.users);
                 users.forEach(function (u) {
                     u.kick("Channel reloading");
@@ -628,7 +630,7 @@ export default {
     /**
      * Initialize the module
      */
-    init: function (app) {
+    init: function (app: any): void {
         app.get("/account/edit", handleAccountEditPage);
         app.post("/account/edit", handleAccountEdit);
         app.get("/account/channels", handleAccountChannelPage);

@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 /**
  * web/auth.js - Webserver functions for user authentication and registration
@@ -236,7 +236,7 @@ export default {
     /**
      * Initializes auth callbacks
      */
-    init: function (app) {
+    init: function (app: any): void {
         app.get("/login", handleLoginPage);
         app.post("/login", handleLogin);
         app.post("/logout", handleLogout);
