@@ -1,3 +1,5 @@
+// @flow weak
+
 import lo from 'lodash';
 
 export function throttle(fn, timeout) {

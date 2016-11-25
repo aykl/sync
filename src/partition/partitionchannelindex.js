@@ -1,3 +1,5 @@
+// @flow weak
+
 import Promise from 'bluebird';
 import uuid from 'uuid';
 import { runLuaScript } from 'cytube-common/lib/redis/lualoader';
@@ -11,6 +13,11 @@ const CACHE_EXPIRE_DELAY = 40 * 1000;
 const READ_CHANNEL_LIST = path.join(__dirname, 'read_channel_list.lua')
 
 class PartitionChannelIndex {
+    redisClient: any;
+    uid: any;
+    cachedList: any;
+    redisClient: any;
+    
     constructor(redisClient) {
         this.redisClient = redisClient;
         this.uid = uuid.v4();

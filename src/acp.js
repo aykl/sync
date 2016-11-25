@@ -1,9 +1,10 @@
-var Logger = require("./logger");
-var Server = require("./server");
-var db = require("./database");
-var util = require("./utilities");
-var Config = require("./config");
-var Server = require("./server");
+// @flow weak
+
+import Logger from './logger';
+import db from './database';
+import util from './utilities';
+import Config from './config';
+import Server from './server';
 
 function eventUsername(user) {
     return user.getName() + "@" + user.realip;

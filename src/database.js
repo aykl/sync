@@ -1,11 +1,13 @@
-var mysql = require("mysql");
-var bcrypt = require("bcrypt");
-var $util = require("./utilities");
-var Logger = require("./logger");
-var Config = require("./config");
-var tables = require("./database/tables");
-var net = require("net");
-var util = require("./utilities");
+// @flow weak
+
+import mysql from 'mysql';
+import bcrypt from 'bcrypt';
+import $util from './utilities';
+import Logger from './logger';
+import Config from './config';
+import tables from './database/tables';
+import net from 'net';
+import util from './utilities';
 import * as Metrics from 'cytube-common/lib/metrics/metrics';
 
 var pool = null;

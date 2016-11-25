@@ -1,3 +1,5 @@
+// @flow weak
+
 import { sendPug } from '../pug';
 
 export default function initialize(app, channelIndex, maxEntries) {

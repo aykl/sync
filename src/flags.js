@@ -1,4 +1,6 @@
-module.exports = {
+// @flow
+
+export default {
     C_READY      : 1 << 0,
     C_ERROR      : 1 << 1,
     C_REGISTERED : 1 << 2,

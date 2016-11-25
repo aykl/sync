@@ -1,6 +1,10 @@
+// @flow weak
+
 import Promise from 'bluebird';
 
 class PartitionClusterClient {
+    partitionDecider: any;
+    
     constructor(partitionDecider) {
         this.partitionDecider = partitionDecider;
     }

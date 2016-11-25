@@ -1,5 +1,7 @@
+// @flow weak
+
 const link = /(\w+:\/\/(?:[^:\/\[\]\s]+|\[[0-9a-f:]+\])(?::\d+)?(?:\/[^\/\s]*)*)/ig;
-var XSS = require("./xss");
+import XSS from './xss';
 
 var Poll = function(initiator, title, options, obscured) {
     this.initiator = initiator;

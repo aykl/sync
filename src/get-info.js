@@ -1,19 +1,21 @@
-var http = require("http");
-var https = require("https");
-var cheerio = require('cheerio');
-var Logger = require("./logger.js");
-var Media = require("./media");
-var CustomEmbedFilter = require("./customembed").filter;
-var Server = require("./server");
-var Config = require("./config");
-var ffmpeg = require("./ffmpeg");
-var mediaquery = require("cytube-mediaquery");
-var YouTube = require("cytube-mediaquery/lib/provider/youtube");
-var Vimeo = require("cytube-mediaquery/lib/provider/vimeo");
-var Vidme = require("cytube-mediaquery/lib/provider/vidme");
-var Streamable = require("cytube-mediaquery/lib/provider/streamable");
-var GoogleDrive = require("cytube-mediaquery/lib/provider/googledrive");
-var TwitchVOD = require("cytube-mediaquery/lib/provider/twitch-vod");
+// @flow weak
+
+import http from 'http';
+import https from 'https';
+import cheerio from 'cheerio';
+import Logger from './logger.js';
+import Media from './media';
+import { filter as CustomEmbedFilter } from './customembed';
+import Server from './server';
+import Config from './config';
+import ffmpeg from './ffmpeg';
+import mediaquery from 'cytube-mediaquery';
+import YouTube from 'cytube-mediaquery/lib/provider/youtube';
+import Vimeo from 'cytube-mediaquery/lib/provider/vimeo';
+import Vidme from 'cytube-mediaquery/lib/provider/vidme';
+import Streamable from 'cytube-mediaquery/lib/provider/streamable';
+import GoogleDrive from 'cytube-mediaquery/lib/provider/googledrive';
+import TwitchVOD from 'cytube-mediaquery/lib/provider/twitch-vod';
 
 /*
  * Preference map of quality => youtube formats.
@@ -29,15 +31,15 @@ const GOOGLE_PREFERENCE = {
 };
 
 const CONTENT_TYPES = {
-    43: "webm",
-    44: "webm",
-    45: "webm",
-    46: "webm",
-    18: "mp4",
-    22: "mp4",
-    37: "mp4",
-    59: "mp4",
-    34: "flv"
+    [43]: "webm",
+    [44]: "webm",
+    [45]: "webm",
+    [46]: "webm",
+    [18]: "mp4",
+    [22]: "mp4",
+    [37]: "mp4",
+    [59]: "mp4",
+    [34]: "flv"
 };
 
 var urlRetrieve = function (transport, options, callback) {

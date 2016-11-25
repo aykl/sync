@@ -1,23 +1,26 @@
-var sio = require("socket.io");
-var Logger = require("../logger");
-var db = require("../database");
-var User = require("../user");
-var Server = require("../server");
-var Config = require("../config");
-var cookieParser = require("cookie-parser")(Config.get("http.cookie-secret"));
-var $util = require("../utilities");
-var Flags = require("../flags");
-var typecheck = require("json-typecheck");
-var net = require("net");
-var util = require("../utilities");
-var crypto = require("crypto");
-var isTorExit = require("../tor").isTorExit;
-var session = require("../session");
+// @flow weak
+
+import sio from 'socket.io';
+import Logger from '../logger';
+import db from '../database';
+import User from '../user';
+import Server from '../server';
+import Config from '../config';
+import CookieParser from 'cookie-parser';
+import $util from '../utilities';
+import Flags from '../flags';
+import typecheck from 'json-typecheck';
+import net from 'net';
+import util from '../utilities';
+import crypto from 'crypto';
+import { isTorExit } from '../tor';
+import session from '../session';
 import counters from '../counters';
 import { verifyIPSessionCookie } from '../web/middleware/ipsessioncookie';
 import Promise from 'bluebird';
 const verifySession = Promise.promisify(session.verifySession);
 const getAliases = Promise.promisify(db.getAliases);
+const cookieParser = CookieParser(Config.get("http.cookie-secret"));
 
 var CONNECT_RATE = {
     burst: 5,

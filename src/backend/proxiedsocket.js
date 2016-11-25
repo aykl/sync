@@ -1,7 +1,17 @@
+// @flow weak
+
 import logger from 'cytube-common/lib/logger';
-import { EventEmitter } from 'events';
+import events from 'events';
+const EventEmitter = events.EventEmitter;
 
 export default class ProxiedSocket extends EventEmitter {
+    id: any;
+    ip: any;
+    _realip: any;
+    user: any;
+    socketEmitter: any;
+    frontendConnection: any;
+
     constructor(socketID, socketIP, socketUser, socketEmitter, frontendConnection) {
         super();
         this.id = socketID;

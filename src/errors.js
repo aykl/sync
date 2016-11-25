@@ -1,3 +1,5 @@
+// @flow
+
 import createError from 'create-error';
 import * as HTTPStatus from './web/httpstatus';
 

@@ -1,11 +1,13 @@
-var Config = require("../config");
-var User = require("../user");
-var XSS = require("../xss");
-var ChannelModule = require("./module");
-var util = require("../utilities");
-var Flags = require("../flags");
-var url = require("url");
-var counters = require("../counters");
+// @flow weak
+
+import Config from '../config';
+import User from '../user';
+import XSS from '../xss';
+import ChannelModule from './module';
+import util from '../utilities';
+import Flags from '../flags';
+import url from 'url';
+import counters from '../counters';
 
 const SHADOW_TAG = "[shadow]";
 const LINK = /(\w+:\/\/(?:[^:\/\[\]\s]+|\[[0-9a-f:]+\])(?::\d+)?(?:\/[^\/\s]*)*)/ig;

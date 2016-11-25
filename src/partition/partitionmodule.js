@@ -1,3 +1,5 @@
+// @flow weak
+
 import { loadFromToml } from 'cytube-common/lib/configuration/configloader';
 import { PartitionConfig } from './partitionconfig';
 import { PartitionDecider } from './partitiondecider';
@@ -13,6 +15,14 @@ const PARTITION_CONFIG_PATH = path.resolve(__dirname, '..', '..', 'conf',
                                            'partitions.toml');
 
 class PartitionModule {
+    cliMode: any;
+    partitionConfig: any;
+    partitionDecider: any;
+    partitionClusterClient: any;
+    announcementRefresher: any;
+    partitionMapReloader: any;
+    redisClientProvider: any;
+
     constructor() {
         this.initConfig();
         this.cliMode = false;

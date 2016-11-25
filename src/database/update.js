@@ -1,6 +1,8 @@
-var db = require("../database");
-var Logger = require("../logger");
-var Q = require("q");
+// @flow weak
+
+import db from '../database';
+import Logger from '../logger';
+import Q from 'q';
 
 const DB_VERSION = 7;
 var hasUpdates = [];

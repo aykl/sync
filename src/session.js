@@ -1,6 +1,8 @@
-var dbAccounts = require("./database/accounts");
-var util = require("./utilities");
-var crypto = require("crypto");
+// @flow weak
+
+import dbAccounts from './database/accounts';
+import util from './utilities';
+import crypto from 'crypto';
 
 function sha256(input) {
     var hash = crypto.createHash("sha256");

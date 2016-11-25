@@ -1,10 +1,11 @@
+// @flow weak
 /*
  * Adapted from https://github.com/expressjs/csurf
  */
 
 import { CSRFError } from '../errors';
 
-var csrf = require("csrf");
+import csrf from 'csrf';
 
 var tokens = csrf();
 

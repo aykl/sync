@@ -1,3 +1,5 @@
+// @flow weak
+
 (function () {
     var root, crypto, net = false;
 
@@ -68,7 +70,7 @@
         return true;
     },
 
-    root.randomSalt = function (length) {
+    root.randomSalt = function (length: number) {
         var chars = "abcdefgihjklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                   + "0123456789!@#$%^&*_+=~";
         var salt = [];

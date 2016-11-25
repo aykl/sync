@@ -1,3 +1,5 @@
+// @flow weak
+
 import net from 'net';
 
 export default function initialize(app, webConfig) {

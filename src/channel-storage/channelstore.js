@@ -1,3 +1,5 @@
+// @flow weak
+
 import { FileStore } from './filestore';
 import { DatabaseStore } from './dbstore';
 import Config from '../config';

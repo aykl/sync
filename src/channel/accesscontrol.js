@@ -1,6 +1,8 @@
-var Account = require("../account");
-var ChannelModule = require("./module");
-var Flags = require("../flags");
+// @flow weak
+
+import Account from '../account';
+import ChannelModule from './module';
+import Flags from '../flags';
 
 function AccessControlModule(channel) {
     ChannelModule.apply(this, arguments);

@@ -1,3 +1,5 @@
+// @flow weak
+
 import Logger from '../logger';
 import uuid from 'uuid';
 
@@ -5,6 +7,10 @@ var SERVER;
 const SERVER_ANNOUNCEMENTS = 'serverAnnouncements';
 
 class AnnouncementRefresher {
+    pubClient: any;
+    subClient: any;
+    uuid: any;
+
     constructor(pubClient, subClient) {
         this.pubClient = pubClient;
         this.subClient = subClient;

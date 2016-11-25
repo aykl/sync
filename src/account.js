@@ -1,9 +1,22 @@
-var db = require("./database");
-var Q = require("q");
+// @flow weak
+
+import db from './database';
+import Q from 'q';
 
 const DEFAULT_PROFILE = Object.freeze({ image: '', text: '' });
 
 class Account {
+    ip: any;
+    user: any;
+    aliases: any;
+    channelRank: any;
+    effectiveRank: any;
+    guestName: any;
+    globalRank: any;
+    name: any;
+    lowername: any;
+    profile: any;
+
     constructor(ip, user, aliases) {
         this.ip = ip;
         this.user = user;

@@ -1,7 +1,9 @@
-var FilterList = require("cytubefilters");
-var ChannelModule = require("./module");
-var XSS = require("../xss");
-var Logger = require("../logger");
+// @flow weak
+
+import FilterList from 'cytubefilters';
+import ChannelModule from './module';
+import XSS from '../xss';
+import Logger from '../logger';
 
 /*
  * Converts JavaScript-style replacements ($1, $2, etc.) with

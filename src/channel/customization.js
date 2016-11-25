@@ -1,5 +1,7 @@
-var ChannelModule = require("./module");
-var XSS = require("../xss");
+// @flow weak
+
+import ChannelModule from './module';
+import XSS from '../xss';
 
 const TYPE_SETCSS = {
     css: "string"

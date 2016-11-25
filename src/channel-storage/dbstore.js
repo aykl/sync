@@ -1,3 +1,5 @@
+// @flow weak
+
 import Promise from 'bluebird';
 import { ChannelStateSizeError,
          ChannelNotFoundError } from '../errors';
@@ -23,7 +25,7 @@ function queryAsync(query, substitutions) {
     });
 }
 
-function buildUpdateQuery(numEntries) {
+function buildUpdateQuery(numEntries: number) : string {
     const values = [];
     for (let i = 0; i < numEntries; i++) {
         values.push('(?, ?, ?)');

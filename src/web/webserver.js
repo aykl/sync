@@ -1,3 +1,5 @@
+// @flow weak
+
 import fs from 'fs';
 import path from 'path';
 import net from 'net';
@@ -13,6 +15,13 @@ import csrf from './csrf';
 import * as HTTPStatus from './httpstatus';
 import { CSRFError, HTTPError } from '../errors';
 import counters from "../counters";
+import xForwardedFor from './middleware/x-forwarded-for';
+import googleDriveUserscript from './routes/google_drive_userscript';
+import socketConfig from './routes/socketconfig';
+import indexRoute from './routes/index';
+import channelRoute from './routes/channel';
+import authorizationMiddleware from './middleware/authorize';
+
 
 function initializeLog(app) {
     const logFormat = ':real-address - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"';
@@ -71,7 +80,7 @@ function handleLegacySocketConfig(req, res) {
     }
 
     sioconfig += 'var IO_URL=\'' + iourl + '\';';
-    sioconfig += 'var IO_V6=' + ipv6 + ';';
+    sioconfig += 'var IO_V6=' + String(ipv6) + ';';
     res.send(sioconfig);
 }
 
@@ -135,7 +144,7 @@ module.exports = {
             counters.add("http:request", 1);
             next();
         });
-        require('./middleware/x-forwarded-for')(app, webConfig);
+        xForwardedFor(app, webConfig);
         app.use(bodyParser.urlencoded({
             extended: false,
             limit: '1kb' // No POST data should ever exceed this size under normal usage
@@ -148,7 +157,7 @@ module.exports = {
         app.use(csrf.init(webConfig.getCookieDomain()));
         app.use('/r/:channel', require('./middleware/ipsessioncookie').ipSessionCookieMiddleware);
         initializeLog(app);
-        require('./middleware/authorize')(app, session);
+        authorizationMiddleware(app, session);
 
         if (webConfig.getEnableGzip()) {
             app.use(require('compression')({
@@ -175,17 +184,17 @@ module.exports = {
             Logger.syslog.log('Enabled express-minify for CSS and JS');
         }
 
-        require('./routes/channel')(app, ioConfig);
-        require('./routes/index')(app, channelIndex, webConfig.getMaxIndexEntries());
+        channelRoute(app, ioConfig);
+        indexRoute(app, channelIndex, webConfig.getMaxIndexEntries());
         app.get('/sioconfig(.json)?', handleLegacySocketConfig);
-        require('./routes/socketconfig')(app, clusterClient);
+        socketConfig(app, clusterClient);
         app.get('/useragreement', handleUserAgreement);
         require('./routes/contact')(app, webConfig);
         require('./auth').init(app);
         require('./account').init(app);
         require('./acp').init(app);
         require('../google2vtt').attach(app);
-        require('./routes/google_drive_userscript')(app);
+        googleDriveUserscript(app);
         app.use(serveStatic(path.join(__dirname, '..', '..', 'www'), {
             maxAge: webConfig.getCacheTTL()
         }));

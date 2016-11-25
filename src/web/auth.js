@@ -1,21 +1,22 @@
+// @flow weak
+
 /**
  * web/auth.js - Webserver functions for user authentication and registration
  *
  * @author Calvin Montgomery <cyzon@cyzon.us>
  */
 
-var pug = require("pug");
-var path = require("path");
-var webserver = require("./webserver");
-var cookieall = webserver.cookieall;
-var sendPug = require("./pug").sendPug;
-var Logger = require("../logger");
-var $util = require("../utilities");
-var db = require("../database");
-var Config = require("../config");
-var url = require("url");
-var session = require("../session");
-var csrf = require("./csrf");
+import pug from 'pug';
+import path from 'path';
+import webserver from './webserver';
+import { sendPug } from './pug';
+import Logger from '../logger';
+import $util from '../utilities';
+import db from '../database';
+import Config from '../config';
+import url from 'url';
+import session from '../session';
+import csrf from './csrf';
 
 /**
  * Processes a login request.  Sets a cookie upon successful authentication

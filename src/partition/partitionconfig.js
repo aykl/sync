@@ -1,5 +1,14 @@
+// @flow
+
+type PartitionConfigData = {
+    identity: any,
+    redis: any,
+}
+
 class PartitionConfig {
-    constructor(config) {
+    config: PartitionConfigData;
+
+    constructor(config: PartitionConfigData) {
         this.config = config;
     }
 

@@ -1,10 +1,12 @@
-var path = require("path");
-var fs = require("fs");
-var webserver = require("./webserver");
-var sendPug = require("./pug").sendPug;
-var Logger = require("../logger");
-var db = require("../database");
-var Config = require("../config");
+// @flow weak
+
+import path from 'path';
+import fs from 'fs';
+import webserver from './webserver';
+import { sendPug } from './pug';
+import Logger from '../logger';
+import db from '../database';
+import Config from '../config';
 
 function checkAdmin(cb) {
     return function (req, res) {
@@ -15,7 +17,7 @@ function checkAdmin(cb) {
         if (req.user.global_rank < 255) {
             res.send(403);
             Logger.eventlog.log("[acp] Attempted GET "+req.path+" from non-admin " +
-                                user.name + "@" + req.realIP);
+                                req.user.name + "@" + req.realIP);
             return;
         }
 

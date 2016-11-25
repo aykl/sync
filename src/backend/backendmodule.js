@@ -1,3 +1,5 @@
+// @flow weak
+
 import { RedisClusterClient } from '../io/cluster/redisclusterclient';
 import { DualClusterClient } from '../io/cluster/dualclusterclient';
 import NullClusterClient from '../io/cluster/nullclusterclient';
@@ -11,10 +13,21 @@ import redisAdapter from 'socket.io-redis';
 import LegacyConfig from '../config';
 import IOConfiguration from '../configuration/ioconfig';
 import * as Switches from '../switches';
+import IOBackend from './iobackend';
 
 const BACKEND_CONFIG_PATH = path.resolve(__dirname, '..', '..', 'backend.toml');
 
 class BackendModule {
+    backendConfig: any;
+    redisAdapter: any;
+    sioEmitter: any;
+    ioBackend: any;
+    redisClusterClient: any;
+    frontendPool: any;
+    clusterClient: any;
+    nullClusterClient: any;
+    redisClientProvider: any;
+
     constructor() {
         this.initConfig();
     }
@@ -43,7 +56,7 @@ class BackendModule {
         });
         this.sioEmitter = require('socket.io').instance;
         this.sioEmitter.adapter(this.redisAdapter);
-        const IOBackend = require('./iobackend');
+
         this.ioBackend = new IOBackend(
                 this.backendConfig.getListenerConfig()[0],
                 this.sioEmitter,

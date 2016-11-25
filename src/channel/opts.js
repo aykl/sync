@@ -1,7 +1,9 @@
-var ChannelModule = require("./module");
-var Config = require("../config");
-var Utilities = require("../utilities");
-var url = require("url");
+// @flow weak
+
+import ChannelModule from './module';
+import Config from '../config';
+import Utilities from '../utilities';
+import url from 'url';
 
 function OptionsModule(channel) {
     ChannelModule.apply(this, arguments);

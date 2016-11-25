@@ -1,11 +1,13 @@
-var cheerio = require('cheerio');
-var https = require('https');
-var fs = require('fs');
-var path = require('path');
-var querystring = require('querystring');
-var crypto = require('crypto');
+// @flow weak
 
-var Logger = require('./logger');
+import cheerio from 'cheerio';
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
+import querystring from 'querystring';
+import crypto from 'crypto';
+
+import Logger from './logger';
 
 function md5(input) {
     var hash = crypto.createHash('md5');

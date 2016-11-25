@@ -1,21 +1,29 @@
-var Logger = require("../logger");
-var ChannelModule = require("./module");
-var Flags = require("../flags");
-var Account = require("../account");
-var util = require("../utilities");
-var fs = require("graceful-fs");
-var path = require("path");
-var sio = require("socket.io");
-var db = require("../database");
+// @flow weak
+
+import Logger from '../logger';
+import ChannelModule from './module';
+import Flags from '../flags';
+import Account from '../account';
+import util from '../utilities';
+import fs from 'graceful-fs';
+import path from 'path';
+import sio from 'socket.io';
+import db from '../database';
 import * as ChannelStore from '../channel-storage/channelstore';
 import { ChannelStateSizeError } from '../errors';
 import Promise from 'bluebird';
-import { EventEmitter } from 'events';
+import events from 'events';
+const EventEmitter = events.EventEmitter;
 import { throttle } from '../util/throttle';
 
 const USERCOUNT_THROTTLE = 10000;
 
 class ReferenceCounter {
+    channel: any;
+    channelName: any;
+    refCount: any;
+    references: any;
+
     constructor(channel) {
         this.channel = channel;
         this.channelName = channel.name;
@@ -162,6 +170,7 @@ Channel.prototype.initModules = function () {
     var self = this;
     var inited = [];
     Object.keys(modules).forEach(function (m) {
+        // $FlowIgnore
         var ctor = require(m);
         var module = new ctor(self);
         self.modules[modules[m]] = module;
@@ -665,12 +674,11 @@ Channel.prototype.broadcastAll = function (msg, data) {
 };
 
 Channel.prototype.packInfo = function (isAdmin) {
-    var data = {
-        name: this.name,
-        usercount: this.users.length,
-        users: [],
-        registered: this.is(Flags.C_REGISTERED)
-    };
+    var data = {};
+    data.name = this.name;
+    data.usercount = this.users.length;
+    data.users = [];
+    data.registered = this.is(Flags.C_REGISTERED);
 
     for (var i = 0; i < this.users.length; i++) {
         if (this.users[i].name !== "") {

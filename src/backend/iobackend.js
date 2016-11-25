@@ -1,3 +1,5 @@
+// @flow weak
+
 import Server from 'cytube-common/lib/proxy/server';
 import ProxyInterceptor from './proxyinterceptor';
 import uuid from 'uuid';
@@ -8,6 +10,14 @@ import { formatProxyAddress } from 'cytube-common/lib/util/addressutil';
 const BACKEND_POOL = 'backend-hosts';
 
 export default class IOBackend {
+    proxyListenerConfig: any;
+    socketEmitter: any;
+    poolRedisClient: any;
+    protocol: any;
+    proxyInterceptor: any;
+    proxyListener: any;
+    poolEntryUpdater: any;
+
     constructor(proxyListenerConfig, socketEmitter, poolRedisClient) {
         this.proxyListenerConfig = proxyListenerConfig;
         this.socketEmitter = socketEmitter;

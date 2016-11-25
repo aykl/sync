@@ -1,9 +1,13 @@
+// @flow weak
+
 import Promise from 'bluebird';
 
 const ONE_SECOND = 1000;
 const ERR_TIMEOUT = 'Timed out when retrieving server information';
 
 class RedisClusterClient {
+    frontendPool: any;
+
     constructor(frontendPool) {
         this.frontendPool = frontendPool;
     }

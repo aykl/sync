@@ -1,3 +1,5 @@
+// @flow
+
 import Promise from 'bluebird';
 import Server from '../server';
 

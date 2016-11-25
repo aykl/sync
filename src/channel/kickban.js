@@ -1,9 +1,11 @@
-var ChannelModule = require("./module");
-var db = require("../database");
-var Flags = require("../flags");
-var util = require("../utilities");
-var Account = require("../account");
-var Q = require("q");
+// @flow weak
+
+import ChannelModule from './module';
+import db from '../database';
+import Flags from '../flags';
+import util from '../utilities';
+import Account from '../account';
+import Q from 'q';
 
 const TYPE_UNBAN = {
     id: "number",

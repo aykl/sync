@@ -1,9 +1,11 @@
-var ChannelModule = require("./module");
-var Flags = require("../flags");
-var util = require("../utilities");
-var InfoGetter = require("../get-info");
-var db = require("../database");
-var Media = require("../media");
+// @flow weak
+
+import ChannelModule from './module';
+import Flags from '../flags';
+import util from '../utilities';
+import InfoGetter from '../get-info';
+import db from '../database';
+import Media from '../media';
 
 const TYPE_UNCACHE = {
     id: "string"

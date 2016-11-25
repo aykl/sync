@@ -1,4 +1,6 @@
-var ChannelModule = require("./module");
+// @flow weak
+
+import ChannelModule from './module';
 
 function DrinkModule(channel) {
     ChannelModule.apply(this, arguments);

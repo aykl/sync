@@ -1,6 +1,10 @@
+// @flow weak
+
 import Promise from 'bluebird';
 
 export default class NullClusterClient {
+    ioConfig: any;
+    
     constructor(ioConfig) {
         this.ioConfig = ioConfig;
     }

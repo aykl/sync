@@ -1,8 +1,10 @@
-var https = require("https");
-var path = require("path");
-var fs = require("fs");
-var domain = require("domain");
-var Logger = require("./logger");
+// @flow weak
+
+import https from 'https';
+import path from 'path';
+import fs from 'fs';
+import domain from 'domain';
+import Logger from './logger';
 
 function retrieveIPs(cb) {
     var options = {
@@ -29,7 +31,7 @@ function retrieveIPs(cb) {
         else
             Logger.errlog.log(err);
     });
-    
+
     d.run(function () {
         var req = https.request(options, function (res) {
             var buffer = "";
@@ -37,7 +39,7 @@ function retrieveIPs(cb) {
             res.on("data", function (data) { buffer += data; });
             res.on("end", function () { finish(res.statusCode, buffer); });
         });
-        
+
         req.end();
     });
 }

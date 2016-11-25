@@ -1,3 +1,5 @@
+// @flow weak
+
 import crypto from 'crypto';
 import fs from 'fs';
 import toml from 'toml';
@@ -9,6 +11,11 @@ function sha256(input) {
 }
 
 class PartitionMap {
+    partitions: { [key: string]: mixed };
+    pool: Array<string>;
+    overrides: { [key: string]: string };
+    _hash: any;
+
     /**
      * @param {Map<string, object>} partitions Map of node ids to io configs
      * @param {Array<string>} pool List of available nodes

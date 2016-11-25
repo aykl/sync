@@ -1,7 +1,13 @@
+// @flow weak
+
 var fs = require('fs');
 var net = require('net');
 
 export default class ServiceSocket {
+    connections: any;
+    handler: any;
+    socket: any;
+    server: any;
 
     constructor() {
         this.connections = {};

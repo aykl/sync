@@ -1,7 +1,7 @@
-var Config = require("./config");
-var fs = require("fs");
-var path = require("path");
-var execSync = require("child_process").execSync;
+import Config from './config';
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
 
 var needPermissionsFixed = [
     path.join(__dirname, "..", "chanlogs"),

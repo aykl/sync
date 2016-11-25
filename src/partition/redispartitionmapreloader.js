@@ -1,8 +1,16 @@
+// @flow weak
+
 import { PartitionMap } from './partitionmap';
 import logger from 'cytube-common/lib/logger';
-import { EventEmitter } from 'events';
+import events from 'events';
+const EventEmitter = events.EventEmitter;
 
 class RedisPartitionMapReloader extends EventEmitter {
+    config: any;
+    redisClient: any;
+    subClient: any;
+    partitionMap: any;
+
     constructor(config, redisClient, subClient) {
         super();
         this.config = config;

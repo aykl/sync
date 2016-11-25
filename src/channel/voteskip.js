@@ -1,6 +1,8 @@
-var ChannelModule = require("./module");
-var Flags = require("../flags");
-var Poll = require("../poll").Poll;
+// @flow weak
+
+import ChannelModule from './module';
+import Flags from '../flags';
+import { Poll } from '../poll';
 
 function VoteskipModule(channel) {
     ChannelModule.apply(this, arguments);

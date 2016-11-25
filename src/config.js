@@ -1,9 +1,11 @@
-var fs = require("fs");
-var path = require("path");
-var Logger = require("./logger");
-var nodemailer = require("nodemailer");
-var net = require("net");
-var YAML = require("yamljs");
+// @flow weak
+
+import fs from 'fs';
+import path from 'path';
+import Logger from './logger';
+import nodemailer from 'nodemailer';
+import net from 'net';
+import YAML from 'yamljs';
 
 var defaults = {
     mysql: {

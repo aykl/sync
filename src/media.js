@@ -1,4 +1,6 @@
-var util = require("./utilities");
+// @flow weak
+
+import util from './utilities';
 
 function Media(id, title, seconds, type, meta) {
     if (!meta) {

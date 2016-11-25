@@ -1,7 +1,9 @@
-var pug = require("pug");
-var fs = require("fs");
-var path = require("path");
-var Config = require("../config");
+// @flow weak
+
+import pug from 'pug';
+import fs from 'fs';
+import path from 'path';
+import Config from '../config';
 var templates = path.join(__dirname, "..", "..", "templates");
 var cache = {};
 

@@ -1,3 +1,5 @@
+// @flow weak
+
 import Config from '../../config';
 import CyTubeUtil from '../../utilities';
 import Logger from '../../logger';

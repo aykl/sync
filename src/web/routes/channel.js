@@ -1,3 +1,5 @@
+// @flow weak
+
 import CyTubeUtil from '../../utilities';
 import { sanitizeText } from '../../xss';
 import { sendPug } from '../pug';

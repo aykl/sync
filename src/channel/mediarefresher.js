@@ -1,8 +1,10 @@
-var Vimeo = require("cytube-mediaquery/lib/provider/vimeo");
-var ChannelModule = require("./module");
-var Config = require("../config");
-var InfoGetter = require("../get-info");
-var Logger = require("../logger");
+// @flow weak
+
+import Vimeo from 'cytube-mediaquery/lib/provider/vimeo';
+import ChannelModule from './module';
+import Config from '../config';
+import InfoGetter from '../get-info';
+import Logger from '../logger';
 
 function MediaRefresherModule(channel) {
     ChannelModule.apply(this, arguments);

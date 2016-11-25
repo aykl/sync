@@ -1,4 +1,8 @@
+// @flow weak
+
 class BackendConfiguration {
+    config: any;
+
     constructor(config) {
         this.config = config;
     }

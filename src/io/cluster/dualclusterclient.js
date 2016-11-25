@@ -1,7 +1,12 @@
+// @flow weak
+
 import logger from 'cytube-common/lib/logger';
 import * as Switches from '../../switches';
 
 class DualClusterClient {
+    authoritativeClient: any;
+    altClient: any;
+
     constructor(authoritativeClient, altClient) {
         this.authoritativeClient = authoritativeClient;
         this.altClient = altClient;

@@ -1,11 +1,15 @@
-var Logger = require('./logger');
-var path = require('path');
-var counterLog = new Logger.Logger(path.resolve(__dirname, '..', 'counters.log'));
+// @flow
+
+import Logger from './logger';
+import path from 'path';
 import os from 'os';
 import io from 'socket.io';
 import Socket from 'socket.io/lib/socket';
 import * as Metrics from 'cytube-common/lib/metrics/metrics';
 import { JSONFileMetricsReporter } from 'cytube-common/lib/metrics/jsonfilemetricsreporter';
+
+
+const counterLog = new Logger.Logger(path.resolve(__dirname, '..', 'counters.log'));
 
 var counters = {};
 var server = null;

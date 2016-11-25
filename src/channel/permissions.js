@@ -1,5 +1,7 @@
-var ChannelModule = require("./module");
-var User = require("../user");
+// @flow weak
+
+import ChannelModule from './module';
+import User from '../user';
 
 const DEFAULT_PERMISSIONS = {
     seeplaylist: -1,          // See the playlist

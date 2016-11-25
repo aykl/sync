@@ -1,14 +1,15 @@
-var ChannelModule = require("./module"); var ULList = require("../ullist");
-var AsyncQueue = require("../asyncqueue");
-var Media = require("../media");
-var util = require("../utilities");
-var InfoGetter = require("../get-info");
-var Config = require("../config");
-var Flags = require("../flags");
-var db = require("../database");
-var Logger = require("../logger");
-var CustomEmbedFilter = require("../customembed").filter;
-var XSS = require("../xss");
+import ChannelModule from './module';
+import ULList from '../ullist';
+import AsyncQueue from '../asyncqueue';
+import Media from '../media';
+import util from '../utilities';
+import InfoGetter from '../get-info';
+import Config from '../config';
+import Flags from '../flags';
+import db from '../database';
+import Logger from '../logger';
+import { filter as CustomEmbedFilter } from '../customembed';
+import XSS from '../xss';
 
 const MAX_ITEMS = Config.get("playlist.max-items");
 // Limit requestPlaylist to once per 60 seconds

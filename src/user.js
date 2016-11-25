@@ -1,13 +1,16 @@
-var Logger = require("./logger");
-var Server = require("./server");
-var util = require("./utilities");
-var db = require("./database");
-var InfoGetter = require("./get-info");
-var Config = require("./config");
-var ACP = require("./acp");
-var Account = require("./account");
-var Flags = require("./flags");
-import { EventEmitter } from 'events';
+// @flow weak
+
+import Logger from './logger';
+import Server from './server';
+import util from './utilities';
+import db from './database';
+import InfoGetter from './get-info';
+import Config from './config';
+import ACP from './acp';
+import Account from './account';
+import Flags from './flags';
+import events from 'events';
+const EventEmitter = events.EventEmitter;
 
 function User(socket) {
     var self = this;

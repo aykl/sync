@@ -1,5 +1,7 @@
-var ChannelModule = require("./module");
-var Poll = require("../poll").Poll;
+// @flow weak
+
+import ChannelModule from './module';
+import { Poll } from '../poll';
 
 const TYPE_NEW_POLL = {
     title: "string",

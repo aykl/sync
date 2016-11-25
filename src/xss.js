@@ -1,4 +1,6 @@
-var sanitizeHTML = require("sanitize-html");
+// @flow weak
+
+import sanitizeHTML from 'sanitize-html';
 
 // These tags are allowed in addition to the defaults
 // See https://github.com/punkave/sanitize-html

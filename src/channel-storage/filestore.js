@@ -1,3 +1,5 @@
+// @flow weak
+
 import * as Promise from 'bluebird';
 import { stat } from 'fs';
 import * as fs from 'graceful-fs';

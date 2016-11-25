@@ -6,6 +6,8 @@ const DEFAULT_TRUSTED_PROXIES = Object.freeze([
 ]);
 
 export default class WebConfiguration {
+    config: any;
+
     constructor(config) {
         this.config = config;
     }
@@ -45,36 +47,36 @@ export default class WebConfiguration {
     getMaxIndexEntries() {
         return this.config.maxIndexEntries;
     }
-}
 
-WebConfiguration.fromOldConfig = function (oldConfig) {
-    const config = {
-        contacts: []
-    };
+    static fromOldConfig(oldConfig) {
+        const config = {
+            contacts: []
+        };
 
-    oldConfig.get('contacts').forEach(contact => {
-        config.contacts.push({
-            name: contact.name,
-            email: contact.email,
-            title: contact.title
+        oldConfig.get('contacts').forEach(contact => {
+            config.contacts.push({
+                name: contact.name,
+                email: contact.email,
+                title: contact.title
+            });
         });
-    });
 
-    config.gzip = {
-        enabled: oldConfig.get('http.gzip'),
-        threshold: oldConfig.get('http.gzip-threshold')
-    };
+        config.gzip = {
+            enabled: oldConfig.get('http.gzip'),
+            threshold: oldConfig.get('http.gzip-threshold')
+        };
 
-    config.authCookie = {
-        cookieSecret: oldConfig.get('http.cookie-secret'),
-        cookieDomain: oldConfig.get('http.root-domain-dotted')
-    };
+        config.authCookie = {
+            cookieSecret: oldConfig.get('http.cookie-secret'),
+            cookieDomain: oldConfig.get('http.root-domain-dotted')
+        };
 
-    config.enableMinification = oldConfig.get('http.minify');
+        config.enableMinification = oldConfig.get('http.minify');
 
-    config.cacheTTL = oldConfig.get('http.max-age');
+        config.cacheTTL = oldConfig.get('http.max-age');
 
-    config.maxIndexEntries = oldConfig.get('http.index.max-entries');
+        config.maxIndexEntries = oldConfig.get('http.index.max-entries');
 
-    return new WebConfiguration(config);
+        return new WebConfiguration(config);
+    }
 };

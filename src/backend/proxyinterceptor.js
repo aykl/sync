@@ -1,8 +1,14 @@
+// @flow weak
+
 import logger from 'cytube-common/lib/logger';
 import ioServer from '../io/ioserver';
 import ProxiedSocket from './proxiedsocket';
 
 export default class ProxyInterceptor {
+    socketEmitter: any;
+    frontendConnections: any;
+    frontendProxiedSockets: any;
+
     constructor(socketEmitter) {
         this.socketEmitter = socketEmitter;
         this.frontendConnections = {};

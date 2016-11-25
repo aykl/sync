@@ -1,3 +1,5 @@
+// @flow weak
+
 import { PartitionModule } from './partitionmodule';
 import { PartitionMap } from './partitionmap';
 import fs from 'fs';

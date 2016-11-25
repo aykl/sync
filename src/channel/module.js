@@ -1,3 +1,5 @@
+// @flow weak
+
 function ChannelModule(channel) {
     this.channel = channel;
 }

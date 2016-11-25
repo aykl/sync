@@ -1,3 +1,5 @@
+// @flow weak
+
 var AsyncQueue = function () {
     this._q = [];
     this._lock = false;

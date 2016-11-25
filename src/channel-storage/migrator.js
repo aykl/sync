@@ -1,3 +1,5 @@
+// @flow weak
+
 import Config from '../config';
 import Promise from 'bluebird';
 import db from '../database';

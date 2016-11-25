@@ -1,7 +1,9 @@
-var ChannelModule = require("./module");
-var Flags = require("../flags");
-var Account = require("../account");
-var db = require("../database");
+// @flow weak
+
+import ChannelModule from './module';
+import Flags from '../flags';
+import Account from '../account';
+import db from '../database';
 
 const TYPE_SET_CHANNEL_RANK = {
     name: "string",

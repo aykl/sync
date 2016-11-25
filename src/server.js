@@ -1,9 +1,11 @@
-const VERSION = require("../package.json").version;
-var singleton = null;
-var Config = require("./config");
-var Promise = require("bluebird");
+import  { version as VERSION } from '../package.json';
+import Config from './config';
+import Promise from 'bluebird';
 import * as ChannelStore from './channel-storage/channelstore';
-import { EventEmitter } from 'events';
+import events from 'events';
+const EventEmitter = events.EventEmitter;
+
+var singleton = null;
 
 module.exports = {
     init: function () {
@@ -202,6 +204,7 @@ Server.prototype.getChannel = function (name) {
     if (this.partitionDecider &&
             !this.partitionDecider.isChannelOnThisPartition(cname)) {
         const error = new Error(`Channel '${cname}' is mapped to a different partition`);
+        // $FlowIgnore
         error.code = 'EWRONGPART';
         throw error;
     }
@@ -272,7 +275,7 @@ Server.prototype.unloadChannel = function (chan, options) {
     chan.broadcastUsercount.cancel();
     // Empty all outward references from the channel
     var keys = Object.keys(chan);
-    for (var i in keys) {
+    for (let i in keys) {
         if (keys[i] !== "refCounter") {
             delete chan[keys[i]];
         }

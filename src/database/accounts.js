@@ -1,8 +1,10 @@
-var $util = require("../utilities");
-var bcrypt = require("bcrypt");
-var db = require("../database");
-var Config = require("../config");
-var Logger = require("../logger");
+// @flow weak
+
+import $util from '../utilities';
+import bcrypt from 'bcrypt';
+import db from '../database';
+import Config from '../config';
+import Logger from '../logger';
 
 var registrationLock = {};
 var blackHole = function () { };

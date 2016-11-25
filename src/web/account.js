@@ -4,15 +4,15 @@
  * @author Calvin Montgomery <cyzon@cyzon.us>
  */
 
-var webserver = require("./webserver");
-var sendPug = require("./pug").sendPug;
-var Logger = require("../logger");
-var db = require("../database");
-var $util = require("../utilities");
-var Config = require("../config");
-var Server = require("../server");
-var session = require("../session");
-var csrf = require("./csrf");
+import webserver from './webserver';
+import { sendPug } from './pug';
+import Logger from '../logger';
+import db from '../database';
+import $util from '../utilities';
+import Config from '../config';
+import Server from '../server';
+import session from '../session';
+import csrf from './csrf';
 
 /**
  * Handles a GET request for /account/edit

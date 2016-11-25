@@ -1,3 +1,5 @@
+// @flow weak
+
 /*
     bgtask.js
 
@@ -5,10 +7,10 @@
     running.
 */
 
-var Logger = require("./logger");
-var Config = require("./config");
-var db = require("./database");
-var Promise = require("bluebird");
+import Logger from './logger';
+import Config from './config';
+import db from './database';
+import Promise from 'bluebird';
 
 var init = null;
 

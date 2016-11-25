@@ -1,11 +1,11 @@
-var Logger = require("./logger");
-var Config = require("./config");
-var spawn = require("child_process").spawn;
-var https = require("https");
-var http = require("http");
-var urlparse = require("url");
-var path = require("path");
-require("status-message-polyfill");
+import Logger from './logger';
+import Config from './config';
+import { spawn } from 'child_process';
+import https from 'https';
+import http from 'http';
+import urlparse from 'url';
+import path from 'path';
+import 'status-message-polyfill';
 
 var USE_JSON = true;
 var TIMEOUT = 30000;
@@ -73,7 +73,7 @@ function translateStatusCode(statusCode) {
 function testUrl(url, cb, redirCount) {
     if (!redirCount) redirCount = 0;
     var data = urlparse.parse(url);
-    if (!/https?:/.test(data.protocol)) {
+    if (!data.protocol || !/https?:/.test(data.protocol)) {
         return cb("Only links starting with 'http://' or 'https://' are supported " +
                   "for raw audio/video support");
     }
@@ -171,8 +171,11 @@ function reformatData(data) {
     var reformatted = {};
 
     var duration = parseInt(data.format.duration, 10);
-    if (isNaN(duration)) duration = "--:--";
-    reformatted.duration = Math.ceil(duration);
+    if (isNaN(duration)) {
+      reformatted.duration = "--:--";
+    } else {
+      reformatted.duration = Math.ceil(duration);
+    }
 
     var bitrate = parseInt(data.format.bit_rate, 10) / 1000;
     if (isNaN(bitrate)) bitrate = 0;
@@ -208,10 +211,9 @@ function reformatData(data) {
             }
         } else if (stream.codec_type === "audio" && !audio &&
                 acceptedAudioCodecs.hasOwnProperty(stream.codec_name)) {
-            audio = {
-                acodec: stream.codec_name,
-                medium: "audio"
-            };
+            audio = {};
+            audio.acodec = stream.codec_name;
+            audio.medium = "audio";
 
             if (stream.tags && stream.tags.title) {
                 audio.title = stream.tags.title;

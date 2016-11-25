@@ -1,3 +1,5 @@
+// @flow weak
+
 const STATIC_RESOURCE = /\..+$/;
 
 export default function initialize(app, session) {

@@ -1,6 +1,11 @@
+// @flow weak
+
 import { murmurHash1 } from '../util/murmur';
 
 class PartitionDecider {
+    config: any;
+    partitionMap: any;
+
     constructor(config, partitionMap) {
         this.config = config;
         this.partitionMap = partitionMap;

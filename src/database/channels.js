@@ -1,11 +1,13 @@
-var db = require("../database");
-var valid = require("../utilities").isValidChannelName;
-var fs = require("fs");
-var path = require("path");
-var Logger = require("../logger");
-var tables = require("./tables");
-var Flags = require("../flags");
-var util = require("../utilities");
+// @flow weak
+
+import db from '../database';
+import { isValidChannelName as valid } from '../utilities';
+import fs from 'fs';
+import path from 'path';
+import Logger from '../logger';
+import tables from './tables';
+import Flags from '../flags';
+import util from '../utilities';
 
 var blackHole = function () { };
 

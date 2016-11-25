@@ -1,12 +1,14 @@
-var fs = require("graceful-fs");
-var path = require("path");
+// @flow
+
+import fs from 'graceful-fs';
+import path from 'path';
 
 function getTimeString() {
     var d = new Date();
     return d.toDateString() + " " + d.toTimeString().split(" ")[0];
 }
 
-var Logger = function(filename) {
+function Logger(filename: string) {
     this.filename = filename;
     this.writer = fs.createWriteStream(filename, {
         flags: "a",

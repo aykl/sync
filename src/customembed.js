@@ -1,6 +1,8 @@
-var cheerio = require("cheerio");
-var crypto = require("crypto");
-var Media = require("./media");
+// @flow weak
+
+import cheerio from 'cheerio';
+import crypto from 'crypto';
+import Media from './media';
 
 function sha256(input) {
     var hash = crypto.createHash("sha256");
