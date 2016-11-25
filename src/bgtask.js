@@ -77,7 +77,7 @@ function initChannelDumper(Server) {
     }, CHANNEL_SAVE_INTERVAL);
 }
 
-module.exports = function (Server) {
+export default function (Server) {
     if (init === Server) {
         Logger.errlog.log("WARNING: Attempted to re-init background tasks");
         return;

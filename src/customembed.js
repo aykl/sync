@@ -98,4 +98,4 @@ function filterIframe(tag) {
     return meta;
 }
 
-exports.filter = filter;
+export default { filter };

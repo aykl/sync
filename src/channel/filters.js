@@ -299,4 +299,4 @@ ChatFilterModule.prototype.handleRequestChatFilters = function (user) {
     this.sendChatFilters([user]);
 };
 
-module.exports = ChatFilterModule;
+export default ChatFilterModule;

@@ -439,4 +439,4 @@ User.prototype.setChannelRank = function setRank(rank) {
     }
 };
 
-module.exports = User;
+export default User;

@@ -710,4 +710,4 @@ Channel.prototype.packInfo = function (isAdmin) {
     return data;
 };
 
-module.exports = Channel;
+export default Channel;

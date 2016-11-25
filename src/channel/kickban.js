@@ -439,4 +439,4 @@ KickBanModule.prototype.handleUnban = function (user, data) {
     });
 };
 
-module.exports = KickBanModule;
+export default KickBanModule;

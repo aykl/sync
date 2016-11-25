@@ -57,7 +57,9 @@ var errlog = makeConsoleLogger(path.join(__dirname, "..", "error.log"));
 var syslog = makeConsoleLogger(path.join(__dirname, "..", "sys.log"));
 var eventlog = makeConsoleLogger(path.join(__dirname, "..", "events.log"));
 
-exports.Logger = Logger;
-exports.errlog = errlog;
-exports.syslog = syslog;
-exports.eventlog = eventlog;
+export default {
+  Logger,
+  errlog,
+  syslog,
+  eventlog
+};

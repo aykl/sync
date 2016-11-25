@@ -236,7 +236,7 @@ function reformatData(data) {
     return reformatted;
 }
 
-exports.ffprobe = function ffprobe(filename, cb) {
+function ffprobe(filename, cb) {
     fflog("Spawning ffprobe for " + filename);
     var childErr;
     var args = ["-show_streams", "-show_format", filename];
@@ -307,7 +307,7 @@ exports.ffprobe = function ffprobe(filename, cb) {
     });
 }
 
-exports.query = function (filename, cb) {
+function query(filename, cb) {
     if (Config.get("ffmpeg.log") && !fflog.initialized) {
         initFFLog();
     }
@@ -326,7 +326,7 @@ exports.query = function (filename, cb) {
             return cb(err);
         }
 
-        exports.ffprobe(filename, function (err, data) {
+        ffprobe(filename, function (err, data) {
             if (err) {
                 if (err.code && err.code === "ENOENT") {
                     return cb("Failed to execute `ffprobe`.  Set ffmpeg.ffprobe-exec " +

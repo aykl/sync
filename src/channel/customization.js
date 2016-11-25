@@ -118,4 +118,4 @@ CustomizationModule.prototype.handleSetMotd = function (user, data) {
     this.channel.logger.log("[mod] " + user.getName() + " updated the MOTD");
 };
 
-module.exports = CustomizationModule;
+export default CustomizationModule;

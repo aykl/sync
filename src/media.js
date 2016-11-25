@@ -66,4 +66,4 @@ Media.prototype = {
     }
 };
 
-module.exports = Media;
+export default Media;

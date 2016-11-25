@@ -44,9 +44,7 @@ class Account {
     }
 }
 
-module.exports.Account = Account;
-
-module.exports.rankForName = function (name, opts, cb) {
+function rankForName(name, opts, cb) {
     if (!cb) {
         cb = opts;
         opts = {};
@@ -71,7 +69,7 @@ module.exports.rankForName = function (name, opts, cb) {
     }).done();
 };
 
-module.exports.rankForIP = function (ip, opts, cb) {
+function rankForIP(ip, opts, cb) {
     if (!cb) {
         cb = opts;
         opts = {};
@@ -113,4 +111,10 @@ module.exports.rankForIP = function (ip, opts, cb) {
             });
         }).done();
     }
+};
+
+export default {
+  Account,
+  rankForName,
+  rankForIP
 };

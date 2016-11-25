@@ -391,4 +391,4 @@ PermissionsModule.prototype.loadUnregistered = function () {
     this.openPlaylist = true;
 };
 
-module.exports = PermissionsModule;
+export default PermissionsModule;

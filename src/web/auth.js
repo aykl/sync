@@ -232,7 +232,7 @@ function handleRegister(req, res) {
     });
 }
 
-module.exports = {
+export default {
     /**
      * Initializes auth callbacks
      */

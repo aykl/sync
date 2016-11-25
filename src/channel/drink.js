@@ -55,4 +55,4 @@ DrinkModule.prototype.onMediaChange = function () {
     this.channel.broadcastAll("drinkCount", 0);
 };
 
-module.exports = DrinkModule;
+export default DrinkModule;

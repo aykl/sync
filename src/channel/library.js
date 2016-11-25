@@ -113,4 +113,4 @@ LibraryModule.prototype.handleSearchMedia = function (user, data) {
     }
 };
 
-module.exports = LibraryModule;
+export default LibraryModule;

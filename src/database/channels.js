@@ -23,33 +23,126 @@ function initTables(name, owner, callback) {
 
 }
 
-module.exports = {
+
+/**
+ * Checks if the given channel name is registered
+ */
+function isChannelTaken(name, callback) {
+    if (typeof callback !== "function") {
+        return;
+    }
+
+    if (!valid(name)) {
+        callback("Invalid channel name", null);
+        return;
+    }
+
+    db.query("SELECT name FROM `channels` WHERE name=?",
+                 [name],
+                 function (err, rows) {
+        if (err) {
+            callback(err, true);
+            return;
+        }
+        callback(null, rows.length > 0);
+    });
+}
+
+
+/**
+ * Updates a user's rank
+ */
+function setRank(chan, name, rank, callback) {
+    if (typeof callback !== "function") {
+        callback = blackHole;
+    }
+
+    if (rank < 2) {
+        deleteRank(chan, name, callback);
+        return;
+    }
+
+    if (!valid(chan)) {
+        callback("Invalid channel name", null);
+        return;
+    }
+
+    db.query("INSERT INTO `channel_ranks` VALUES (?, ?, ?) " +
+             "ON DUPLICATE KEY UPDATE rank=?",
+             [name, rank, chan, rank, chan], callback);
+}
+
+
+/**
+ * Removes a user's rank entry
+ */
+function deleteRank(chan, name, callback) {
+    if (typeof callback !== "function") {
+        callback = blackHole;
+    }
+
+    if (!valid(chan)) {
+        callback("Invalid channel name", null);
+        return;
+    }
+
+    db.query("DELETE FROM `channel_ranks` WHERE name=? AND channel=?", [name, chan],
+        callback);
+}
+
+/**
+ * Removes all bans from a channel
+ */
+function deleteBans(chan, id, callback) {
+    if (typeof callback !== "function") {
+        callback = blackHole;
+    }
+
+    if (!valid(chan)) {
+        callback("Invalid channel name", null);
+        return;
+    }
+
+    db.query("DELETE FROM `channel_bans` WHERE channel=?", [chan], callback);
+}
+
+/**
+ * Deletes all library entries for a channel
+ */
+function deleteLibrary(chan, callback) {
+    if (typeof callback !== "function") {
+        callback = blackHole;
+    }
+
+    if (!valid(chan)) {
+        callback("Invalid channel name", null);
+        return;
+    }
+
+    db.query("DELETE FROM `channel_libraries` WHERE channel=?", [chan], callback);
+}
+
+
+/**
+ * Removes all ranks for a channel
+ */
+function deleteAllRanks(chan, callback) {
+    if (typeof callback !== "function") {
+        callback = blackHole;
+    }
+
+    if (!valid(chan)) {
+        callback("Invalid channel name", null);
+        return;
+    }
+
+    db.query("DELETE FROM `channel_ranks` WHERE channel=?", [chan], callback);
+}
+
+export default {
     init: function () {
     },
-
-    /**
-     * Checks if the given channel name is registered
-     */
-    isChannelTaken: function (name, callback) {
-        if (typeof callback !== "function") {
-            return;
-        }
-
-        if (!valid(name)) {
-            callback("Invalid channel name", null);
-            return;
-        }
-
-        db.query("SELECT name FROM `channels` WHERE name=?",
-                     [name],
-                     function (err, rows) {
-            if (err) {
-                callback(err, true);
-                return;
-            }
-            callback(null, rows.length > 0);
-        });
-    },
+    isChannelTaken,
 
     /**
      * Looks up a channel
@@ -137,7 +230,7 @@ module.exports = {
             return;
         }
 
-        module.exports.isChannelTaken(name, function (err, taken) {
+        isChannelTaken(name, function (err, taken) {
             if (err) {
                 callback(err, null);
                 return;
@@ -165,7 +258,7 @@ module.exports = {
 
                     rank = Math.max(rank, 5);
 
-                    module.exports.setRank(name, owner, rank, function (err) {
+                    setRank(name, owner, rank, function (err) {
                         if (err) {
                             callback(err, null);
                             return;
@@ -193,19 +286,19 @@ module.exports = {
 
         db.query("DELETE FROM `channels` WHERE name=?", [name], function (err) {
 
-            module.exports.deleteBans(name, function (err) {
+            deleteBans(name, function (err) {
                 if (err) {
                     Logger.errlog.log("Failed to delete bans for " + name + ": " + err);
                 }
             });
 
-            module.exports.deleteLibrary(name, function (err) {
+            deleteLibrary(name, function (err) {
                 if (err) {
                     Logger.errlog.log("Failed to delete library for " + name + ": " + err);
                 }
             });
 
-            module.exports.deleteAllRanks(name, function (err) {
+            deleteAllRanks(name, function (err) {
                 if (err) {
                     Logger.errlog.log("Failed to delete ranks for " + name + ": " + err);
                 }
@@ -358,61 +451,11 @@ module.exports = {
         db.query("SELECT * FROM `channel_ranks` WHERE channel=?", [chan], callback);
     },
 
-    /**
-     * Updates a user's rank
-     */
-    setRank: function (chan, name, rank, callback) {
-        if (typeof callback !== "function") {
-            callback = blackHole;
-        }
+    setRank,
 
-        if (rank < 2) {
-            module.exports.deleteRank(chan, name, callback);
-            return;
-        }
+    deleteRank,
 
-        if (!valid(chan)) {
-            callback("Invalid channel name", null);
-            return;
-        }
-
-        db.query("INSERT INTO `channel_ranks` VALUES (?, ?, ?) " +
-                 "ON DUPLICATE KEY UPDATE rank=?",
-                 [name, rank, chan, rank, chan], callback);
-    },
-
-    /**
-     * Removes a user's rank entry
-     */
-    deleteRank: function (chan, name, callback) {
-        if (typeof callback !== "function") {
-            callback = blackHole;
-        }
-
-        if (!valid(chan)) {
-            callback("Invalid channel name", null);
-            return;
-        }
-
-        db.query("DELETE FROM `channel_ranks` WHERE name=? AND channel=?", [name, chan],
-            callback);
-    },
-
-    /**
-     * Removes all ranks for a channel
-     */
-    deleteAllRanks: function (chan, callback) {
-        if (typeof callback !== "function") {
-            callback = blackHole;
-        }
-
-        if (!valid(chan)) {
-            callback("Invalid channel name", null);
-            return;
-        }
-
-        db.query("DELETE FROM `channel_ranks` WHERE channel=?", [chan], callback);
-    },
+    deleteAllRanks,
 
     /**
      * Adds a media item to the library
@@ -497,21 +540,7 @@ module.exports = {
             [id, chan], callback);
     },
 
-    /**
-     * Deletes all library entries for a channel
-     */
-    deleteLibrary: function (chan, callback) {
-        if (typeof callback !== "function") {
-            callback = blackHole;
-        }
-
-        if (!valid(chan)) {
-            callback("Invalid channel name", null);
-            return;
-        }
-
-        db.query("DELETE FROM `channel_libraries` WHERE channel=?", [chan], callback);
-    },
+    deleteLibrary,
 
     /**
      * Add a ban to the banlist
@@ -606,19 +635,5 @@ module.exports = {
                  [id, chan], callback);
     },
 
-    /**
-     * Removes all bans from a channel
-     */
-    deleteBans: function (chan, id, callback) {
-        if (typeof callback !== "function") {
-            callback = blackHole;
-        }
-
-        if (!valid(chan)) {
-            callback("Invalid channel name", null);
-            return;
-        }
-
-        db.query("DELETE FROM `channel_bans` WHERE channel=?", [chan], callback);
-    }
+    deleteBans
 };

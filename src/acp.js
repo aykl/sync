@@ -316,4 +316,4 @@ function init(user) {
     Logger.eventlog.log("[acp] Initialized ACP for " + eventUsername(user));
 }
 
-module.exports.init = init;
+export default { init };

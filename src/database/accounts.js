@@ -29,24 +29,27 @@ function parseProfile(data) {
     }
 }
 
-module.exports = {
+
+/**
+ * Check if a username is taken
+ */
+function isUsernameTaken(name, callback) {
+    db.query("SELECT name FROM `users` WHERE name LIKE ? ESCAPE '\\\\'",
+             [wildcardSimilarChars(name)],
+    function (err, rows) {
+        if (err) {
+            callback(err, true);
+            return;
+        }
+        callback(null, rows.length > 0);
+    });
+}
+
+export default {
     init: function () {
     },
 
-    /**
-     * Check if a username is taken
-     */
-    isUsernameTaken: function (name, callback) {
-        db.query("SELECT name FROM `users` WHERE name LIKE ? ESCAPE '\\\\'",
-                 [wildcardSimilarChars(name)],
-        function (err, rows) {
-            if (err) {
-                callback(err, true);
-                return;
-            }
-            callback(null, rows.length > 0);
-        });
-    },
+    isUsernameTaken,
 
     /**
      * Search for a user by name
@@ -156,7 +159,7 @@ module.exports = {
                 return;
             }
 
-            module.exports.isUsernameTaken(name, function (err, taken) {
+            isUsernameTaken(name, function (err, taken) {
                 if (err) {
                     delete registrationLock[lname];
                     callback(err, null);

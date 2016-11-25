@@ -282,4 +282,4 @@ MediaRefresherModule.prototype.refreshVidme = function (media, cb) {
     });
 }
 
-module.exports = MediaRefresherModule;
+export default MediaRefresherModule;

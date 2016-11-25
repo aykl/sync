@@ -7,7 +7,7 @@ const EventEmitter = events.EventEmitter;
 
 var singleton = null;
 
-module.exports = {
+export default {
     init: function () {
         Logger.syslog.log("Starting CyTube v" + VERSION);
         var chanlogpath = path.join(__dirname, "../chanlogs");

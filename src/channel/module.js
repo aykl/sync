@@ -80,4 +80,4 @@ ChannelModule.ERROR = -1;
 ChannelModule.PASSTHROUGH = 0;
 ChannelModule.DENY = 1;
 
-module.exports = ChannelModule;
+export default ChannelModule;

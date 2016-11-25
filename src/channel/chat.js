@@ -654,4 +654,4 @@ ChatModule.prototype.handleCmdUnmute = function (user, msg, meta) {
     this.sendModMessage(user.getName() + " unmuted " + target.getName(), muteperm);
 };
 
-module.exports = ChatModule;
+export default ChatModule;

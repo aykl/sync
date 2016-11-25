@@ -145,7 +145,7 @@ var cfg = defaults;
 /**
  * Initializes the configuration from the given YAML file
  */
-exports.load = function (file) {
+function load(file) {
     try {
         cfg = YAML.load(path.join(__dirname, "..", file));
     } catch (e) {
@@ -400,7 +400,7 @@ function preprocessConfig(cfg) {
  * Accepts a dot-separated key for nested values, e.g. "http.port"
  * Throws an error if a nonexistant key is requested
  */
-exports.get = function (key) {
+function get(key) {
     var obj = cfg;
     var keylist = key.split(".");
     var current = keylist.shift();
@@ -415,4 +415,9 @@ exports.get = function (key) {
     }
 
     return obj[current];
+};
+
+export default {
+  load,
+  get
 };

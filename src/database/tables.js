@@ -1,4 +1,5 @@
 // @flow weak
+import AsyncQueue from '../asyncqueue';
 
 const TBL_USERS = "" +
     "CREATE TABLE IF NOT EXISTS `users` (" +
@@ -115,7 +116,7 @@ const TBL_CHANNEL_DATA = "" +
     "FOREIGN KEY (`channel_id`) REFERENCES `channels`(`id`) ON DELETE CASCADE" +
     ") CHARACTER SET utf8";
 
-module.exports.init = function (queryfn, cb) {
+function init(queryfn, cb) {
     var tables = {
         users: TBL_USERS,
         channels: TBL_CHANNELS,
@@ -131,7 +132,6 @@ module.exports.init = function (queryfn, cb) {
         channel_data: TBL_CHANNEL_DATA
     };
 
-    var AsyncQueue = require("../asyncqueue");
     var aq = new AsyncQueue();
     var hasError = false;
     Object.keys(tables).forEach(function (tbl) {
@@ -151,3 +151,5 @@ module.exports.init = function (queryfn, cb) {
         cb(hasError);
     });
 };
+
+export default { init };

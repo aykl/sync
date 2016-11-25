@@ -122,4 +122,4 @@ VoteskipModule.prototype.onMediaChange = function (data) {
     this.sendVoteskipData(this.channel.users);
 };
 
-module.exports = VoteskipModule;
+export default VoteskipModule;

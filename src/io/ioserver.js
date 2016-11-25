@@ -263,7 +263,7 @@ function handleConnection(sock) {
     }
 }
 
-module.exports = {
+export default {
     init: function (srv, webConfig) {
         var bound = {};
         const ioOptions = {

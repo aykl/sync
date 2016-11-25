@@ -21,6 +21,9 @@ import socketConfig from './routes/socketconfig';
 import indexRoute from './routes/index';
 import channelRoute from './routes/channel';
 import authorizationMiddleware from './middleware/authorize';
+import google2Vtt from '../google2vtt';
+import auth from './auth';
+import acp from './acp';
 
 
 function initializeLog(app) {
@@ -135,7 +138,7 @@ function initializeErrorHandlers(app) {
     });
 }
 
-module.exports = {
+export default {
     /**
      * Initializes webserver callbacks
      */
@@ -190,10 +193,10 @@ module.exports = {
         socketConfig(app, clusterClient);
         app.get('/useragreement', handleUserAgreement);
         require('./routes/contact')(app, webConfig);
-        require('./auth').init(app);
+        auth.init(app);
         require('./account').init(app);
-        require('./acp').init(app);
-        require('../google2vtt').attach(app);
+        acp.init(app);
+        google2Vtt.attach(app);
         googleDriveUserscript(app);
         app.use(serveStatic(path.join(__dirname, '..', '..', 'www'), {
             maxAge: webConfig.getCacheTTL()

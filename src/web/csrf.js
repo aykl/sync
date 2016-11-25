@@ -9,7 +9,7 @@ import csrf from 'csrf';
 
 var tokens = csrf();
 
-exports.init = function csrfInit (domain) {
+function init(domain) {
     return function (req, res, next) {
         var secret = req.signedCookies._csrf;
         if (!secret) {
@@ -36,7 +36,7 @@ exports.init = function csrfInit (domain) {
     };
 };
 
-exports.verify = function csrfVerify(req) {
+function verify(req) {
     var secret = req.signedCookies._csrf;
     var token = req.body._csrf || req.query._csrf;
 
@@ -44,3 +44,5 @@ exports.verify = function csrfVerify(req) {
         throw new CSRFError('Invalid CSRF token');
     }
 };
+
+export default { init, verify };

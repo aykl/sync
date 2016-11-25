@@ -9,11 +9,15 @@ import tables from './database/tables';
 import net from 'net';
 import util from './utilities';
 import * as Metrics from 'cytube-common/lib/metrics/metrics';
+import databaseUpdate from './database/update';
+import accounts from './database/accounts';
+import channels from './database/channels';
+
 
 var pool = null;
 var global_ipbans = {};
 
-module.exports.init = function () {
+function init() {
     pool = mysql.createPool({
         host: Config.get("mysql.server"),
         port: Config.get("mysql.port"),
@@ -30,27 +34,25 @@ module.exports.init = function () {
             Logger.errlog.log("Initial database connection failed: " + err.stack);
             process.exit(1);
         } else {
-            tables.init(module.exports.query, function (err) {
+            tables.init(runQuery, function (err) {
                 if (err) {
                     return;
                 }
-                require("./database/update").checkVersion();
-                module.exports.loadAnnouncement();
+                databaseUpdate.checkVersion();
+                loadAnnouncement();
             });
             // Refresh global IP bans
-            module.exports.listGlobalBans();
+            listGlobalBans();
         }
     });
 
     global_ipbans = {};
-    module.exports.users = require("./database/accounts");
-    module.exports.channels = require("./database/channels");
 };
 
 /**
  * Execute a database query
  */
-module.exports.query = function (query, sub, callback) {
+function runQuery(query, sub, callback) {
     const timer = Metrics.startTimer('db:queryTime');
     // 2nd argument is optional
     if (typeof sub === "function") {
@@ -107,7 +109,7 @@ function blackHole() {
 /**
  * Check if an IP address is globally banned
  */
-module.exports.isGlobalIPBanned = function (ip, callback) {
+function isGlobalIPBanned(ip, callback) {
     var range = util.getIPRange(ip);
     var wrange = util.getWideIPRange(ip);
     var banned = ip in global_ipbans ||
@@ -124,12 +126,12 @@ module.exports.isGlobalIPBanned = function (ip, callback) {
  * Retrieve all global bans from the database.
  * Cache locally in global_bans
  */
-module.exports.listGlobalBans = function (callback) {
+function listGlobalBans(callback) {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
 
-    module.exports.query("SELECT * FROM global_bans WHERE 1", function (err, res) {
+    runQuery("SELECT * FROM global_bans WHERE 1", function (err, res) {
         if (err) {
             callback(err, null);
             return;
@@ -147,20 +149,20 @@ module.exports.listGlobalBans = function (callback) {
 /**
  * Globally ban by IP
  */
-module.exports.globalBanIP = function (ip, reason, callback) {
+function globalBanIP(ip, reason, callback) {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
 
     var query = "INSERT INTO global_bans (ip, reason) VALUES (?, ?)" +
                 " ON DUPLICATE KEY UPDATE reason=?";
-    module.exports.query(query, [ip, reason, reason], function (err, res) {
+    runQuery(query, [ip, reason, reason], function (err, res) {
         if(err) {
             callback(err, null);
             return;
         }
 
-        module.exports.listGlobalBans();
+        listGlobalBans();
         callback(null, res);
     });
 };
@@ -168,20 +170,20 @@ module.exports.globalBanIP = function (ip, reason, callback) {
 /**
  * Remove a global IP ban
  */
-module.exports.globalUnbanIP = function (ip, callback) {
+function globalUnbanIP(ip, callback) {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
 
 
     var query = "DELETE FROM global_bans WHERE ip=?";
-    module.exports.query(query, [ip], function (err, res) {
+    runQuery(query, [ip], function (err, res) {
         if(err) {
             callback(err, null);
             return;
         }
 
-        module.exports.listGlobalBans();
+        listGlobalBans();
         callback(null, res);
     });
 };
@@ -193,16 +195,16 @@ module.exports.globalUnbanIP = function (ip, callback) {
 /**
  * Deletes recovery rows older than the given time
  */
-module.exports.cleanOldPasswordResets = function (callback) {
+function cleanOldPasswordResets(callback) {
     if (typeof callback === "undefined") {
         callback = blackHole;
     }
 
     var query = "DELETE FROM aliases WHERE time < ?";
-    module.exports.query(query, [Date.now() - 24*60*60*1000], callback);
+    runQuery(query, [Date.now() - 24*60*60*1000], callback);
 };
 
-module.exports.addPasswordReset = function (data, cb) {
+function addPasswordReset(data, cb) {
     if (typeof cb !== "function") {
         cb = blackHole;
     }
@@ -218,17 +220,17 @@ module.exports.addPasswordReset = function (data, cb) {
         return;
     }
 
-    module.exports.query("INSERT INTO `password_reset` (`ip`, `name`, `email`, `hash`, `expire`) " +
+    runQuery("INSERT INTO `password_reset` (`ip`, `name`, `email`, `hash`, `expire`) " +
                          "VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE ip=?, hash=?, email=?, expire=?",
                          [ip, name, email, hash, expire, ip, hash, email, expire], cb);
 };
 
-module.exports.lookupPasswordReset = function (hash, cb) {
+function lookupPasswordReset(hash, cb) {
     if (typeof cb !== "function") {
         return;
     }
 
-    module.exports.query("SELECT * FROM `password_reset` WHERE hash=?", [hash],
+    runQuery("SELECT * FROM `password_reset` WHERE hash=?", [hash],
                          function (err, rows) {
         if (err) {
             cb(err, null);
@@ -240,17 +242,17 @@ module.exports.lookupPasswordReset = function (hash, cb) {
     });
 };
 
-module.exports.deletePasswordReset = function (hash) {
-    module.exports.query("DELETE FROM `password_reset` WHERE hash=?", [hash]);
+function deletePasswordReset(hash) {
+    runQuery("DELETE FROM `password_reset` WHERE hash=?", [hash]);
 };
 
 /*
-module.exports.genPasswordReset = function (ip, name, email, callback) {
+function genPasswordReset(ip, name, email, callback) {
     if(typeof callback !== "function")
         callback = blackHole;
 
     var query = "SELECT email FROM registrations WHERE uname=?";
-    module.exports.query(query, [name], function (err, res) {
+    runQuery(query, [name], function (err, res) {
         if(err) {
             callback(err, null);
             return;
@@ -271,7 +273,7 @@ module.exports.genPasswordReset = function (ip, name, email, callback) {
         query = "INSERT INTO password_reset " +
                 "(ip, name, hash, email, expire) VALUES (?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE hash=?, expire=?";
-        module.exports.query(query, [ip, name, hash, email, expire, hash, expire],
+        runQuery(query, [ip, name, hash, email, expire, hash, expire],
                    function (err, res) {
             if(err) {
                 callback(err, null);
@@ -283,12 +285,12 @@ module.exports.genPasswordReset = function (ip, name, email, callback) {
     });
 };
 
-module.exports.recoverUserPassword = function (hash, callback) {
+function recoverUserPassword(hash, callback) {
     if(typeof callback !== "function")
         callback = blackHole;
 
     var query = "SELECT * FROM password_reset WHERE hash=?";
-    module.exports.query(query, [hash], function (err, res) {
+    runQuery(query, [hash], function (err, res) {
         if(err) {
             callback(err, null);
             return;
@@ -300,7 +302,7 @@ module.exports.recoverUserPassword = function (hash, callback) {
         }
 
         if(Date.now() > res[0].expire) {
-            module.exports.query("DELETE FROM password_reset WHERE hash=?", [hash]);
+            runQuery("DELETE FROM password_reset WHERE hash=?", [hash]);
             callback("Link expired.  Password resets are valid for 24hr",
                      null);
             return;
@@ -314,7 +316,7 @@ module.exports.recoverUserPassword = function (hash, callback) {
                 return;
             }
 
-            module.exports.query("DELETE FROM password_reset WHERE hash=?", [hash]);
+            runQuery("DELETE FROM password_reset WHERE hash=?", [hash]);
             callback(null, {
                 name: name,
                 pw: pw
@@ -323,7 +325,7 @@ module.exports.recoverUserPassword = function (hash, callback) {
     });
 };
 
-module.exports.resetUserPassword = function (name, callback) {
+function resetUserPassword(name, callback) {
     if(typeof callback !== "function")
         callback = blackHole;
 
@@ -340,7 +342,7 @@ module.exports.resetUserPassword = function (name, callback) {
         }
 
         var query = "UPDATE registrations SET pw=? WHERE uname=?";
-        module.exports.query(query, [data, name], function (err, res) {
+        runQuery(query, [data, name], function (err, res) {
             if(err) {
                 callback(err, null);
                 return;
@@ -357,19 +359,19 @@ module.exports.resetUserPassword = function (name, callback) {
 /**
  * Retrieve all of a user's playlists
  */
-module.exports.listUserPlaylists = function (name, callback) {
+function listUserPlaylists(name, callback) {
     if (typeof callback !== "function") {
         return;
     }
 
     var query = "SELECT name, count, duration FROM user_playlists WHERE user=?";
-    module.exports.query(query, [name], callback);
+    runQuery(query, [name], callback);
 };
 
 /**
  * Retrieve a user playlist by (user, name) pair
  */
-module.exports.getUserPlaylist = function (username, plname, callback) {
+function getUserPlaylist(username, plname, callback) {
     if (typeof callback !== "function") {
         return;
     }
@@ -377,7 +379,7 @@ module.exports.getUserPlaylist = function (username, plname, callback) {
     var query = "SELECT contents FROM user_playlists WHERE " +
                 "user=? AND name=?";
 
-    module.exports.query(query, [username, plname], function (err, res) {
+    runQuery(query, [username, plname], function (err, res) {
         if (err) {
             callback(err, null);
             return;
@@ -403,7 +405,7 @@ module.exports.getUserPlaylist = function (username, plname, callback) {
  * Saves a user playlist.  Overwrites if the playlist keyed by
  * (user, name) already exists
  */
-module.exports.saveUserPlaylist = function (pl, username, plname, callback) {
+function saveUserPlaylist(pl, username, plname, callback) {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -434,19 +436,19 @@ module.exports.saveUserPlaylist = function (pl, username, plname, callback) {
     var params = [username, plname, plText, count, time,
                   plText, count, time];
 
-    module.exports.query(query, params, callback);
+    runQuery(query, params, callback);
 };
 
 /**
  * Deletes a user playlist
  */
-module.exports.deleteUserPlaylist = function (username, plname, callback) {
+function deleteUserPlaylist(username, plname, callback) {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
 
     var query = "DELETE FROM user_playlists WHERE user=? AND name=?";
-    module.exports.query(query, [username, plname], callback);
+    runQuery(query, [username, plname], callback);
 };
 
 /* aliases */
@@ -454,7 +456,7 @@ module.exports.deleteUserPlaylist = function (username, plname, callback) {
 /**
  * Records a user or guest login in the aliases table
  */
-module.exports.recordVisit = function (ip, name, callback) {
+function recordVisit(ip, name, callback) {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -463,25 +465,25 @@ module.exports.recordVisit = function (ip, name, callback) {
     var query = "DELETE FROM aliases WHERE ip=? AND name=?;" +
                 "INSERT INTO aliases VALUES (NULL, ?, ?, ?)";
 
-    module.exports.query(query, [ip, name, ip, name, time], callback);
+    runQuery(query, [ip, name, ip, name, time], callback);
 };
 
 /**
  * Deletes alias rows older than the given time
  */
-module.exports.cleanOldAliases = function (expiration, callback) {
+function cleanOldAliases(expiration, callback) {
     if (typeof callback === "undefined") {
         callback = blackHole;
     }
 
     var query = "DELETE FROM aliases WHERE time < ?";
-    module.exports.query(query, [Date.now() - expiration], callback);
+    runQuery(query, [Date.now() - expiration], callback);
 };
 
 /**
  * Retrieves a list of aliases for an IP address
  */
-module.exports.getAliases = function (ip, callback) {
+function getAliases(ip, callback) {
     if (typeof callback !== "function") {
         return;
     }
@@ -501,7 +503,7 @@ module.exports.getAliases = function (ip, callback) {
 
     query += " ORDER BY time DESC LIMIT 5";
 
-    module.exports.query(query, [ip], function (err, res) {
+    runQuery(query, [ip], function (err, res) {
         var names = null;
         if(!err) {
             names = res.map(function (row) { return row.name; });
@@ -514,13 +516,13 @@ module.exports.getAliases = function (ip, callback) {
 /**
  * Retrieves a list of IPs that a name as logged in from
  */
-module.exports.getIPs = function (name, callback) {
+function getIPs(name, callback) {
     if (typeof callback !== "function") {
         return;
     }
 
     var query = "SELECT ip FROM aliases WHERE name=?";
-    module.exports.query(query, [name], function (err, res) {
+    runQuery(query, [name], function (err, res) {
         var ips = null;
         if(!err) {
             ips = res.map(function (row) { return row.ip; });
@@ -533,39 +535,39 @@ module.exports.getIPs = function (name, callback) {
 
 /* REGION stats */
 
-module.exports.addStatPoint = function (time, ucount, ccount, mem, callback) {
+function addStatPoint(time, ucount, ccount, mem, callback) {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
 
     var query = "INSERT INTO stats VALUES (?, ?, ?, ?)";
-    module.exports.query(query, [time, ucount, ccount, mem], callback);
+    runQuery(query, [time, ucount, ccount, mem], callback);
 };
 
-module.exports.pruneStats = function (before, callback) {
+function pruneStats(before, callback) {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
 
     var query = "DELETE FROM stats WHERE time < ?";
-    module.exports.query(query, [before], callback);
+    runQuery(query, [before], callback);
 };
 
-module.exports.listStats = function (callback) {
+function listStats(callback) {
     if (typeof callback !== "function") {
         return;
     }
 
     var query = "SELECT * FROM stats ORDER BY time ASC";
-    module.exports.query(query, callback);
+    runQuery(query, callback);
 };
 
 /* END REGION */
 
 /* Misc */
-module.exports.loadAnnouncement = function () {
+function loadAnnouncement() {
     var query = "SELECT * FROM `meta` WHERE `key`='announcement'";
-    module.exports.query(query, function (err, rows) {
+    runQuery(query, function (err, rows) {
         if (err) {
             return;
         }
@@ -580,7 +582,7 @@ module.exports.loadAnnouncement = function () {
         } catch (e) {
             Logger.errlog.log("Invalid announcement data in database: " +
                               announcement.value);
-            module.exports.clearAnnouncement();
+            clearAnnouncement();
             return;
         }
 
@@ -597,13 +599,42 @@ module.exports.loadAnnouncement = function () {
     });
 };
 
-module.exports.setAnnouncement = function (data) {
+function setAnnouncement(data) {
     var query = "INSERT INTO `meta` (`key`, `value`) VALUES ('announcement', ?) " +
                 "ON DUPLICATE KEY UPDATE `value`=?";
     var repl = JSON.stringify(data);
-    module.exports.query(query, [repl, repl]);
+    runQuery(query, [repl, repl]);
 };
 
-module.exports.clearAnnouncement = function () {
-    module.exports.query("DELETE FROM `meta` WHERE `key`='announcement'");
+function clearAnnouncement() {
+    runQuery("DELETE FROM `meta` WHERE `key`='announcement'");
+};
+
+export default {
+  init,
+  isGlobalIPBanned,
+  listGlobalBans,
+  globalBanIP,
+  globalUnbanIP,
+  cleanOldPasswordResets,
+  addPasswordReset,
+  lookupPasswordReset,
+  deletePasswordReset,
+  listUserPlaylists,
+  getUserPlaylist,
+  saveUserPlaylist,
+  deleteUserPlaylist,
+  recordVisit,
+  cleanOldAliases,
+  getAliases,
+  getIPs,
+  addStatPoint,
+  pruneStats,
+  listStats,
+  loadAnnouncement,
+  setAnnouncement,
+  clearAnnouncement,
+  channels,
+  users: accounts,
+  query: runQuery,
 };

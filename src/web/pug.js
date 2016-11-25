@@ -37,7 +37,7 @@ function getBaseUrl(res) {
 /**
  * Renders and serves a pug template
  */
-function sendPug(res, view, locals) {
+export function sendPug(res, view, locals) {
     if (!locals) {
         locals = {};
     }
@@ -55,7 +55,3 @@ function sendPug(res, view, locals) {
     var html = cache[view](merge(locals, res));
     res.send(html);
 }
-
-module.exports = {
-    sendPug: sendPug
-};

@@ -104,7 +104,7 @@ function handleReadChanlog(req, res) {
     readLog(res, path.join(__dirname, "..", "..", "chanlogs", req.params.name + ".log"), 1048576);
 }
 
-module.exports = {
+export default {
     init: function (app) {
         app.get("/acp", checkAdmin(handleAcp));
         app.get("/acp/syslog", checkAdmin(handleReadSyslog));

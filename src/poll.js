@@ -3,7 +3,7 @@
 const link = /(\w+:\/\/(?:[^:\/\[\]\s]+|\[[0-9a-f:]+\])(?::\d+)?(?:\/[^\/\s]*)*)/ig;
 import XSS from './xss';
 
-var Poll = function(initiator, title, options, obscured) {
+export var Poll = function(initiator, title, options, obscured) {
     this.initiator = initiator;
     title = XSS.sanitizeText(title);
     this.title = title.replace(link, "<a href=\"$1\" target=\"_blank\">$1</a>");
@@ -54,5 +54,3 @@ Poll.prototype.packUpdate = function (showhidden) {
     };
     return packed;
 }
-
-exports.Poll = Poll;

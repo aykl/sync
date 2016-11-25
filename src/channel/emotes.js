@@ -218,4 +218,4 @@ EmoteModule.prototype.handleMoveEmote = function (user, data) {
     this.emotes.moveEmote(data.from, data.to);
 };
 
-module.exports = EmoteModule;
+export default EmoteModule;

@@ -192,4 +192,4 @@ RankModule.prototype.updateDatabase = function (data, cb) {
     });
 };
 
-module.exports = RankModule;
+export default RankModule;

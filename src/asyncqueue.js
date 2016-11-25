@@ -53,4 +53,4 @@ AsyncQueue.prototype.reset = function () {
     this._lock = false;
 };
 
-module.exports = AsyncQueue;
+export default AsyncQueue;

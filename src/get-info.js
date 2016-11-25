@@ -5,7 +5,7 @@ import https from 'https';
 import cheerio from 'cheerio';
 import Logger from './logger.js';
 import Media from './media';
-import { filter as CustomEmbedFilter } from './customembed';
+import customEmbed from './customembed';
 import Server from './server';
 import Config from './config';
 import ffmpeg from './ffmpeg';
@@ -16,6 +16,8 @@ import Vidme from 'cytube-mediaquery/lib/provider/vidme';
 import Streamable from 'cytube-mediaquery/lib/provider/streamable';
 import GoogleDrive from 'cytube-mediaquery/lib/provider/googledrive';
 import TwitchVOD from 'cytube-mediaquery/lib/provider/twitch-vod';
+
+const CustomEmbedFilter = customEmbed.filter;
 
 /*
  * Preference map of quality => youtube formats.
@@ -614,7 +616,7 @@ var Getters = {
     }
 };
 
-module.exports = {
+export default {
     Getters: Getters,
     getMedia: function (id, type, callback) {
         if(type in this.Getters) {

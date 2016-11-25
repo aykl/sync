@@ -206,4 +206,4 @@ PollModule.prototype.handlePollCmd = function (obscured, user, msg, meta) {
     this.channel.logger.log("[poll] " + user.getName() + " opened poll: '" + poll.title + "'");
 };
 
-module.exports = PollModule;
+export default PollModule;

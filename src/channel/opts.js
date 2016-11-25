@@ -293,4 +293,4 @@ OptionsModule.prototype.handleSetOptions = function (user, data) {
     this.sendOpts(this.channel.users);
 };
 
-module.exports = OptionsModule;
+export default OptionsModule;

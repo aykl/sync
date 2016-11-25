@@ -14,12 +14,12 @@ const counterLog = new Logger.Logger(path.resolve(__dirname, '..', 'counters.log
 var counters = {};
 var server = null;
 
-exports.add = Metrics.incCounter;
+const add = Metrics.incCounter;
 
 Socket.prototype._packet = Socket.prototype.packet;
 Socket.prototype.packet = function () {
     this._packet.apply(this, arguments);
-    exports.add('socket.io:packet');
+    add('socket.io:packet');
 };
 
 function getConnectedSockets() {
@@ -60,3 +60,5 @@ Metrics.addReportHook((metrics) => {
     metrics.addProperty('socket.io:count', getConnectedSockets());
     setChannelCounts(metrics);
 });
+
+export default { add };

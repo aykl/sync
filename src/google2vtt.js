@@ -54,7 +54,7 @@ function fixText(text) {
         .replace(/-->/g, '--&gt;');
 }
 
-exports.convert = function convertSubtitles(subtitles) {
+function convertSubtitles(subtitles) {
     var $ = cheerio.load(subtitles, { xmlMode: true });
     var lines = slice.call($('transcript text').map(function (index, elem) {
         var start = parseFloat(elem.attribs.start);
@@ -74,7 +74,7 @@ exports.convert = function convertSubtitles(subtitles) {
     return 'WEBVTT\n\n' + lines.join('\n');
 };
 
-exports.attach = function setupRoutes(app) {
+function attach(app) {
     app.get('/gdvtt/:id/:lang/(:name)?.vtt', handleGetSubtitles);
 };
 
@@ -134,7 +134,7 @@ function fetchSubtitles(id, lang, name, vid, file, cb) {
 
         res.on('end', function () {
             try {
-                buf = exports.convert(buf);
+                buf = convertSubtitles(buf);
             } catch (e) {
                 return cb(e);
             }
@@ -195,3 +195,5 @@ function takeSubtitleLock(filename, cb) {
 
 setInterval(clearOldSubtitles, ONE_HOUR);
 clearOldSubtitles();
+
+export default { attach };

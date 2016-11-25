@@ -182,4 +182,4 @@ ULList.prototype.findAll = function(fn) {
     return result;
 }
 
-module.exports = ULList;
+export default ULList;

@@ -65,4 +65,4 @@ AccessControlModule.prototype.onUserPreJoin = function (user, data, cb) {
     }
 };
 
-module.exports = AccessControlModule;
+export default AccessControlModule;

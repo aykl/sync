@@ -624,7 +624,7 @@ function handlePasswordRecover(req, res) {
     });
 }
 
-module.exports = {
+export default {
     /**
      * Initialize the module
      */

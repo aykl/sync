@@ -3,11 +3,12 @@
 import db from '../database';
 import Logger from '../logger';
 import Q from 'q';
+import customEmbed from '../customembed';
 
 const DB_VERSION = 7;
 var hasUpdates = [];
 
-module.exports.checkVersion = function () {
+function checkVersion() {
     db.query("SELECT `key`,`value` FROM `meta` WHERE `key`=?", ["db_version"], function (err, rows) {
         if (err) {
             return;
@@ -197,7 +198,7 @@ function mergeChannelBans(cb) {
     }).done(function () { cb(null); });
 }
 
-module.exports.deleteOldChannelTables = function (cb) {
+function deleteOldChannelTables(cb) {
     Q.nfcall(db.query, "SHOW TABLES")
     .then(function (rows) {
         rows = rows.map(function (r) {
@@ -248,7 +249,7 @@ function fixUtf8mb4(cb) {
 };
 
 function fixCustomEmbeds(cb) {
-    var CustomEmbedFilter = require("../customembed").filter;
+    var CustomEmbedFilter = customEmbed.filter;
 
     Q.nfcall(db.query, "SELECT * FROM `channel_libraries` WHERE type='cu'")
         .then(function (rows) {
@@ -276,7 +277,7 @@ function fixCustomEmbeds(cb) {
 }
 
 function fixCustomEmbedsInUserPlaylists(cb) {
-    var CustomEmbedFilter = require("../customembed").filter;
+    var CustomEmbedFilter = customEmbed.filter;
     Q.nfcall(db.query, "SELECT * FROM `user_playlists` WHERE `contents` LIKE '%\"type\":\"cu\"%'")
         .then(function (rows) {
             var all = [];
@@ -332,3 +333,5 @@ function fixCustomEmbedsInUserPlaylists(cb) {
             Logger.errlog.log(err.stack);
         });
 }
+
+export default { checkVersion, deleteOldChannelTables };

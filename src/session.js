@@ -10,7 +10,7 @@ function sha256(input) {
     return hash.digest("base64");
 }
 
-exports.genSession = function (account, expiration, cb) {
+function genSession(account, expiration, cb) {
     if (expiration instanceof Date) {
         expiration = Date.parse(expiration);
     }
@@ -22,7 +22,7 @@ exports.genSession = function (account, expiration, cb) {
     cb(null, [account.name, expiration, salt, hash].join(":"));
 };
 
-exports.verifySession = function (input, cb) {
+function verifySession(input, cb) {
     if (typeof input !== "string") {
         return cb("Invalid auth string");
     }
@@ -53,4 +53,9 @@ exports.verifySession = function (input, cb) {
 
         cb(null, account);
     });
+};
+
+export default {
+  genSession,
+  verifySession,
 };

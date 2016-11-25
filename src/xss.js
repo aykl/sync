@@ -1,6 +1,6 @@
 // @flow weak
 
-import sanitizeHTML from 'sanitize-html';
+import sanitizeHtml from 'sanitize-html';
 
 // These tags are allowed in addition to the defaults
 // See https://github.com/punkave/sanitize-html
@@ -72,7 +72,7 @@ const SETTINGS = {
     allowedAttributes: ATTRIBUTE_MAP
 };
 
-function sanitizeText(str) {
+export function sanitizeText(str) {
     str = str.replace(/&/g, "&amp;")
              .replace(/</g, "&lt;")
              .replace(/>/g, "&gt;")
@@ -83,7 +83,7 @@ function sanitizeText(str) {
     return str;
 }
 
-function decodeText(str) {
+export function decodeText(str) {
     str = str.replace(/&#([0-9]{2,7});?/g, function (m, p1) {
         return String.fromCharCode(parseInt(p1));
     });
@@ -97,9 +97,12 @@ function decodeText(str) {
     return str;
 }
 
-module.exports.sanitizeHTML = function (html) {
-    return sanitizeHTML(html, SETTINGS);
-};
+export function sanitizeHTML(html) {
+  return sanitizeHtml(html, SETTINGS);
+}
 
-module.exports.sanitizeText = sanitizeText;
-module.exports.decodeText = decodeText;
+export default {
+  sanitizeText,
+  sanitizeHTML,
+  decodeText,
+};

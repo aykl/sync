@@ -76,6 +76,6 @@ getTorIPs(function (err, ips) {
     _ipList = ips;
 });
 
-exports.isTorExit = function (ip) {
+export function isTorExit(ip) {
     return _ipList.indexOf(ip) >= 0;
 };

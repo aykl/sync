@@ -1370,4 +1370,4 @@ PlaylistModule.prototype.handleRequestPlaylist = function (user) {
     }
 };
 
-module.exports = PlaylistModule;
+export default PlaylistModule;
