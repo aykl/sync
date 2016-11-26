@@ -8,9 +8,9 @@ var SERVER = null;
 export default class LocalChannelIndex {
     listPublicChannels() {
         if (SERVER === null) {
-            SERVER = require('../server').getServer();
+            SERVER = Server.getServer();
         }
 
-        return Promise.resolve(SERVER.packChannelList(true));
+        return Promise.resolve(SERVER.packChannelList(true, false));
     }
 }

@@ -1,3 +1,5 @@
+// @flow
+
 import Logger from './logger';
 import Config from './config';
 import { spawn } from 'child_process';
@@ -70,8 +72,7 @@ function translateStatusCode(statusCode: number): string {
     }
 }
 
-function testUrl(url, cb, redirCount: number): void {
-    if (!redirCount) redirCount = 0;
+function testUrl(url, cb, redirCount: number = 0): void {
     var data = urlparse.parse(url);
     if (!data.protocol || !/https?:/.test(data.protocol)) {
         return cb("Only links starting with 'http://' or 'https://' are supported " +
@@ -84,6 +85,7 @@ function testUrl(url, cb, redirCount: number): void {
     }
 
     var transport = (data.protocol === "https:") ? https : http;
+    // $FlowIgnore
     data.method = "HEAD";
     var req = transport.request(data, function (res) {
         req.abort();
@@ -126,9 +128,8 @@ function testUrl(url, cb, redirCount: number): void {
 function readOldFormat(buf) {
     var lines = buf.split("\n");
     var tmp = { tags: {} };
-    var data = {
-        streams: []
-    };
+    var data = {};
+    data.streams = [];
 
     lines.forEach(function (line) {
         if (line.match(/\[stream\]|\[format\]/i)) {
@@ -328,6 +329,7 @@ function query(filename: string, cb: any): void {
 
         ffprobe(filename, function (err, data) {
             if (err) {
+                // $FlowIgnore
                 if (err.code && err.code === "ENOENT") {
                     return cb("Failed to execute `ffprobe`.  Set ffmpeg.ffprobe-exec " +
                               "to the correct name of the executable in config.yaml.  " +
@@ -393,4 +395,8 @@ function query(filename: string, cb: any): void {
             }
         });
     });
+};
+
+export default {
+  query
 };

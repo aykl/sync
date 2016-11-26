@@ -1,4 +1,5 @@
 // @flow
+
 import AsyncQueue from '../asyncqueue';
 
 const TBL_USERS = "" +

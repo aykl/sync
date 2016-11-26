@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import Promise from 'bluebird';
 import uuid from 'uuid';
@@ -47,7 +47,12 @@ class PartitionChannelIndex {
     }
 
     publishLocalChannels(): void {
-        const channels = SERVER.packChannelList(true).map(channel => {
+        if (SERVER === null) {
+            console.error('SERVER is null');
+            process.exit(1);
+            return;
+        }
+        const channels = SERVER.packChannelList(true, false).map(channel => {
             return {
                 name: channel.name,
                 mediatitle: channel.mediatitle,

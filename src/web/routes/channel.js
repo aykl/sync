@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import CyTubeUtil from '../../utilities';
 import { sanitizeText } from '../../xss';
@@ -6,7 +6,7 @@ import { sendPug } from '../pug';
 import * as HTTPStatus from '../httpstatus';
 import { HTTPError } from '../../errors';
 
-export default function initialize(app, ioConfig) {
+export default function initialize(app: any, ioConfig: any): void {
     app.get('/r/:channel', (req, res) => {
         if (!req.params.channel || !CyTubeUtil.isValidChannelName(req.params.channel)) {
             throw new HTTPError(`"${sanitizeText(req.params.channel)}" is not a valid ` +

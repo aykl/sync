@@ -1,3 +1,5 @@
+// @flow
+
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
@@ -8,6 +10,7 @@ const SALT_PATH = path.resolve(__dirname, '..', '..', '..', 'state', 'ipsessions
 const NO_EXPIRATION = new Date('Fri, 31 Dec 9999 23:59:59 GMT');
 var SALT;
 try {
+    // $FlowIgnore
     SALT = require(SALT_PATH);
 } catch (error) {
     SALT = crypto.randomBytes(32).toString('base64');
@@ -27,7 +30,7 @@ function sha256(input) {
     return hash.digest("base64");
 }
 
-export function createIPSessionCookie(ip, date) {
+export function createIPSessionCookie(ip: any, date: any): string {
     const hashInput = [
         ip,
         date.getTime(),
@@ -40,7 +43,7 @@ export function createIPSessionCookie(ip, date) {
     ].join(':');
 }
 
-export function verifyIPSessionCookie(ip, cookie) {
+export function verifyIPSessionCookie(ip: any, cookie: string): { date: Date }|false {
     const parts = cookie.split(':');
     if (parts.length !== 2) {
         return false;
@@ -62,7 +65,7 @@ export function verifyIPSessionCookie(ip, cookie) {
     };
 }
 
-export function ipSessionCookieMiddleware(req, res, next) {
+export function ipSessionCookieMiddleware(req: any, res: any, next: any): void {
     var firstSeen = new Date();
     var hasSession = false;
     if (req.signedCookies && req.signedCookies['ip-session']) {

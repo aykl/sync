@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import db from '../database';
 import { isValidChannelName as valid } from '../utilities';
@@ -76,7 +76,7 @@ function setRank(chan: any, name: string, rank: number, callback: any): void {
 /**
  * Removes a user's rank entry
  */
-function deleteRank(chan, name, callback) {
+function deleteRank(chan: any, name: string, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -93,7 +93,7 @@ function deleteRank(chan, name, callback) {
 /**
  * Removes all bans from a channel
  */
-function deleteBans(chan, id, callback) {
+function deleteBans(chan: any, id: any, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -109,7 +109,7 @@ function deleteBans(chan, id, callback) {
 /**
  * Deletes all library entries for a channel
  */
-function deleteLibrary(chan, callback) {
+function deleteLibrary(chan: any, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -126,7 +126,7 @@ function deleteLibrary(chan, callback) {
 /**
  * Removes all ranks for a channel
  */
-function deleteAllRanks(chan, callback) {
+function deleteAllRanks(chan: any, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -147,7 +147,7 @@ export default {
     /**
      * Looks up a channel
      */
-    lookup: function (name, callback) {
+    lookup: function (name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -176,7 +176,7 @@ export default {
     /**
      * Searches for a channel
      */
-    search: function (name, callback) {
+    search: function (name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -195,7 +195,7 @@ export default {
     /**
      * Searches for a channel by owner
      */
-    searchOwner: function (name, callback) {
+    searchOwner: function (name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -214,7 +214,7 @@ export default {
     /**
      * Validates and registers a new channel
      */
-    register: function (name, owner, callback) {
+    register: function (name: string, owner: string, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -274,7 +274,7 @@ export default {
     /**
      * Unregisters a channel
      */
-    drop: function (name, callback) {
+    drop: function (name: string, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -319,7 +319,7 @@ export default {
     /**
      * Looks up channels registered by a given user
      */
-    listUserChannels: function (owner, callback) {
+    listUserChannels: function (owner: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -338,7 +338,7 @@ export default {
     /**
      * Loads the channel from the database
      */
-    load: function (chan, callback) {
+    load: function (chan: any, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -438,7 +438,7 @@ export default {
     /**
      * Query all user ranks at once
      */
-    allRanks: function (chan, callback) {
+    allRanks: function (chan: any, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -460,7 +460,7 @@ export default {
     /**
      * Adds a media item to the library
      */
-    addToLibrary: function (chan, media, callback) {
+    addToLibrary: function (chan: any, media: any, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -486,7 +486,7 @@ export default {
     /**
      * Retrieves a media item from the library by id
      */
-    getLibraryItem: function (chan, id, callback) {
+    getLibraryItem: function (chan: any, id: any, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -514,7 +514,7 @@ export default {
     /**
      * Search the library by title
      */
-    searchLibrary: function (chan, search, callback) {
+    searchLibrary: function (chan: any, search: any, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -526,7 +526,7 @@ export default {
     /**
      * Deletes a media item from the library
      */
-    deleteFromLibrary: function (chan, id, callback) {
+    deleteFromLibrary: function (chan: any, id: any, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -545,7 +545,7 @@ export default {
     /**
      * Add a ban to the banlist
      */
-    ban: function (chan, ip, name, note, bannedby, callback) {
+    ban: function (chan: any, ip: any, name: string, note: any, bannedby: any, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -563,7 +563,7 @@ export default {
     /**
      * Check if an IP address or range is banned
      */
-    isIPBanned: function (chan, ip, callback) {
+    isIPBanned: function (chan: any, ip: any, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -586,7 +586,7 @@ export default {
     /**
      * Check if a username is banned
      */
-    isNameBanned: function (chan, name, callback) {
+    isNameBanned: function (chan: any, name: string, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -605,7 +605,7 @@ export default {
     /**
      * Lists all bans
      */
-    listBans: function (chan, callback) {
+    listBans: function (chan: any, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -621,7 +621,7 @@ export default {
     /**
      * Removes a ban from the banlist
      */
-    unbanId: function (chan, id, callback) {
+    unbanId: function (chan: any, id: any, callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }

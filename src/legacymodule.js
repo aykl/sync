@@ -6,7 +6,7 @@ import IOConfiguration from './configuration/ioconfig';
 
 class LegacyModule {
     ioConfig: any;
-    
+
     getIOConfig() {
         if (!this.ioConfig) {
             this.ioConfig = IOConfiguration.fromOldConfig(Config);
@@ -21,6 +21,10 @@ class LegacyModule {
 
     onReady() {
 
+    }
+
+    getRedisClientProvider() {
+        throw new Error('Not implemented');
     }
 }
 

@@ -1,30 +1,38 @@
+// @flow
+
 import util from './utilities';
 
-function Media(id: any, title: any, seconds: any, type: any, meta: any) {
-    if (!meta) {
-        meta = {};
+class Media {
+    id: any;
+    seconds: any;
+    duration: any;
+    type: any;
+    meta: any;
+    currentTime: any;
+    paused: bool;
+    title: string;
+    thumb: any;
+
+    constructor(id: any, title: string, seconds: any, type: any, meta: any = {}) {
+        this.id = id;
+        this.setTitle(title);
+
+        this.seconds = seconds === "--:--" ? 0 : parseInt(seconds);
+        this.duration = util.formatTime(seconds);
+        this.type = type;
+        this.meta = meta;
+        this.currentTime = 0;
+        this.paused = false;
     }
 
-    this.id = id;
-    this.setTitle(title);
-
-    this.seconds = seconds === "--:--" ? 0 : parseInt(seconds);
-    this.duration = util.formatTime(seconds);
-    this.type = type;
-    this.meta = meta;
-    this.currentTime = 0;
-    this.paused = false;
-}
-
-Media.prototype = {
-    setTitle: function (title) {
+    setTitle(title: string): void {
         this.title = title;
         if (this.title.length > 100) {
             this.title = this.title.substring(0, 97) + "...";
         }
-    },
+    }
 
-    pack: function () {
+    pack(): any {
         return {
             id: this.id,
             title: this.title,
@@ -42,26 +50,26 @@ Media.prototype = {
                 html5hack: this.meta.html5hack
             }
         };
-    },
+    }
 
-    getTimeUpdate: function () {
+    getTimeUpdate(): any {
         return {
             currentTime: this.currentTime,
             paused: this.paused
         };
-    },
+    }
 
-    getFullUpdate: function () {
+    getFullUpdate(): any {
         var packed = this.pack();
         packed.currentTime = this.currentTime;
         packed.paused = this.paused;
         return packed;
-    },
+    }
 
-    reset: function () {
+    reset(): void {
         this.currentTime = 0;
         this.paused = false;
     }
-};
+}
 
 export default Media;

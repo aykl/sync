@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import Logger from './logger';
 import db from './database';
@@ -281,7 +281,7 @@ function handleListStats(user) {
     });
 }
 
-function init(user) {
+function init(user: any): void {
     var s = user.socket;
     s.on("acp-announce", handleAnnounce.bind(this, user));
     s.on("acp-announce-clear", handleAnnounceClear.bind(this, user));

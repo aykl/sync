@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 (function () {
     var root, crypto, net = false;
@@ -14,47 +14,51 @@
         net = require("net");
     }
 
-    var Set = function (items) {
-        this._items = {};
-        var self = this;
-        if (items instanceof Array)
-            items.forEach(function (it) { self.add(it); });
-    };
+    class Set {
+        _items: any;
 
-    Set.prototype.contains = function (what) {
-        return (what in this._items);
-    };
-
-    Set.prototype.add = function (what) {
-        this._items[what] = true;
-    };
-
-    Set.prototype.remove = function (what) {
-        if (what in this._items)
-            delete this._items[what];
-    };
-
-    Set.prototype.clear = function () {
-        this._items = {};
-    };
-
-    Set.prototype.forEach = function (fn) {
-        for (var k in this._items) {
-            fn(k);
+        constructor(items: any[] = []) {
+            this._items = {};
+            var self = this;
+            if (items instanceof Array)
+                items.forEach(function (it) { self.add(it); });
         }
-    };
+
+        contains(what: any): bool {
+            return (what in this._items);
+        }
+
+        add(what: any): void {
+            this._items[what] = true;
+        }
+
+        remove(what: any): void {
+            if (what in this._items)
+                delete this._items[what];
+        }
+
+        clear(): void {
+            this._items = {};
+        }
+
+        forEach(fn: any): void {
+            for (var k in this._items) {
+                fn(k);
+            }
+        }
+    }
 
     root.Set = Set;
 
-    root.isValidChannelName = function (name) {
+    root.isValidChannelName = function (name: string) {
         return name.match(/^[\w-]{1,30}$/);
     },
 
-    root.isValidUserName = function (name) {
+    root.isValidUserName = function (name: string) {
         return name.match(/^[\w-]{1,20}$/);
     },
 
-    root.isValidEmail = function (email) {
+    root.isValidEmail = function (email: string): bool {
         if (email.length > 255) {
             return false;
         }
@@ -80,7 +84,7 @@
         return salt.join('');
     },
 
-    root.getIPRange = function (ip) {
+    root.getIPRange = function (ip: string): string {
         if (net.isIPv6(ip)) {
             return root.expandIPv6(ip)
                    .replace(/((?:[0-9a-f]{4}:){3}[0-9a-f]{4}):(?:[0-9a-f]{4}:){3}[0-9a-f]{4}/, "$1");
@@ -89,7 +93,7 @@
         }
     },
 
-    root.getWideIPRange = function (ip) {
+    root.getWideIPRange = function (ip: string): string {
         if (net.isIPv6(ip)) {
             return root.expandIPv6(ip)
                    .replace(/((?:[0-9a-f]{4}:){2}[0-9a-f]{4}):(?:[0-9a-f]{4}:){4}[0-9a-f]{4}/, "$1");
@@ -98,7 +102,7 @@
         }
     },
 
-    root.expandIPv6 = function (ip) {
+    root.expandIPv6 = function (ip: string): string {
         var result = "0000:0000:0000:0000:0000:0000:0000:0000".split(":");
         var parts = ip.split("::");
         var left = parts[0].split(":");
@@ -124,7 +128,7 @@
         return result.join(":");
     },
 
-    root.formatTime = function (sec) {
+    root.formatTime = function (sec: any): string {
         if(sec === "--:--")
             return sec;
 
@@ -152,7 +156,7 @@
         return [h, m, s].join(":");
     },
 
-    root.parseTime = function (time) {
+    root.parseTime = function (time: string): number {
         var parts = time.split(":").reverse();
         var seconds = 0;
         switch (parts.length) {
@@ -173,7 +177,7 @@
         return {
             count: 0,
             lastTime: 0,
-            throttle: function (opts) {
+            throttle: function (opts: { [key: string]: any } = {}) {
                 if (typeof opts === "undefined")
                     opts = {};
 
@@ -214,7 +218,7 @@
         };
     },
 
-    root.formatLink = function (id, type) {
+    root.formatLink = function (id: string, type: string): string {
         switch (type) {
             case "yt":
                 return "http://youtu.be/" + id;
@@ -253,7 +257,7 @@
         }
     },
 
-    root.isLive = function (type) {
+    root.isLive = function (type: string): bool {
         switch (type) {
             case "li":
             case "tw":
@@ -270,7 +274,7 @@
         }
     },
 
-    root.sha1 = function (data) {
+    root.sha1 = function (data: any): string {
         if (!crypto) {
             return "";
         }
@@ -279,7 +283,7 @@
         return shasum.digest("hex");
     }
 
-    root.cloakIP = function (ip) {
+    root.cloakIP = function (ip: string): string {
         if (ip.match(/\d+\.\d+(\.\d+)?(\.\d+)?/)) {
             return cloakIPv4(ip);
         } else if (ip.match(/([0-9a-f]{1,4}\:){1,7}[0-9a-f]{1,4}/)) {

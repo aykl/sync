@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 
 import { loadFromToml } from 'cytube-common/lib/configuration/configloader';
 import { PartitionConfig } from './partitionconfig';
