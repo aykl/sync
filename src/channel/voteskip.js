@@ -4,11 +4,12 @@ import ChannelModule from './module';
 import Flags from '../flags';
 import { Poll } from '../poll';
 import User from '../user';
+import Channel from './channel';
 
 class VoteskipModule extends ChannelModule {
     poll: any;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this.poll = false;
     }

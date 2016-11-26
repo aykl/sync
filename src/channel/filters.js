@@ -5,6 +5,7 @@ import ChannelModule from './module';
 import XSS from '../xss';
 import Logger from '../logger';
 import User from '../user';
+import Channel from './channel';
 
 /*
  * Converts JavaScript-style replacements ($1, $2, etc.) with
@@ -69,7 +70,7 @@ const DEFAULT_FILTERS = [
 class ChatFilterModule extends ChannelModule {
     filters: any;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this.filters = new FilterList();
     }

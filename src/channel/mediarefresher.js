@@ -5,13 +5,14 @@ import ChannelModule from './module';
 import Config from '../config';
 import InfoGetter from '../get-info';
 import Logger from '../logger';
+import Channel from './channel';
 
 class MediaRefresherModule extends ChannelModule {
     _interval: any;
     _media: any;
     _playlist: any;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this._interval = false;
         this._media = null;

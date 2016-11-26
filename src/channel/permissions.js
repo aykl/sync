@@ -2,6 +2,7 @@
 
 import ChannelModule from './module';
 import User from '../user';
+import Channel from './channel';
 
 const DEFAULT_PERMISSIONS = {
     seeplaylist: -1,          // See the playlist
@@ -50,7 +51,7 @@ class PermissionsModule extends ChannelModule {
     permissions: any;
     openPlaylist: any;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this.permissions = {};
         this.openPlaylist = false;

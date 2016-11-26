@@ -4,10 +4,11 @@ import Account from '../account';
 import ChannelModule from './module';
 import Flags from '../flags';
 import User from '../user';
+import Channel from './channel';
 
 class AccessControlModule extends ChannelModule {
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
       super(channel);
     }
 

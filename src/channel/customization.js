@@ -3,6 +3,8 @@
 import ChannelModule from './module';
 import XSS from '../xss';
 import User from '../user';
+import Channel from './channel';
+
 
 const TYPE_SETCSS = {
     css: "string"
@@ -21,7 +23,7 @@ class CustomizationModule extends ChannelModule {
     js: string;
     motd: string;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this.css = "";
         this.js = "";

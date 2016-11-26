@@ -5,6 +5,7 @@ import Flags from '../flags';
 import Account from '../account';
 import db from '../database';
 import User from '../user';
+import Channel from './channel';
 
 const TYPE_SET_CHANNEL_RANK = {
     name: "string",
@@ -12,7 +13,7 @@ const TYPE_SET_CHANNEL_RANK = {
 };
 
 class RankModule extends ChannelModule {
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         if (this.channel.modules.chat) {
             this.channel.modules.chat.registerCommand("/rank", this.handleCmdRank.bind(this));

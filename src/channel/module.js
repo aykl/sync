@@ -1,12 +1,13 @@
 // @flow
 
 import User from '../user';
+import Channel from './channel';
 
 
 class ChannelModule {
-    channel: any;
+    channel: Channel;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
       this.channel = channel;
     }
 

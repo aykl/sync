@@ -13,6 +13,7 @@ import Logger from '../logger';
 import customEmbed from '../customembed';
 import XSS from '../xss';
 import User from '../user';
+import Channel from './channel';
 
 const CustomEmbedFilter = customEmbed.filter;
 
@@ -102,7 +103,7 @@ class PlaylistModule extends ChannelModule {
     _counter: any;
     _refreshing: any;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this.items = new ULList();
         this.meta = {
@@ -201,6 +202,7 @@ class PlaylistModule extends ChannelModule {
             this._leadInterval = false;
         }
 
+        // $FlowIgnore
         this.channel = null;
     }
 
@@ -801,6 +803,7 @@ class PlaylistModule extends ChannelModule {
                     this._leadInterval = false;
                 }
                 if (this.leader.account.effectiveRank < 1.5) {
+                    // $FlowIgnore
                     this.leader.account.oldRank = this.leader.account.effectiveRank;
                     this.leader.account.effectiveRank = 1.5;
                     this.leader.emit("effectiveRankChange", 1.5);

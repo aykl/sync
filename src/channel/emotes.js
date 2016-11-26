@@ -3,6 +3,7 @@
 import ChannelModule from './module';
 import XSS from '../xss';
 import User from '../user';
+import Channel from './channel';
 
 function EmoteList(defaults) {
     if (!defaults) {
@@ -98,7 +99,7 @@ function validateEmote(f) {
 class EmoteModule extends ChannelModule {
     emotes: any;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this.emotes = new EmoteList();
     }

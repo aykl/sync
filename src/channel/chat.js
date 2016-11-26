@@ -108,7 +108,7 @@ class ChatModule extends ChannelModule {
                this.muted.contains(SHADOW_TAG + name.toLowerCase());
     }
 
-    mutedUsers(): void {
+    mutedUsers(): User[] {
         var self = this;
         return self.channel.users.filter(function (u) {
             return self.isMuted(u.getName());

@@ -7,6 +7,7 @@ import InfoGetter from '../get-info';
 import db from '../database';
 import Media from '../media';
 import User from '../user';
+import Channel from './channel';
 
 const TYPE_UNCACHE = {
     id: "string"
@@ -18,7 +19,7 @@ const TYPE_SEARCH_MEDIA = {
 };
 
 class LibraryModule extends ChannelModule {
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
     }
 

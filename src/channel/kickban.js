@@ -7,6 +7,7 @@ import util from '../utilities';
 import Account from '../account';
 import Q from 'q';
 import User from '../user';
+import Channel from './channel';
 
 const TYPE_UNBAN = {
     id: "number",
@@ -34,7 +35,7 @@ function checkNameBan(cname, name, cb) {
 }
 
 class KickBanModule extends ChannelModule {
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
 
         if (this.channel.modules.chat) {

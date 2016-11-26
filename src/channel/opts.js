@@ -5,6 +5,7 @@ import Config from '../config';
 import Utilities from '../utilities';
 import url from 'url';
 import User from '../user';
+import Channel from './channel';
 
 type Options = {
     allow_voteskip: bool,
@@ -34,7 +35,7 @@ type Options = {
 class OptionsModule extends ChannelModule {
     opts: Options;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this.opts = {
             allow_voteskip: true,      // Allow users to voteskip

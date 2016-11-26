@@ -3,6 +3,7 @@
 import ChannelModule from './module';
 import { Poll } from '../poll';
 import User from '../user';
+import Channel from './channel';
 
 const TYPE_NEW_POLL = {
     title: "string",
@@ -23,7 +24,7 @@ class PollModule extends ChannelModule {
     roomViewHidden: any;
     roomNoViewHidden: any;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
 
         this.poll = null;

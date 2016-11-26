@@ -2,11 +2,12 @@
 
 import ChannelModule from './module';
 import User from '../user';
+import Channel from './channel';
 
 class DrinkModule extends ChannelModule {
     drinks: number;
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this.drinks = 0;
     }
