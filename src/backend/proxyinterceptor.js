@@ -5,11 +5,11 @@ import ioServer from '../io/ioserver';
 import ProxiedSocket from './proxiedsocket';
 
 export default class ProxyInterceptor {
-    socketEmitter: any;
+    socketEmitter: mixed;
     frontendConnections: any;
     frontendProxiedSockets: any;
 
-    constructor(socketEmitter: any) {
+    constructor(socketEmitter: mixed) {
         this.socketEmitter = socketEmitter;
         this.frontendConnections = {};
         this.frontendProxiedSockets = {};
@@ -20,7 +20,7 @@ export default class ProxyInterceptor {
      *
      * @param {Connection} socket frontend proxy connection
      */
-    onConnection(socket: any): void {
+    onConnection(socket: { endpoint: string, on(mixed): mixed }): void {
         if (this.frontendConnections.hasOwnProperty(socket.endpoint)) {
             logger.error(`Duplicate frontend connection: ${socket.endpoint}`);
             return;

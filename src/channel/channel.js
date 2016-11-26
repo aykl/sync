@@ -340,7 +340,7 @@ class Channel extends EventEmitter {
         });
     }
 
-    joinUser(user: User, data: any): void {
+    joinUser(user: User, data: mixed): void {
         const self = this;
 
         self.refCounter.ref("Channel::user");
@@ -517,7 +517,7 @@ class Channel extends EventEmitter {
         };
     }
 
-    sendUserMeta(users: User[], user: User, minrank: any): void {
+    sendUserMeta(users: User[], user: User, minrank: mixed): void {
         var self = this;
         var userdata = self.packUserData(user);
         users.filter(function (u) {
@@ -679,11 +679,11 @@ class Channel extends EventEmitter {
         });
     }
 
-    broadcastToRoom(msg: any, data: any, ns: any): void {
+    broadcastToRoom(msg: mixed, data: mixed, ns: mixed): void {
         sio.instance.in(ns).emit(msg, data);
     }
 
-    broadcastAll(msg: any, data: any): void {
+    broadcastAll(msg: mixed, data: mixed): void {
         this.broadcastToRoom(msg, data, this.name);
     }
 

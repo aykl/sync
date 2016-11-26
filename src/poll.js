@@ -3,17 +3,21 @@
 const link = /(\w+:\/\/(?:[^:\/\[\]\s]+|\[[0-9a-f:]+\])(?::\d+)?(?:\/[^\/\s]*)*)/ig;
 import XSS from './xss';
 
-export class Poll {
-    initiator: any;
-    title: string;
-    options: any;
-    obscured: bool;
-    counts: any[];
-    votes: any;
-    timestamp: number;
-    timer: any;
 
-    constructor(initiator: any, title: string, options: any, obscured: bool = false) {
+type Option = string;
+type Options = Option[];
+
+export class Poll {
+    initiator: mixed;
+    title: string;
+    options: Options;
+    obscured: bool;
+    counts: number[];
+    votes: { [key: mixed]: ?number };
+    timestamp: number;
+    timer: mixed;
+
+    constructor(initiator: mixed, title: string, options: Options, obscured: bool = false) {
         this.initiator = initiator;
         title = XSS.sanitizeText(title);
         this.title = title.replace(link, "<a href=\"$1\" target=\"_blank\">$1</a>");

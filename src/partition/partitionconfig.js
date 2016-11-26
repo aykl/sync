@@ -1,7 +1,7 @@
 // @flow
 
 type PartitionConfigData = {
-    identity: any,
+    identity: mixed,
     redis: any,
 }
 

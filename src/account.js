@@ -6,18 +6,18 @@ import Q from 'q';
 const DEFAULT_PROFILE = Object.freeze({ image: '', text: '' });
 
 class Account {
-    ip: any;
+    ip: mixed;
     user: any;
     aliases: any;
-    channelRank: any;
-    effectiveRank: any;
+    channelRank: number;
+    effectiveRank: number;
     guestName: any;
-    globalRank: any;
-    name: any;
-    lowername: any;
-    profile: any;
+    globalRank: number;
+    name: string;
+    lowername: string;
+    profile: mixed;
 
-    constructor(ip: any, user: any, aliases: any) {
+    constructor(ip: mixed, user: any, aliases: any) {
         this.ip = ip;
         this.user = user;
         this.aliases = aliases;

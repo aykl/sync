@@ -154,7 +154,13 @@ function readOldFormat(buf) {
     return data;
 }
 
-function isAlternateDisposition(stream) {
+type Stream = {
+  disposition: { [key: mixed]: mixed },
+  codec_name: string,
+  [key: mixed]: mixed
+};
+
+function isAlternateDisposition(stream: Stream) {
     if (!stream.disposition) {
         return false;
     }

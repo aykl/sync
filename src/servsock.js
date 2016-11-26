@@ -1,19 +1,21 @@
 // @flow
 
-var fs = require('fs');
-var net = require('net');
+import fs from 'fs';
+import net from 'net';
+
+type Handler = (mixed) => mixed;
 
 export default class ServiceSocket {
-    connections: any;
-    handler: any;
-    socket: any;
-    server: any;
+    connections: { [key: mixed]: { write: (mixed) => mixed, end: (mixed) => mixed } };
+    handler: Handler;
+    socket: string;
+    server: { close: () => mixed };
 
     constructor() {
         this.connections = {};
     }
 
-    init(handler: any, socket: any): void {
+    init(handler: Handler, socket: string): void {
         this.handler = handler;
         this.socket = socket;
 
@@ -31,6 +33,7 @@ export default class ServiceSocket {
     }
 
     openServiceSocket(){
+        // $FlowIgnore
         this.server = net.createServer((stream) => {
             let id = Date.now();
             this.connections[id] = stream;

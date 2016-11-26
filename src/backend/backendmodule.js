@@ -19,14 +19,14 @@ const BACKEND_CONFIG_PATH = path.resolve(__dirname, '..', '..', 'backend.toml');
 
 class BackendModule {
     backendConfig: BackendConfiguration;
-    redisAdapter: any;
-    sioEmitter: any;
-    ioBackend: any;
-    redisClusterClient: any;
-    frontendPool: any;
-    clusterClient: any;
-    nullClusterClient: any;
-    redisClientProvider: any;
+    redisAdapter: mixed;
+    sioEmitter: mixed;
+    ioBackend: IOBackend;
+    redisClusterClient: RedisClusterClient;
+    frontendPool: mixed;
+    clusterClient: mixed;
+    nullClusterClient: NullClusterClient;
+    redisClientProvider: RedisClientProvider;
 
     constructor() {
         this.initConfig();

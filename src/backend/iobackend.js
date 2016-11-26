@@ -12,13 +12,13 @@ const BACKEND_POOL = 'backend-hosts';
 export default class IOBackend {
     proxyListenerConfig: any;
     socketEmitter: any;
-    poolRedisClient: any;
+    poolRedisClient: mixed;
     protocol: any;
     proxyInterceptor: any;
     proxyListener: any;
     poolEntryUpdater: any;
 
-    constructor(proxyListenerConfig: any, socketEmitter: any, poolRedisClient: any) {
+    constructor(proxyListenerConfig: any, socketEmitter: any, poolRedisClient: mixed) {
         this.proxyListenerConfig = proxyListenerConfig;
         this.socketEmitter = socketEmitter;
         this.poolRedisClient = poolRedisClient;

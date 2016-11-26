@@ -110,7 +110,7 @@ function blackHole() {
 /**
  * Check if an IP address is globally banned
  */
-function isGlobalIPBanned(ip: any, callback: any): bool {
+function isGlobalIPBanned(ip: string, callback: any): bool {
     var range = util.getIPRange(ip);
     var wrange = util.getWideIPRange(ip);
     var banned = ip in global_ipbans ||
@@ -127,7 +127,7 @@ function isGlobalIPBanned(ip: any, callback: any): bool {
  * Retrieve all global bans from the database.
  * Cache locally in global_bans
  */
-function listGlobalBans(callback: any): void {
+function listGlobalBans(callback: (mixed) => mixed = blackHole): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -150,7 +150,7 @@ function listGlobalBans(callback: any): void {
 /**
  * Globally ban by IP
  */
-function globalBanIP(ip: any, reason: any, callback: any): void {
+function globalBanIP(ip: string, reason: string, callback: (mixed) => mixed = blackHole): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -171,7 +171,7 @@ function globalBanIP(ip: any, reason: any, callback: any): void {
 /**
  * Remove a global IP ban
  */
-function globalUnbanIP(ip: any, callback: any): void {
+function globalUnbanIP(ip: string, callback: (mixed) => mixed = blackHole): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -205,7 +205,9 @@ function cleanOldPasswordResets(callback: any): void {
     runQuery(query, [Date.now() - 24*60*60*1000], callback);
 };
 
-function addPasswordReset(data: any, cb: any): void {
+function addPasswordReset(data: { ip?: string, name: string, email: string,
+                                  hash: mixed, expire: mixed
+                                }, cb: (mixed) => mixed = blackHole): void {
     if (typeof cb !== "function") {
         cb = blackHole;
     }
@@ -226,7 +228,7 @@ function addPasswordReset(data: any, cb: any): void {
                          [ip, name, email, hash, expire, ip, hash, email, expire], cb);
 };
 
-function lookupPasswordReset(hash: any, cb: any): void {
+function lookupPasswordReset(hash: mixed, cb: any): void {
     if (typeof cb !== "function") {
         return;
     }
@@ -243,7 +245,7 @@ function lookupPasswordReset(hash: any, cb: any): void {
     });
 };
 
-function deletePasswordReset(hash: any): void {
+function deletePasswordReset(hash: mixed): void {
     runQuery("DELETE FROM `password_reset` WHERE hash=?", [hash]);
 };
 
@@ -484,7 +486,7 @@ function cleanOldAliases(expiration: any, callback: any): void {
 /**
  * Retrieves a list of aliases for an IP address
  */
-function getAliases(ip: any, callback: any): void {
+function getAliases(ip: string, callback: any): void {
     if (typeof callback !== "function") {
         return;
     }
@@ -536,7 +538,7 @@ function getIPs(name: string, callback: any): void {
 
 /* REGION stats */
 
-function addStatPoint(time: any, ucount: any, ccount: any, mem: any, callback: any): void {
+function addStatPoint(time: mixed, ucount: mixed, ccount: mixed, mem: mixed, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -545,7 +547,7 @@ function addStatPoint(time: any, ucount: any, ccount: any, mem: any, callback: a
     runQuery(query, [time, ucount, ccount, mem], callback);
 };
 
-function pruneStats(before: any, callback: any): void {
+function pruneStats(before: mixed, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }

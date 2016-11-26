@@ -2,8 +2,8 @@
 
 class AsyncQueue {
     _q: any;
-    _lock: any;
-    _tm: any;
+    _lock: mixed;
+    _tm: number;
 
     constructor() {
         this._q = [];

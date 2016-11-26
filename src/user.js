@@ -12,23 +12,41 @@ import Flags from './flags';
 import events from 'events';
 const EventEmitter = events.EventEmitter;
 
+type Socket = {
+  _realip: string,
+  _displayip: string,
+  _hostmask: any,
+  aliases: any,
+  _events: { [key: mixed]: mixed },
+  ipSessionFirstSeen: { getTime(): number },
+
+  emit(mixed): void,
+  on(mixed): mixed,
+  join(mixed): mixed,
+  typecheckedOn(mixed): mixed,
+  typecheckedOnce(mixed): mixed,
+  leave(mixed): mixed,
+  once(mixed): mixed,
+  disconnect(mixed): mixed,
+};
+
 class User extends EventEmitter {
-    flags: any;
-    socket: any;
-    realip: any;
-    displayip: any;
+    flags: number;
+    socket: Socket;
+    realip: string;
+    displayip: string;
     hostmask: any;
     channel: any;
     queueLimiter: any;
     chatLimiter: any;
     reqPlaylistLimiter: any;
-    awaytimer: any;
+    awaytimer: mixed;
     account: Account.Account;
     registrationTime: Date;
     __evHandlers: any;
     dead: bool;
 
-    constructor(socket: any) {
+    constructor(socket: Socket) {
         super();
         this.flags = 0;
         this.socket = socket;
@@ -183,7 +201,7 @@ class User extends EventEmitter {
         this.emit("clearFlag", flag);
     }
 
-    waitFlag(flag: any, cb: any): void {
+    waitFlag(flag: any, cb: () => void): void {
         var self = this;
         if (self.is(flag)) {
             cb();
@@ -215,7 +233,7 @@ class User extends EventEmitter {
     }
 
     /* Called when a user's AFK status changes */
-    setAFK(afk: any): void {
+    setAFK(afk: mixed): void {
         if (!this.inChannel()) {
             return;
         }

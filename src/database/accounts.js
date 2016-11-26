@@ -33,7 +33,7 @@ function parseProfile(data) {
 /**
  * Check if a username is taken
  */
-function isUsernameTaken(name: string, callback: any): void {
+function isUsernameTaken(name: string, callback: (mixed) => mixed): void {
     db.query("SELECT name FROM `users` WHERE name LIKE ? ESCAPE '\\\\'",
              [wildcardSimilarChars(name)],
     function (err, rows) {
@@ -54,7 +54,7 @@ export default {
     /**
      * Search for a user by name
      */
-    search: function (name: string, fields: any, callback: any): void {
+    search: function (name: string, fields: mixed[], callback: (mixed) => mixed): void {
         /* This bit allows it to accept varargs
            Function can be called as (name, callback) or
            (name, fields, callback)
@@ -107,7 +107,8 @@ export default {
     /**
      * Registers a new user account
      */
-    register: function (name: string, pw: string, email: string, ip: any, callback: any): void {
+    register: function (name: string, pw: string, email: string, ip: string,
+                        callback: (mixed) => mixed): void {
         // Start off with a boatload of error checking
         if (typeof callback !== "function") {
             callback = blackHole;
@@ -464,7 +465,9 @@ export default {
     /**
      * Updates a user's profile
      */
-    setProfile: function (name: string, profile: any, callback: any): void {
+    setProfile: function (name: string,
+                          profile: { image: string, text: string },
+                          callback: any): void {
         if (typeof callback !== "function") {
             callback = blackHole;
         }
@@ -499,7 +502,7 @@ export default {
         });
     },
 
-    generatePasswordReset: function (ip: any, name: any, email: any, callback: any): void {
+    generatePasswordReset: function (ip: mixed, name: mixed, email: mixed, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -507,7 +510,7 @@ export default {
         callback("generatePasswordReset is not implemented", null);
     },
 
-    recoverPassword: function (hash: any, callback: any): void {
+    recoverPassword: function (hash: mixed, callback: any): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -518,7 +521,7 @@ export default {
     /**
      * Retrieve a list of channels owned by a user
      */
-    getChannels: function (name: string, callback: any): void {
+    getChannels: function (name: string, callback: (mixed) => mixed): void {
         if (typeof callback !== "function") {
             return;
         }
@@ -529,7 +532,7 @@ export default {
     /**
      * Retrieves all names registered from a given IP
      */
-    getAccounts: function (ip: any, callback: any): void {
+    getAccounts: function (ip: any, callback: (mixed) => mixed): void {
         if (typeof callback !== "function") {
             return;
         }

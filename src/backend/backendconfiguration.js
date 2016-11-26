@@ -2,7 +2,7 @@
 
 type BackendConfig = {
   redis: any,
-  proxy: any
+  proxy: { listeners: { host: mixed, port: mixed }[] }
 };
 
 class BackendConfiguration {
@@ -16,7 +16,7 @@ class BackendConfiguration {
         return this.config.redis;
     }
 
-    getListenerConfig(): any[] {
+    getListenerConfig(): mixed[] {
         return this.config.proxy.listeners.map(listener => ({
             getHost() {
                 return listener.host;

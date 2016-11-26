@@ -15,24 +15,24 @@
     }
 
     class Set {
-        _items: any;
+        _items: { [key: mixed]: mixed };
 
-        constructor(items: any[] = []) {
+        constructor(items: mixed[] = []) {
             this._items = {};
             var self = this;
             if (items instanceof Array)
                 items.forEach(function (it) { self.add(it); });
         }
 
-        contains(what: any): bool {
+        contains(what: string|number): bool {
             return (what in this._items);
         }
 
-        add(what: any): void {
+        add(what: mixed): void {
             this._items[what] = true;
         }
 
-        remove(what: any): void {
+        remove(what: string|number): void {
             if (what in this._items)
                 delete this._items[what];
         }
@@ -41,7 +41,7 @@
             this._items = {};
         }
 
-        forEach(fn: any): void {
+        forEach(fn: (mixed) => mixed): void {
             for (var k in this._items) {
                 fn(k);
             }
@@ -179,7 +179,7 @@
         return {
             count: 0,
             lastTime: 0,
-            throttle: function (opts: { [key: string]: any } = {}) {
+            throttle: function (opts: { [key: string]: mixed } = {}) {
                 if (typeof opts === "undefined")
                     opts = {};
 
@@ -276,7 +276,7 @@
         }
     },
 
-    root.sha1 = function (data: any): string {
+    root.sha1 = function (data: mixed): string {
         if (!crypto) {
             return "";
         }

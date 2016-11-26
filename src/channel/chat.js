@@ -32,8 +32,8 @@ const MIN_ANTIFLOOD = {
 };
 
 class ChatModule extends ChannelModule {
-    buffer: any[];
-    muted: any;
+    buffer: mixed[];
+    muted: util.Set;
     commandHandlers: any;
 
     constructor(channel: any) {
@@ -103,7 +103,7 @@ class ChatModule extends ChannelModule {
         });
     }
 
-    isMuted(name: string): void {
+    isMuted(name: string): bool {
         return this.muted.contains(name.toLowerCase()) ||
                this.muted.contains(SHADOW_TAG + name.toLowerCase());
     }
@@ -126,7 +126,7 @@ class ChatModule extends ChannelModule {
         });
     }
 
-    restrictNewAccount(user: User, data: any): bool {
+    restrictNewAccount(user: User, data: { msg: string }): bool {
         if (user.account.effectiveRank < 2 && this.channel.modules.options) {
             const firstSeen = user.getFirstSeenTime();
             const opts = this.channel.modules.options;
@@ -147,7 +147,9 @@ class ChatModule extends ChannelModule {
         return false;
     }
 
-    handleChatMsg(user: User, data: any): void {
+    handleChatMsg(user: User, data: { msg: string,
+                                      meta: { [key: mixed]: mixed },
+                                      modflair: mixed }): void {
         var self = this;
         counters.add("chat:incoming");
 
@@ -195,7 +197,8 @@ class ChatModule extends ChannelModule {
         });
     }
 
-    handlePm(user: any, data: any): void {
+    handlePm(user: any, data: { msg: string, to: string,
+                                meta: { modflair: mixed } }): void {
         if (!this.channel) {
             return;
         }
@@ -279,7 +282,8 @@ class ChatModule extends ChannelModule {
         user.socket.emit("pm", msgobj);
     }
 
-    processChatMsg(user: User, data: any): void {
+    processChatMsg(user: User, data: { msg: string,
+                                      meta: { [key: mixed]: mixed } }): void {
         if (data.msg.match(Config.get("link-domain-blacklist-regex"))) {
             this.channel.logger.log(user.displayip + " (" + user.getName() + ") was kicked for " +
                     "blacklisted domain");

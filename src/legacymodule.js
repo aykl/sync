@@ -5,9 +5,9 @@ import Config from './config';
 import IOConfiguration from './configuration/ioconfig';
 
 class LegacyModule {
-    ioConfig: any;
+    ioConfig: IOConfiguration;
 
-    getIOConfig() {
+    getIOConfig(): IOConfiguration {
         if (!this.ioConfig) {
             this.ioConfig = IOConfiguration.fromOldConfig(Config);
         }
@@ -15,11 +15,11 @@ class LegacyModule {
         return this.ioConfig;
     }
 
-    getClusterClient() {
+    getClusterClient(): NullClusterClient {
         return new NullClusterClient(this.getIOConfig());
     }
 
-    onReady() {
+    onReady(): void {
 
     }
 

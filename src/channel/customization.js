@@ -30,12 +30,12 @@ class CustomizationModule extends ChannelModule {
         this.motd = "";
     }
 
-    load(data: any): void {
-        if ("css" in data) {
+    load(data: { css?: string, js?: string, motd?: { motd: string }|string }): void {
+        if (data.css !== undefined) {
             this.css = data.css;
         }
 
-        if ("js" in data) {
+        if (data.js !== undefined) {
             this.js = data.js;
         }
 
@@ -52,7 +52,7 @@ class CustomizationModule extends ChannelModule {
         }
     }
 
-    save(data: any): void {
+    save(data: { css: string, js: string, motd: string }): void {
         data.css = this.css;
         data.js = this.js;
         data.motd = this.motd;
@@ -88,7 +88,7 @@ class CustomizationModule extends ChannelModule {
         });
     }
 
-    handleSetCSS(user: User, data: any): void {
+    handleSetCSS(user: User, data: { css: string }): void {
         if (!this.channel.modules.permissions.canSetCSS(user)) {
             user.kick("Attempted setChannelCSS as non-admin");
             return;
@@ -100,7 +100,7 @@ class CustomizationModule extends ChannelModule {
         this.channel.logger.log("[mod] " + user.getName() + " updated the channel CSS");
     }
 
-    handleSetJS(user: User, data: any): void {
+    handleSetJS(user: User, data: { js: string }): void {
         if (!this.channel.modules.permissions.canSetJS(user)) {
             user.kick("Attempted setChannelJS as non-admin");
             return;
@@ -112,7 +112,7 @@ class CustomizationModule extends ChannelModule {
         this.channel.logger.log("[mod] " + user.getName() + " updated the channel JS");
     }
 
-    handleSetMotd(user: User, data: any): void {
+    handleSetMotd(user: User, data: { motd: string }): void {
         if (!this.channel.modules.permissions.canEditMotd(user)) {
             user.kick("Attempted setMotd with insufficient permission");
             return;

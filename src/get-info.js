@@ -84,7 +84,7 @@ function convertMedia(media) {
 
 var Getters = {
     /* youtube.com */
-    yt(id: any, callback: any): void {
+    yt(id: mixed, callback: (mixed) => mixed): mixed {
         if (!Config.get("youtube-v3-key")) {
             return callback("The YouTube API now requires an API key.  Please see the " +
                             "documentation for youtube-v3-key in config.template.yaml");
@@ -105,7 +105,7 @@ var Getters = {
     },
 
     /* youtube.com playlists */
-    yp(id: any, callback: any): void {
+    yp(id: mixed, callback: (mixed) => mixed): mixed {
         if (!Config.get("youtube-v3-key")) {
             return callback("The YouTube API now requires an API key.  Please see the " +
                             "documentation for youtube-v3-key in config.template.yaml");
@@ -128,7 +128,7 @@ var Getters = {
     },
 
     /* youtube.com search */
-    ytSearch(query: any, callback: any): void {
+    ytSearch(query: mixed, callback: (mixed) => mixed): mixed {
         if (!Config.get("youtube-v3-key")) {
             return callback("The YouTube API now requires an API key.  Please see the " +
                             "documentation for youtube-v3-key in config.template.yaml");
@@ -154,7 +154,7 @@ var Getters = {
     },
 
     /* vimeo.com */
-    vi(id: any, callback: any): void {
+    vi(id: string, callback: (mixed) => mixed): void {
         var m = id.match(/([\w-]+)/);
         if (m) {
             id = m[1];

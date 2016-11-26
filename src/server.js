@@ -35,6 +35,7 @@ import webServer from './web/webserver';
 import ioServer from './io/ioserver';
 import bgTask from './bgtask';
 import setUid from './setuid';
+import { PartitionDecider } from './partition/partitiondecider';
 
 
 var singleton: null|Server = null;
@@ -72,15 +73,15 @@ export default {
 };
 
 class Server extends EventEmitter {
-    channels: any;
+    channels: any[];
     express: any;
-    db: any;
-    api: any;
-    announcement: any;
-    infogetter: any;
+    db: mixed;
+    api: mixed;
+    announcement: mixed;
+    infogetter: mixed;
     servers: any;
     initModule: any;
-    partitionDecider: any;
+    partitionDecider: PartitionDecider;
 
     constructor() {
         super();

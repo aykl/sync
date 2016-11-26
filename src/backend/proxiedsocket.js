@@ -5,14 +5,16 @@ import events from 'events';
 const EventEmitter = events.EventEmitter;
 
 export default class ProxiedSocket extends EventEmitter {
-    id: any;
-    ip: any;
-    _realip: any;
-    user: any;
+    id: mixed;
+    ip: mixed;
+    _realip: mixed;
+    user: mixed;
     socketEmitter: any;
     frontendConnection: any;
 
-    constructor(socketID: any, socketIP: any, socketUser: any, socketEmitter: any, frontendConnection: any) {
+    constructor(socketID: mixed, socketIP: mixed,
+                socketUser: { name: mixed, globalRank: mixed },
+                socketEmitter: mixed, frontendConnection: any) {
         super();
         this.id = socketID;
         this.ip = socketIP;
@@ -40,7 +42,7 @@ export default class ProxiedSocket extends EventEmitter {
         }
     }
 
-    join(channel: any): void {
+    join(channel: mixed): void {
         this.frontendConnection.write(
                 this.frontendConnection.protocol.newSocketJoinRoomsEvent(
                         this.id, [channel]
@@ -48,7 +50,7 @@ export default class ProxiedSocket extends EventEmitter {
         );
     }
 
-    leave(room: any): void {
+    leave(room: mixed): void {
         this.frontendConnection.write(
                 this.frontendConnection.protocol.newSocketLeaveRoomsEvent(
                         this.id, [room]

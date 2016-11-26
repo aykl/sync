@@ -12,7 +12,7 @@ class AccessControlModule extends ChannelModule {
       super(channel);
     }
 
-    onUserPreJoin(user: User, data: any, cb: any): void {
+    onUserPreJoin(user: User, data: { pw: mixed }, cb: (mixed) => void): void {
         var chan = this.channel,
             opts = this.channel.modules.options;
         var self = this;

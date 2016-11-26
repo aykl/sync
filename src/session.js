@@ -4,13 +4,14 @@ import dbAccounts from './database/accounts';
 import util from './utilities';
 import crypto from 'crypto';
 
+
 function sha256(input) {
     var hash = crypto.createHash("sha256");
     hash.update(input);
     return hash.digest("base64");
 }
 
-function genSession(account: any, expiration: any, cb: any): void {
+function genSession(account: { name: string, password: string }, expiration: mixed, cb: (null, string) => mixed): void {
     if (expiration instanceof Date) {
         expiration = Date.parse(expiration);
     }

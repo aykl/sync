@@ -2,18 +2,21 @@
 
 import util from './utilities';
 
+
+type Meta = { [key: mixed]: mixed };
+
 class Media {
-    id: any;
-    seconds: any;
-    duration: any;
+    id: mixed;
+    seconds: mixed;
+    duration: mixed;
     type: any;
-    meta: any;
-    currentTime: any;
+    meta: Meta;
+    currentTime: mixed;
     paused: bool;
     title: string;
-    thumb: any;
+    thumb: mixed;
 
-    constructor(id: any, title: string, seconds: any, type: any, meta: any = {}) {
+    constructor(id: mixed, title: string, seconds: mixed, type: mixed, meta: Meta = {}) {
         this.id = id;
         this.setTitle(title);
 
@@ -32,7 +35,7 @@ class Media {
         }
     }
 
-    pack(): any {
+    pack(): { [key: mixed]: mixed } {
         return {
             id: this.id,
             title: this.title,
@@ -52,14 +55,14 @@ class Media {
         };
     }
 
-    getTimeUpdate(): any {
+    getTimeUpdate(): mixed {
         return {
             currentTime: this.currentTime,
             paused: this.paused
         };
     }
 
-    getFullUpdate(): any {
+    getFullUpdate(): mixed {
         var packed = this.pack();
         packed.currentTime = this.currentTime;
         packed.paused = this.paused;

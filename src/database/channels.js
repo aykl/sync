@@ -52,7 +52,7 @@ function isChannelTaken(name: string, callback: any): void {
 /**
  * Updates a user's rank
  */
-function setRank(chan: any, name: string, rank: number, callback: any): void {
+function setRank(chan: string, name: string, rank: number, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -76,7 +76,7 @@ function setRank(chan: any, name: string, rank: number, callback: any): void {
 /**
  * Removes a user's rank entry
  */
-function deleteRank(chan: any, name: string, callback: any): void {
+function deleteRank(chan: string, name: string, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -93,7 +93,7 @@ function deleteRank(chan: any, name: string, callback: any): void {
 /**
  * Removes all bans from a channel
  */
-function deleteBans(chan: any, id: any, callback: any): void {
+function deleteBans(chan: string, id: mixed, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -109,7 +109,7 @@ function deleteBans(chan: any, id: any, callback: any): void {
 /**
  * Deletes all library entries for a channel
  */
-function deleteLibrary(chan: any, callback: any): void {
+function deleteLibrary(chan: string, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }
@@ -126,7 +126,7 @@ function deleteLibrary(chan: any, callback: any): void {
 /**
  * Removes all ranks for a channel
  */
-function deleteAllRanks(chan: any, callback: any): void {
+function deleteAllRanks(chan: string, callback: any): void {
     if (typeof callback !== "function") {
         callback = blackHole;
     }

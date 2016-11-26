@@ -47,7 +47,7 @@ class KickBanModule extends ChannelModule {
         }
     }
 
-    onUserPreJoin(user: User, data: any, cb: any): void {
+    onUserPreJoin(user: User, data: mixed, cb: any): void {
         if (!this.channel.is(Flags.C_REGISTERED)) {
             return cb(null, ChannelModule.PASSTHROUGH);
         }
@@ -141,7 +141,7 @@ class KickBanModule extends ChannelModule {
         });
     }
 
-    sendUnban(users: User[], data: any): void {
+    sendUnban(users: User[], data: mixed): void {
         var perms = this.channel.modules.permissions;
         users.forEach(function (u) {
             if (perms.canBan(u)) {
@@ -150,7 +150,7 @@ class KickBanModule extends ChannelModule {
         });
     }
 
-    handleCmdKick(user: User, msg: any, meta: any): void {
+    handleCmdKick(user: User, msg: string, meta: mixed): void {
         if (!this.channel.modules.permissions.canKick(user)) {
             return;
         }
@@ -194,7 +194,7 @@ class KickBanModule extends ChannelModule {
         }
     }
 
-    handleCmdKickAnons(user: User, msg: any, meta: any): void {
+    handleCmdKickAnons(user: User, msg: mixed, meta: mixed): void {
         if (!this.channel.modules.permissions.canKick(user)) {
             return;
         }
@@ -214,7 +214,7 @@ class KickBanModule extends ChannelModule {
     }
 
     /* /ban - name bans */
-    handleCmdBan(user: User, msg: any, meta: any): void {
+    handleCmdBan(user: User, msg: string, meta: mixed): void {
         var args = msg.split(" ");
         args.shift(); /* shift off /ban */
         if (args.length === 0 || args[0].trim() === "") {
@@ -233,7 +233,7 @@ class KickBanModule extends ChannelModule {
     }
 
     /* /ipban - bans name and IP addresses associated with it */
-    handleCmdIPBan(user: User, msg: any, meta: any): void {
+    handleCmdIPBan(user: User, msg: string, meta: mixed): void {
         var args = msg.split(" ");
         args.shift(); /* shift off /ipban */
         if (args.length === 0 || args[0].trim() === "") {

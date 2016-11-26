@@ -74,7 +74,7 @@ function convertSubtitles(subtitles) {
     return 'WEBVTT\n\n' + lines.join('\n');
 };
 
-function attach(app: any): void {
+function attach(app: (mixed) => mixed): void {
     app.get('/gdvtt/:id/:lang/(:name)?.vtt', handleGetSubtitles);
 };
 
