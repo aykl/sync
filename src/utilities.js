@@ -85,6 +85,7 @@
     },
 
     root.getIPRange = function (ip: string): string {
+        // $FlowIgnore
         if (net.isIPv6(ip)) {
             return root.expandIPv6(ip)
                    .replace(/((?:[0-9a-f]{4}:){3}[0-9a-f]{4}):(?:[0-9a-f]{4}:){3}[0-9a-f]{4}/, "$1");
@@ -94,6 +95,7 @@
     },
 
     root.getWideIPRange = function (ip: string): string {
+        // $FlowIgnore
         if (net.isIPv6(ip)) {
             return root.expandIPv6(ip)
                    .replace(/((?:[0-9a-f]{4}:){2}[0-9a-f]{4}):(?:[0-9a-f]{4}:){4}[0-9a-f]{4}/, "$1");

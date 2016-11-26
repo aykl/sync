@@ -1,5 +1,8 @@
 // @flow
 
+import User from '../user';
+
+
 class ChannelModule {
     channel: any;
 
@@ -37,26 +40,26 @@ class ChannelModule {
      * data is the data sent by the client with the joinChannel
      * packet.
      */
-    onUserPreJoin(user: any, data: any, cb: any): void {
+    onUserPreJoin(user: User, data: any, cb: any): void {
         cb(null, ChannelModule.PASSTHROUGH);
     }
 
     /**
      * Called after a user has been accepted to the channel.
      */
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
     }
 
     /**
      * Called after a user has been disconnected from the channel.
      */
-    onUserPart(user: any): void {
+    onUserPart(user: User): void {
     }
 
     /**
      * Called when a chatMsg event is received
      */
-    onUserPreChat(user: any, data: any, cb: any): void {
+    onUserPreChat(user: User, data: any, cb: any): void {
         cb(null, ChannelModule.PASSTHROUGH);
     }
 

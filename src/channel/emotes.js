@@ -2,6 +2,7 @@
 
 import ChannelModule from './module';
 import XSS from '../xss';
+import User from '../user';
 
 function EmoteList(defaults) {
     if (!defaults) {
@@ -120,7 +121,7 @@ class EmoteModule extends ChannelModule {
         }
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         user.socket.on("updateEmote", this.handleUpdateEmote.bind(this, user));
         user.socket.on("importEmotes", this.handleImportEmotes.bind(this, user));
         user.socket.on("moveEmote", this.handleMoveEmote.bind(this, user));
@@ -128,7 +129,7 @@ class EmoteModule extends ChannelModule {
         this.sendEmotes([user]);
     }
 
-    sendEmotes(users: any): void {
+    sendEmotes(users: User[]): void {
         var f = this.emotes.pack();
         var chan = this.channel;
         users.forEach(function (u) {
@@ -136,7 +137,7 @@ class EmoteModule extends ChannelModule {
         });
     }
 
-    handleUpdateEmote(user: any, data: any): void {
+    handleUpdateEmote(user: User, data: any): void {
         if (typeof data !== "object") {
             return;
         }
@@ -168,7 +169,7 @@ class EmoteModule extends ChannelModule {
                         f.image);
     }
 
-    handleImportEmotes(user: any, data: any): void {
+    handleImportEmotes(user: User, data: any): void {
         if (!(data instanceof Array)) {
             return;
         }
@@ -185,7 +186,7 @@ class EmoteModule extends ChannelModule {
         this.sendEmotes(this.channel.users);
     }
 
-    handleRemoveEmote(user: any, data: any): void {
+    handleRemoveEmote(user: User, data: any): void {
         if (typeof data !== "object") {
             return;
         }
@@ -203,7 +204,7 @@ class EmoteModule extends ChannelModule {
         this.channel.broadcastAll("removeEmote", data);
     }
 
-    handleMoveEmote(user: any, data: any): void {
+    handleMoveEmote(user: User, data: any): void {
         if (typeof data !== "object") {
             return;
         }

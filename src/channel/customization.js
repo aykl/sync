@@ -2,6 +2,7 @@
 
 import ChannelModule from './module';
 import XSS from '../xss';
+import User from '../user';
 
 const TYPE_SETCSS = {
     css: "string"
@@ -60,7 +61,7 @@ class CustomizationModule extends ChannelModule {
         this.sendMotd(this.channel.users);
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         this.sendCSSJS([user]);
         this.sendMotd([user]);
         user.socket.typecheckedOn("setChannelCSS", TYPE_SETCSS, this.handleSetCSS.bind(this, user));
@@ -68,7 +69,7 @@ class CustomizationModule extends ChannelModule {
         user.socket.typecheckedOn("setMotd", TYPE_SETMOTD, this.handleSetMotd.bind(this, user));
     }
 
-    sendCSSJS(users: any): void {
+    sendCSSJS(users: User[]): void {
         var data = {
             css: this.css,
             js: this.js
@@ -78,14 +79,14 @@ class CustomizationModule extends ChannelModule {
         });
     }
 
-    sendMotd(users: any): void {
+    sendMotd(users: User[]): void {
         var data = this.motd;
         users.forEach(function (u) {
             u.socket.emit("setMotd", data);
         });
     }
 
-    handleSetCSS(user: any, data: any): void {
+    handleSetCSS(user: User, data: any): void {
         if (!this.channel.modules.permissions.canSetCSS(user)) {
             user.kick("Attempted setChannelCSS as non-admin");
             return;
@@ -97,7 +98,7 @@ class CustomizationModule extends ChannelModule {
         this.channel.logger.log("[mod] " + user.getName() + " updated the channel CSS");
     }
 
-    handleSetJS(user: any, data: any): void {
+    handleSetJS(user: User, data: any): void {
         if (!this.channel.modules.permissions.canSetJS(user)) {
             user.kick("Attempted setChannelJS as non-admin");
             return;
@@ -109,7 +110,7 @@ class CustomizationModule extends ChannelModule {
         this.channel.logger.log("[mod] " + user.getName() + " updated the channel JS");
     }
 
-    handleSetMotd(user: any, data: any): void {
+    handleSetMotd(user: User, data: any): void {
         if (!this.channel.modules.permissions.canEditMotd(user)) {
             user.kick("Attempted setMotd with insufficient permission");
             return;

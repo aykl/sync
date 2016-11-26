@@ -92,7 +92,7 @@ class PermissionsModule extends ChannelModule {
         return account.effectiveRank >= this.permissions[node];
     }
 
-    sendPermissions(users: any): void {
+    sendPermissions(users: User[]): void {
         var perms = this.permissions;
         if (users === this.channel.users) {
             this.channel.broadcastAll("setPermissions", perms);
@@ -103,7 +103,7 @@ class PermissionsModule extends ChannelModule {
         }
     }
 
-    sendPlaylistLock(users: any): void {
+    sendPlaylistLock(users: User[]): void {
         if (users === this.channel.users) {
             this.channel.broadcastAll("setPlaylistLocked", !this.openPlaylist);
         } else {
@@ -114,14 +114,14 @@ class PermissionsModule extends ChannelModule {
         }
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         user.socket.on("setPermissions", this.handleSetPermissions.bind(this, user));
         user.socket.on("togglePlaylistLock", this.handleTogglePlaylistLock.bind(this, user));
         this.sendPermissions([user]);
         this.sendPlaylistLock([user]);
     }
 
-    handleTogglePlaylistLock(user: any): void {
+    handleTogglePlaylistLock(user: User): void {
         if (!this.hasPermission(user, "playlistlock")) {
             return;
         }
@@ -136,7 +136,7 @@ class PermissionsModule extends ChannelModule {
         this.sendPlaylistLock(this.channel.users);
     }
 
-    handleSetPermissions(user: any, perms: any): void {
+    handleSetPermissions(user: User, perms: any): void {
         if (typeof perms !== "object") {
             return;
         }

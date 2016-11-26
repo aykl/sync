@@ -269,7 +269,7 @@ class User extends EventEmitter {
         }, timeout * 1000);
     }
 
-    kick(reason: string): void {
+    kick(reason: string|void): void {
         this.socket.emit("kick", { reason: reason });
         this.socket.disconnect();
     }

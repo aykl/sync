@@ -12,6 +12,7 @@ import db from '../database';
 import Logger from '../logger';
 import customEmbed from '../customembed';
 import XSS from '../xss';
+import User from '../user';
 
 const CustomEmbedFilter = customEmbed.filter;
 
@@ -225,7 +226,7 @@ class PlaylistModule extends ChannelModule {
         }
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         this.sendPlaylist([user]);
         this.sendChangeMedia([user]);
         user.socket.typecheckedOn("queue", TYPE_QUEUE, this.handleQueue.bind(this, user));
@@ -275,7 +276,7 @@ class PlaylistModule extends ChannelModule {
         }
     };
 
-    onUserPart(user: any): void {
+    onUserPart(user: User): void {
         if (this.leader === user) {
             this.leader = null;
             this.resumeAutolead();
@@ -286,7 +287,7 @@ class PlaylistModule extends ChannelModule {
      * == Functions for sending various playlist data to users ==
      */
 
-    sendPlaylist(users: any): void {
+    sendPlaylist(users: User[]): void {
         var pl = this.items.toArray(true);
         var perms = this.channel.modules.permissions;
         var self = this;
@@ -302,7 +303,7 @@ class PlaylistModule extends ChannelModule {
         });
     }
 
-    sendChangeMedia(users: any): void {
+    sendChangeMedia(users: User[]): void {
         if (!this.current || !this.current.media || this._refreshing) {
             return;
         }
@@ -324,7 +325,7 @@ class PlaylistModule extends ChannelModule {
         }
     }
 
-    sendMediaUpdate(users: any): void {
+    sendMediaUpdate(users: User[]): void {
         if (!this.current || !this.current.media) {
             return;
         }
@@ -343,7 +344,7 @@ class PlaylistModule extends ChannelModule {
      * == Handlers for playlist manipulation ==
      */
 
-    handleQueue(user: any, data: any): void {
+    handleQueue(user: User, data: any): void {
         if (typeof data.id === "boolean" && data.id !== false) {
             return;
         }
@@ -466,7 +467,7 @@ class PlaylistModule extends ChannelModule {
         }
     }
 
-    queueStandard(user: any, data: any): void {
+    queueStandard(user: User, data: any): void {
         var error = function (what) {
             user.socket.emit("queueFail", {
                 msg: what,
@@ -531,7 +532,7 @@ class PlaylistModule extends ChannelModule {
         });
     }
 
-    queueYouTubePlaylist(user: any, data: any): void {
+    queueYouTubePlaylist(user: User, data: any): void {
         var error = function (what) {
             user.socket.emit("queueFail", {
                 msg: what,
@@ -576,7 +577,7 @@ class PlaylistModule extends ChannelModule {
         });
     }
 
-    handleDelete(user: any, data: any): void {
+    handleDelete(user: User, data: any): void {
         var self = this;
         var perms = this.channel.modules.permissions;
         if (!perms.canDeleteVideo(user)) {
@@ -600,7 +601,7 @@ class PlaylistModule extends ChannelModule {
         });
     }
 
-    handleSetTemp(user: any, data: any): void {
+    handleSetTemp(user: User, data: any): void {
         if (!this.channel.modules.permissions.canSetTemp(user)) {
             return;
         }
@@ -618,7 +619,7 @@ class PlaylistModule extends ChannelModule {
         }
     }
 
-    handleMoveMedia(user: any, data: any): void {
+    handleMoveMedia(user: User, data: any): void {
         if (!this.channel.modules.permissions.canMoveVideo(user)) {
             return;
         }
@@ -665,7 +666,7 @@ class PlaylistModule extends ChannelModule {
         });
     }
 
-    handleJumpTo(user: any, data: any): void {
+    handleJumpTo(user: User, data: any): void {
         if (typeof data !== "string" && typeof data !== "number") {
             return;
         }
@@ -693,7 +694,7 @@ class PlaylistModule extends ChannelModule {
         }
     }
 
-    handlePlayNext(user: any): void {
+    handlePlayNext(user: User): void {
         if (!this.channel.modules.permissions.canSkipVideo(user)) {
             return;
         }
@@ -707,7 +708,7 @@ class PlaylistModule extends ChannelModule {
         this._playNext();
     }
 
-    handleClear(user: any): void {
+    handleClear(user: User): void {
         if (!this.channel.modules.permissions.canClearPlaylist(user)) {
             return;
         }
@@ -727,7 +728,7 @@ class PlaylistModule extends ChannelModule {
         this.channel.broadcastAll("setPlaylistMeta", this.meta);
     }
 
-    handleShuffle(user: any): void {
+    handleShuffle(user: User): void {
         if (!this.channel.modules.permissions.canShufflePlaylist(user)) {
             return;
         }
@@ -763,7 +764,7 @@ class PlaylistModule extends ChannelModule {
     /**
      * == Leader stuff ==
      */
-    handleAssignLeader(user: any, data: any): void {
+    handleAssignLeader(user: User, data: any): void {
         if (!this.channel.modules.permissions.canAssignLeader(user)) {
             return user.kick("Attempted assignLeader without sufficient permission");
         }
@@ -827,7 +828,7 @@ class PlaylistModule extends ChannelModule {
         this.channel.logger.log("[mod] " + user.getName() + " assigned leader to " + data.name);
     }
 
-    handleUpdate(user: any, data: any): void {
+    handleUpdate(user: User, data: any): void {
         if (this.leader !== user) {
             return;
         }
@@ -890,7 +891,7 @@ class PlaylistModule extends ChannelModule {
         return success;
     }
 
-    _addItem(media: any, data: any, user: any, cb: any): void {
+    _addItem(media: any, data: any, user: User, cb: any): void {
         var self = this;
         var allowDuplicates = false;
         if (this.channel.modules.options && this.channel.modules.options.get("allow_dupes")) {
@@ -1177,7 +1178,7 @@ class PlaylistModule extends ChannelModule {
      * == Command Handlers ==
      */
 
-    handleClean(user: any, msg: any, meta: any): void {
+    handleClean(user: User, msg: any, meta: any): void {
         if (!this.channel.modules.permissions.canDeleteVideo(user)) {
             return;
         }
@@ -1208,7 +1209,7 @@ class PlaylistModule extends ChannelModule {
     /**
      * == User playlist stuff ==
      */
-    handleListPlaylists(user: any): void {
+    handleListPlaylists(user: User): void {
         if (!user.is(Flags.U_REGISTERED)) {
             return user.socket.emit("errorMsg", {
                 msg: "Only registered users can use the user playlist function."
@@ -1227,7 +1228,7 @@ class PlaylistModule extends ChannelModule {
         });
     }
 
-    handleClonePlaylist(user: any, data: any): void {
+    handleClonePlaylist(user: User, data: any): void {
         if (!user.is(Flags.U_REGISTERED)) {
             return user.socket.emit("errorMsg", {
                 msg: "Only registered users can use the user playlist function."
@@ -1256,7 +1257,7 @@ class PlaylistModule extends ChannelModule {
         });
     }
 
-    handleDeletePlaylist(user: any, data: any): void {
+    handleDeletePlaylist(user: User, data: any): void {
         if (!user.is(Flags.U_REGISTERED)) {
             return user.socket.emit("errorMsg", {
                 msg: "Only registered users can use the user playlist function."
@@ -1276,7 +1277,7 @@ class PlaylistModule extends ChannelModule {
         });
     }
 
-    handleQueuePlaylist(user: any, data: any): void {
+    handleQueuePlaylist(user: User, data: any): void {
         var perms = this.channel.modules.permissions;
 
         if (!perms.canAddList(user)) {
@@ -1354,7 +1355,7 @@ class PlaylistModule extends ChannelModule {
         });
     }
 
-    handleRequestPlaylist(user: any): void {
+    handleRequestPlaylist(user: User): void {
         if (user.reqPlaylistLimiter.throttle(REQ_PLAYLIST_THROTTLE)) {
             user.socket.emit("errorMsg", {
                 msg: "Get Playlist URLs is limited to 1 usage every 60 seconds.  " +

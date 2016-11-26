@@ -15,6 +15,7 @@ import Promise from 'bluebird';
 import events from 'events';
 const EventEmitter = events.EventEmitter;
 import { throttle } from '../util/throttle';
+import User from '../user';
 
 const USERCOUNT_THROTTLE = 10000;
 
@@ -88,7 +89,7 @@ class Channel extends EventEmitter {
     uniqueName: string;
     modules: any;
     logger: any;
-    users: any[];
+    users: User[];
     refCounter: ReferenceCounter;
     flags: any;
     id: any;
@@ -339,7 +340,7 @@ class Channel extends EventEmitter {
         });
     }
 
-    joinUser(user: any, data: any): void {
+    joinUser(user: User, data: any): void {
         const self = this;
 
         self.refCounter.ref("Channel::user");
@@ -389,7 +390,7 @@ class Channel extends EventEmitter {
         });
     }
 
-    acceptUser(user: any): void {
+    acceptUser(user: User): void {
         user.setFlag(Flags.U_IN_CHANNEL);
         user.socket.join(this.name);
         user.autoAFK();
@@ -441,7 +442,7 @@ class Channel extends EventEmitter {
         }
     };
 
-    partUser(user: any): void {
+    partUser(user: User): void {
         if (!this.logger) {
             Logger.errlog.log("partUser called on dead channel");
             return;
@@ -472,7 +473,7 @@ class Channel extends EventEmitter {
         user.die();
     }
 
-    packUserData(user: any): any {
+    packUserData(user: User): any {
         var base = {
             name: user.getName(),
             rank: user.account.effectiveRank,
@@ -516,7 +517,7 @@ class Channel extends EventEmitter {
         };
     }
 
-    sendUserMeta(users: any, user: any, minrank: any): void {
+    sendUserMeta(users: User[], user: User, minrank: any): void {
         var self = this;
         var userdata = self.packUserData(user);
         users.filter(function (u) {
@@ -541,7 +542,7 @@ class Channel extends EventEmitter {
         });
     }
 
-    sendUserProfile(users: any, user: any): void {
+    sendUserProfile(users: User[], user: User): void {
         var packet = {
             name: user.getName(),
             profile: user.account.profile
@@ -552,7 +553,7 @@ class Channel extends EventEmitter {
         });
     }
 
-    sendUserlist(toUsers: any): void {
+    sendUserlist(toUsers: User[]): void {
         var self = this;
         var base = [];
         var mod = [];
@@ -585,7 +586,7 @@ class Channel extends EventEmitter {
         });
     }
 
-    sendUsercount(users: any): void {
+    sendUsercount(users: User[]): void {
         var self = this;
         if (users === self.users) {
             self.broadcastAll("usercount", self.users.length);
@@ -596,7 +597,7 @@ class Channel extends EventEmitter {
         }
     }
 
-    sendUserJoin(users: any, user: any): void {
+    sendUserJoin(users: User[], user: User): void {
         var self = this;
         if (user.account.aliases.length === 0) {
             user.account.aliases.push(user.getName());
@@ -648,7 +649,7 @@ class Channel extends EventEmitter {
         });
     }
 
-    handleReadLog(user: any): void {
+    handleReadLog(user: User): void {
         if (user.account.effectiveRank < 3) {
             user.kick("Attempted readChanLog with insufficient permission");
             return;
@@ -694,7 +695,7 @@ class Channel extends EventEmitter {
         data.registered = this.is(Flags.C_REGISTERED);
 
         for (var i = 0; i < this.users.length; i++) {
-            if (this.users[i].name !== "") {
+            if (this.users[i].getName() !== "") {
                 var name = this.users[i].getName();
                 var rank = this.users[i].account.effectiveRank;
                 if (rank >= 255) {

@@ -4,9 +4,35 @@ import ChannelModule from './module';
 import Config from '../config';
 import Utilities from '../utilities';
 import url from 'url';
+import User from '../user';
+
+type Options = {
+    allow_voteskip: bool,
+    voteskip_ratio: number,
+    afk_timeout: number,
+    pagetitle: string,
+    maxlength: number,
+    externalcss: string,
+    externaljs: string,
+    chat_antiflood: bool,
+    chat_antiflood_params: {
+        burst: number,
+        sustained: number,
+        cooldown: number,
+    },
+    show_public: bool,
+    enable_link_regex: bool,
+    password: false|string,
+    allow_dupes: bool,
+    torbanned: bool,
+    allow_ascii_control: bool,
+    playlist_max_per_user: number,
+    new_user_chat_delay: number,
+    new_user_chat_link_delay: number,
+};
 
 class OptionsModule extends ChannelModule {
-    opts: { [key: string]: any };
+    opts: Options;
 
     constructor(channel: any) {
         super(channel);
@@ -71,13 +97,13 @@ class OptionsModule extends ChannelModule {
         this.opts[key] = value;
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         user.socket.on("setOptions", this.handleSetOptions.bind(this, user));
 
         this.sendOpts([user]);
     }
 
-    sendOpts(users: any): void {
+    sendOpts(users: User[]): void {
         var opts = this.opts;
 
         if (users === this.channel.users) {
@@ -93,7 +119,7 @@ class OptionsModule extends ChannelModule {
         return this.channel.modules.permissions;
     }
 
-    handleSetOptions(user: any, data: any): void {
+    handleSetOptions(user: User, data: any): void {
         if (typeof data !== "object") {
             return;
         }

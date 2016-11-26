@@ -6,6 +6,7 @@ import Flags from '../flags';
 import util from '../utilities';
 import Account from '../account';
 import Q from 'q';
+import User from '../user';
 
 const TYPE_UNBAN = {
     id: "number",
@@ -45,7 +46,7 @@ class KickBanModule extends ChannelModule {
         }
     }
 
-    onUserPreJoin(user: any, data: any, cb: any): void {
+    onUserPreJoin(user: User, data: any, cb: any): void {
         if (!this.channel.is(Flags.C_REGISTERED)) {
             return cb(null, ChannelModule.PASSTHROUGH);
         }
@@ -68,7 +69,7 @@ class KickBanModule extends ChannelModule {
         });
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         if (!this.channel.is(Flags.C_REGISTERED)) {
             return;
         }
@@ -94,7 +95,7 @@ class KickBanModule extends ChannelModule {
         user.socket.typecheckedOn("unban", TYPE_UNBAN, this.handleUnban.bind(this, user));
     }
 
-    sendBanlist(users: any): void {
+    sendBanlist(users: User[]): void {
         if (!this.channel.is(Flags.C_REGISTERED)) {
             return;
         }
@@ -139,7 +140,7 @@ class KickBanModule extends ChannelModule {
         });
     }
 
-    sendUnban(users: any, data: any): void {
+    sendUnban(users: User[], data: any): void {
         var perms = this.channel.modules.permissions;
         users.forEach(function (u) {
             if (perms.canBan(u)) {
@@ -148,7 +149,7 @@ class KickBanModule extends ChannelModule {
         });
     }
 
-    handleCmdKick(user: any, msg: any, meta: any): void {
+    handleCmdKick(user: User, msg: any, meta: any): void {
         if (!this.channel.modules.permissions.canKick(user)) {
             return;
         }
@@ -192,7 +193,7 @@ class KickBanModule extends ChannelModule {
         }
     }
 
-    handleCmdKickAnons(user: any, msg: any, meta: any): void {
+    handleCmdKickAnons(user: User, msg: any, meta: any): void {
         if (!this.channel.modules.permissions.canKick(user)) {
             return;
         }
@@ -212,7 +213,7 @@ class KickBanModule extends ChannelModule {
     }
 
     /* /ban - name bans */
-    handleCmdBan(user: any, msg: any, meta: any): void {
+    handleCmdBan(user: User, msg: any, meta: any): void {
         var args = msg.split(" ");
         args.shift(); /* shift off /ban */
         if (args.length === 0 || args[0].trim() === "") {
@@ -231,7 +232,7 @@ class KickBanModule extends ChannelModule {
     }
 
     /* /ipban - bans name and IP addresses associated with it */
-    handleCmdIPBan(user: any, msg: any, meta: any): void {
+    handleCmdIPBan(user: User, msg: any, meta: any): void {
         var args = msg.split(" ");
         args.shift(); /* shift off /ipban */
         if (args.length === 0 || args[0].trim() === "") {
@@ -257,7 +258,7 @@ class KickBanModule extends ChannelModule {
         });
     }
 
-    banName(actor: any, name: any, reason: any, cb: any): void {
+    banName(actor: any, name: string, reason: string, cb: any): void {
         var self = this;
         reason = reason.substring(0, 255);
 
@@ -309,7 +310,7 @@ class KickBanModule extends ChannelModule {
         }).catch(error).done();
     }
 
-    banIP(actor: any, ip: any, name: any, reason: any, cb: any): void {
+    banIP(actor: any, ip: any, name: string, reason: any, cb: any): void {
         var self = this;
         reason = reason.substring(0, 255);
         var masked = util.cloakIP(ip);
@@ -354,7 +355,7 @@ class KickBanModule extends ChannelModule {
         }).catch(error).done();
     }
 
-    banAll(actor: any, name: any, range: any, reason: any, cb: any): void {
+    banAll(actor: any, name: string, range: any, reason: any, cb: any): void {
         var self = this;
         reason = reason.substring(0, 255);
 
@@ -401,7 +402,7 @@ class KickBanModule extends ChannelModule {
         });
     }
 
-    kickBanTarget(name: any, ip: any): void {
+    kickBanTarget(name: string, ip: any): void {
         name = name.toLowerCase();
         for (var i = 0; i < this.channel.users.length; i++) {
             if (this.channel.users[i].getLowerName() === name ||
@@ -411,7 +412,7 @@ class KickBanModule extends ChannelModule {
         }
     }
 
-    handleUnban(user: any, data: any): void {
+    handleUnban(user: User, data: any): void {
         if (!this.channel.modules.permissions.canBan(user)) {
             return;
         }

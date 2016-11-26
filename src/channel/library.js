@@ -6,6 +6,7 @@ import util from '../utilities';
 import InfoGetter from '../get-info';
 import db from '../database';
 import Media from '../media';
+import User from '../user';
 
 const TYPE_UNCACHE = {
     id: "string"
@@ -21,7 +22,7 @@ class LibraryModule extends ChannelModule {
         super(channel);
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         user.socket.typecheckedOn("uncache", TYPE_UNCACHE, this.handleUncache.bind(this, user));
         user.socket.typecheckedOn("searchMedia", TYPE_SEARCH_MEDIA, this.handleSearchMedia.bind(this, user));
     }
@@ -43,7 +44,7 @@ class LibraryModule extends ChannelModule {
         });
     }
 
-    handleUncache(user: any, data: any): void {
+    handleUncache(user: User, data: any): void {
         if (!this.channel.is(Flags.C_REGISTERED)) {
             return;
         }
@@ -68,7 +69,7 @@ class LibraryModule extends ChannelModule {
         });
     }
 
-    handleSearchMedia(user: any, data: any): void {
+    handleSearchMedia(user: User, data: any): void {
         var query = data.query.substring(0, 100);
         var searchYT = function () {
             InfoGetter.Getters.ytSearch(query, function (e, vids) {

@@ -4,6 +4,7 @@ import FilterList from 'cytubefilters';
 import ChannelModule from './module';
 import XSS from '../xss';
 import Logger from '../logger';
+import User from '../user';
 
 /*
  * Converts JavaScript-style replacements ($1, $2, etc.) with
@@ -100,7 +101,7 @@ class ChatFilterModule extends ChannelModule {
         }
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         user.socket.on("addFilter", this.handleAddFilter.bind(this, user));
         user.socket.on("updateFilter", this.handleUpdateFilter.bind(this, user));
         user.socket.on("importFilters", this.handleImportFilters.bind(this, user));
@@ -109,7 +110,7 @@ class ChatFilterModule extends ChannelModule {
         user.socket.on("requestChatFilters", this.handleRequestChatFilters.bind(this, user));
     }
 
-    sendChatFilters(users: any): void {
+    sendChatFilters(users: User[]): void {
         var f = this.filters.pack();
         var chan = this.channel;
         users.forEach(function (u) {
@@ -119,7 +120,7 @@ class ChatFilterModule extends ChannelModule {
         });
     }
 
-    handleAddFilter(user: any, data: any): void {
+    handleAddFilter(user: User, data: any): void {
         if (typeof data !== "object") {
             return;
         }
@@ -167,7 +168,7 @@ class ChatFilterModule extends ChannelModule {
                         " active: " + data.active + ", filterlinks: " + data.filterlinks);
     }
 
-    handleUpdateFilter(user: any, data: any): void {
+    handleUpdateFilter(user: User, data: any): void {
         if (typeof data !== "object") {
             return;
         }
@@ -213,7 +214,7 @@ class ChatFilterModule extends ChannelModule {
                         " active: " + data.active + ", filterlinks: " + data.filterlinks);
     }
 
-    handleImportFilters(user: any, data: any): void {
+    handleImportFilters(user: User, data: any): void {
         if (!(data instanceof Array)) {
             return;
         }
@@ -240,7 +241,7 @@ class ChatFilterModule extends ChannelModule {
         this.sendChatFilters(this.channel.users);
     }
 
-    handleRemoveFilter(user: any, data: any): void {
+    handleRemoveFilter(user: User, data: any): void {
         if (typeof data !== "object") {
             return;
         }
@@ -272,7 +273,7 @@ class ChatFilterModule extends ChannelModule {
         this.channel.logger.log("[mod] " + user.getName() + " removed filter: " + data.name);
     }
 
-    handleMoveFilter(user: any, data: any): void {
+    handleMoveFilter(user: User, data: any): void {
         if (typeof data !== "object") {
             return;
         }
@@ -296,7 +297,7 @@ class ChatFilterModule extends ChannelModule {
         }
     }
 
-    handleRequestChatFilters(user: any): void {
+    handleRequestChatFilters(user: User): void {
         this.sendChatFilters([user]);
     }
 }

@@ -34,6 +34,7 @@ import { BackendModule } from './backend/backendmodule';
 import webServer from './web/webserver';
 import ioServer from './io/ioserver';
 import bgTask from './bgtask';
+import setUid from './setuid';
 
 
 var singleton: null|Server = null;
@@ -187,7 +188,7 @@ class Server extends EventEmitter {
         bgTask(self);
 
         // setuid
-        require("./setuid");
+        setUid();
 
         initModule.onReady();
     }

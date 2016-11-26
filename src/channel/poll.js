@@ -2,6 +2,7 @@
 
 import ChannelModule from './module';
 import { Poll } from '../poll';
+import User from '../user';
 
 const TYPE_NEW_POLL = {
     title: "string",
@@ -70,7 +71,7 @@ class PollModule extends ChannelModule {
         };
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         this.sendPoll(user);
         user.socket.typecheckedOn("newPoll", TYPE_NEW_POLL, this.handleNewPoll.bind(this, user));
         user.socket.typecheckedOn("vote", TYPE_VOTE, this.handleVote.bind(this, user));
@@ -82,7 +83,7 @@ class PollModule extends ChannelModule {
         });
     }
 
-    addUserToPollRoom(user: any): void {
+    addUserToPollRoom(user: User): void {
         const perms = this.channel.modules.permissions;
         if (perms.canViewHiddenPoll(user)) {
             user.socket.leave(this.roomNoViewHidden);
@@ -93,14 +94,14 @@ class PollModule extends ChannelModule {
         }
     }
 
-    onUserPart(user: any): void {
+    onUserPart(user: User): void {
         if (this.poll) {
             this.poll.unvote(user.realip);
             this.broadcastPoll(false);
         }
     }
 
-    sendPoll(user: any): void {
+    sendPoll(user: User): void {
         if (!this.poll) {
             return;
         }
@@ -135,7 +136,7 @@ class PollModule extends ChannelModule {
         this.channel.broadcastToRoom(event, obscured, this.roomNoViewHidden);
     }
 
-    handleNewPoll(user: any, data: any): void {
+    handleNewPoll(user: User, data: any): void {
         if (!this.channel.modules.permissions.canControlPoll(user)) {
             return;
         }
@@ -162,7 +163,7 @@ class PollModule extends ChannelModule {
         this.channel.logger.log("[poll] " + user.getName() + " opened poll: '" + poll.title + "'");
     }
 
-    handleVote(user: any, data: any): void {
+    handleVote(user: User, data: any): void {
         if (!this.channel.modules.permissions.canVote(user)) {
             return;
         }
@@ -173,7 +174,7 @@ class PollModule extends ChannelModule {
         }
     }
 
-    handleClosePoll(user: any): void {
+    handleClosePoll(user: { getName(): string }): void {
         if (!this.channel.modules.permissions.canControlPoll(user)) {
             return;
         }
@@ -194,7 +195,7 @@ class PollModule extends ChannelModule {
         }
     }
 
-    handlePollCmd(obscured: any, user: any, msg: any, meta: any): void {
+    handlePollCmd(obscured: any, user: User, msg: any, meta: any): void {
         if (!this.channel.modules.permissions.canControlPoll(user)) {
             return;
         }

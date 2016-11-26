@@ -3,6 +3,7 @@
 import Account from '../account';
 import ChannelModule from './module';
 import Flags from '../flags';
+import User from '../user';
 
 class AccessControlModule extends ChannelModule {
 
@@ -10,7 +11,7 @@ class AccessControlModule extends ChannelModule {
       super(channel);
     }
 
-    onUserPreJoin(user: any, data: any, cb: any): void {
+    onUserPreJoin(user: User, data: any, cb: any): void {
         var chan = this.channel,
             opts = this.channel.modules.options;
         var self = this;

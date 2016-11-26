@@ -3,6 +3,7 @@
 import ChannelModule from './module';
 import Flags from '../flags';
 import { Poll } from '../poll';
+import User from '../user';
 
 class VoteskipModule extends ChannelModule {
     poll: any;
@@ -12,11 +13,11 @@ class VoteskipModule extends ChannelModule {
         this.poll = false;
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         user.socket.on("voteskip", this.handleVoteskip.bind(this, user));
     }
 
-    onUserPart(user: any): void {
+    onUserPart(user: User): void {
         if (!this.poll) {
             return;
         }
@@ -25,7 +26,7 @@ class VoteskipModule extends ChannelModule {
         this.update();
     }
 
-    handleVoteskip(user: any): void {
+    handleVoteskip(user: User): void {
         if (!this.channel.modules.options.get("allow_voteskip")) {
             return;
         }
@@ -56,7 +57,7 @@ class VoteskipModule extends ChannelModule {
         this.update();
     }
 
-    unvote(ip: any): void {
+    unvote(ip: string): void {
         if (!this.poll) {
             return;
         }
@@ -87,7 +88,7 @@ class VoteskipModule extends ChannelModule {
         this.sendVoteskipData(this.channel.users);
     }
 
-    sendVoteskipData(users: any): void {
+    sendVoteskipData(users: User[]): void {
         var max = this.calcVoteskipMax();
         var data = {
             count: this.poll ? this.poll.counts[0] : 0,

@@ -4,6 +4,7 @@ import ChannelModule from './module';
 import Flags from '../flags';
 import Account from '../account';
 import db from '../database';
+import User from '../user';
 
 const TYPE_SET_CHANNEL_RANK = {
     name: "string",
@@ -18,7 +19,7 @@ class RankModule extends ChannelModule {
         }
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         user.socket.typecheckedOn("setChannelRank", TYPE_SET_CHANNEL_RANK, this.handleRankChange.bind(this, user));
         var self = this;
         user.socket.on("requestChannelRanks", function () {
@@ -26,7 +27,7 @@ class RankModule extends ChannelModule {
         });
     }
 
-    sendChannelRanks(users: any): void {
+    sendChannelRanks(users: User[]): void {
         if (!this.channel.is(Flags.C_REGISTERED)) {
             return;
         }
@@ -44,7 +45,7 @@ class RankModule extends ChannelModule {
         });
     }
 
-    handleCmdRank(user: any, msg: any, meta: any): void {
+    handleCmdRank(user: User, msg: any, meta: any): void {
         var args = msg.split(" ");
         args.shift(); /* shift off /rank */
         var name = args.shift();
@@ -61,7 +62,7 @@ class RankModule extends ChannelModule {
         this.handleRankChange(user, { name: name, rank: rank });
     }
 
-    handleRankChange(user: any, data: any): void {
+    handleRankChange(user: User, data: any): void {
         if (user.account.effectiveRank < 3) {
             return;
         }

@@ -83,7 +83,7 @@ class ChatModule extends ChannelModule {
         data.chat = Array.prototype.slice.call(this.buffer);
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         var self = this;
         user.waitFlag(Flags.U_LOGGED_IN, function () {
             var muteperm = self.channel.modules.permissions.permissions.mute;
@@ -103,7 +103,7 @@ class ChatModule extends ChannelModule {
         });
     }
 
-    isMuted(name: any): void {
+    isMuted(name: string): void {
         return this.muted.contains(name.toLowerCase()) ||
                this.muted.contains(SHADOW_TAG + name.toLowerCase());
     }
@@ -119,14 +119,14 @@ class ChatModule extends ChannelModule {
         return this.muted.contains(SHADOW_TAG + name.toLowerCase());
     }
 
-    shadowMutedUsers(): any[] {
+    shadowMutedUsers(): User[] {
         var self = this;
         return self.channel.users.filter(function (u) {
             return self.isShadowMuted(u.getName());
         });
     }
 
-    restrictNewAccount(user: any, data: any): bool {
+    restrictNewAccount(user: User, data: any): bool {
         if (user.account.effectiveRank < 2 && this.channel.modules.options) {
             const firstSeen = user.getFirstSeenTime();
             const opts = this.channel.modules.options;
@@ -147,7 +147,7 @@ class ChatModule extends ChannelModule {
         return false;
     }
 
-    handleChatMsg(user: any, data: any): void {
+    handleChatMsg(user: User, data: any): void {
         var self = this;
         counters.add("chat:incoming");
 
@@ -279,7 +279,7 @@ class ChatModule extends ChannelModule {
         user.socket.emit("pm", msgobj);
     }
 
-    processChatMsg(user: any, data: any): void {
+    processChatMsg(user: User, data: any): void {
         if (data.msg.match(Config.get("link-domain-blacklist-regex"))) {
             this.channel.logger.log(user.displayip + " (" + user.getName() + ") was kicked for " +
                     "blacklisted domain");
@@ -433,7 +433,7 @@ class ChatModule extends ChannelModule {
      * == Default commands ==
      */
 
-    handleCmdMe(user: any, msg: any, meta: any): void {
+    handleCmdMe(user: User, msg: any, meta: any): void {
         meta.addClass = "action";
         meta.action = true;
         var args = msg.split(" ");
@@ -441,14 +441,14 @@ class ChatModule extends ChannelModule {
         this.processChatMsg(user, { msg: args.join(" "), meta: meta });
     }
 
-    handleCmdSp(user: any, msg: any, meta: any): void {
+    handleCmdSp(user: User, msg: any, meta: any): void {
         meta.addClass = "spoiler";
         var args = msg.split(" ");
         args.shift();
         this.processChatMsg(user, { msg: args.join(" "), meta: meta });
     }
 
-    handleCmdSay(user: any, msg: any, meta: any): void {
+    handleCmdSay(user: User, msg: any, meta: any): void {
         if (user.account.effectiveRank < 1.5) {
             return;
         }
@@ -460,7 +460,7 @@ class ChatModule extends ChannelModule {
         this.processChatMsg(user, { msg: args.join(" "), meta: meta });
     }
 
-    handleCmdClear(user: any, msg: any, meta: any): void {
+    handleCmdClear(user: User, msg: any, meta: any): void {
         if (!this.channel.modules.permissions.canClearChat(user)) {
             return;
         }
@@ -470,7 +470,7 @@ class ChatModule extends ChannelModule {
         this.channel.logger.log("[mod] " + user.getName() + " used /clear");
     }
 
-    handleCmdAdminflair(user: any, msg: any, meta: any): void {
+    handleCmdAdminflair(user: User, msg: any, meta: any): void {
         if (user.account.globalRank < 255) {
             return;
         }
@@ -499,11 +499,11 @@ class ChatModule extends ChannelModule {
         this.processChatMsg(user, { msg: cargs.join(" "), meta: meta });
     }
 
-    handleCmdAfk(user: any, msg: any, meta: any): void {
+    handleCmdAfk(user: User, msg: any, meta: any): void {
         user.setAFK(!user.is(Flags.U_AFK));
     }
 
-    handleCmdMute(user: any, msg: any, meta: any): void {
+    handleCmdMute(user: User, msg: any, meta: any): void {
         if (!this.channel.modules.permissions.canMute(user)) {
             return;
         }
@@ -553,7 +553,7 @@ class ChatModule extends ChannelModule {
         this.sendModMessage(user.getName() + " muted " + target.getName(), muteperm);
     }
 
-    handleCmdSMute(user: any, msg: any, meta: any): void {
+    handleCmdSMute(user: User, msg: any, meta: any): void {
         if (!this.channel.modules.permissions.canMute(user)) {
             return;
         }
@@ -604,7 +604,7 @@ class ChatModule extends ChannelModule {
         this.sendModMessage(user.getName() + " shadowmuted " + target.getName(), muteperm);
     }
 
-    handleCmdUnmute(user: any, msg: any, meta: any): void {
+    handleCmdUnmute(user: User, msg: any, meta: any): void {
         if (!this.channel.modules.permissions.canMute(user)) {
             return;
         }

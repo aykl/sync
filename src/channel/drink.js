@@ -1,6 +1,7 @@
 // @flow
 
 import ChannelModule from './module';
+import User from '../user';
 
 class DrinkModule extends ChannelModule {
     drinks: number;
@@ -10,11 +11,11 @@ class DrinkModule extends ChannelModule {
         this.drinks = 0;
     }
 
-    onUserPostJoin(user: any): void {
+    onUserPostJoin(user: User): void {
         user.socket.emit("drinkCount", this.drinks);
     };
 
-    onUserPreChat(user: any, data: any, cb: any): void {
+    onUserPreChat(user: User, data: any, cb: any): void {
         var msg = data.msg;
         var perms = this.channel.modules.permissions;
         if (msg.match(/^\/d-?[0-9]*/) && perms.canCallDrink(user)) {
