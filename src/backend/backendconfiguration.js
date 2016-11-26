@@ -1,7 +1,12 @@
 // @flow
 
+export type ProxyListenerConfig = {
+  getHost(): mixed,
+  getPort(): mixed,
+};
+
 type BackendConfig = {
-  redis: any,
+  redis: mixed,
   proxy: { listeners: { host: mixed, port: mixed }[] }
 };
 
@@ -12,11 +17,11 @@ class BackendConfiguration {
         this.config = config;
     }
 
-    getRedisConfig(): void {
+    getRedisConfig(): mixed {
         return this.config.redis;
     }
 
-    getListenerConfig(): mixed[] {
+    getListenerConfig(): ProxyListenerConfig[] {
         return this.config.proxy.listeners.map(listener => ({
             getHost() {
                 return listener.host;

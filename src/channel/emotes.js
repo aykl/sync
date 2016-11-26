@@ -5,26 +5,36 @@ import XSS from '../xss';
 import User from '../user';
 import Channel from './channel';
 
-function EmoteList(defaults) {
-    if (!defaults) {
-        defaults = [];
+
+type Emote = {
+  name: string,
+  image: string,
+  source: string,
+};
+
+class EmoteList {
+    emotes: Emote[];
+
+    constructor(defaults?: Emote[]) {
+        if (!defaults) {
+            defaults = [];
+        }
+
+        let validated : Array<Emote|false> = defaults.map(validateEmote);
+        // $FlowIgnore;
+        let emotes : Array<Emote> = validated.filter(e => e !== false);
+        this.emotes = emotes;
     }
 
-    this.emotes = defaults.map(validateEmote).filter(function (f) {
-        return f !== false;
-    });
-}
-
-EmoteList.prototype = {
-    pack: function () {
+    pack(): Emote[] {
         return Array.prototype.slice.call(this.emotes);
-    },
+    }
 
-    importList: function (emotes) {
+    importList(emotes: Emote[]): void {
         this.emotes = Array.prototype.slice.call(emotes);
-    },
+    }
 
-    updateEmote: function (emote) {
+    updateEmote(emote: Emote): void {
         var found = false;
         for (var i = 0; i < this.emotes.length; i++) {
             if (this.emotes[i].name === emote.name) {
@@ -38,9 +48,9 @@ EmoteList.prototype = {
         if (!found) {
             this.emotes.push(emote);
         }
-    },
+    }
 
-    removeEmote: function (emote) {
+    removeEmote(emote: Emote): void {
         var found = false;
         for (var i = 0; i < this.emotes.length; i++) {
             if (this.emotes[i].name === emote.name) {
@@ -48,9 +58,9 @@ EmoteList.prototype = {
                 break;
             }
         }
-    },
+    }
 
-    moveEmote: function (from, to) {
+    moveEmote(from: number, to: number): bool {
         if (from < 0 || to < 0 ||
             from >= this.emotes.length || to >= this.emotes.length) {
             return false;
@@ -68,10 +78,10 @@ EmoteList.prototype = {
         this.emotes.splice(to, 0, f);
         this.emotes.splice(from, 1);
         return true;
-    },
-};
+    }
+}
 
-function validateEmote(f) {
+function validateEmote(f: Emote): Emote|false {
     if (typeof f.name !== "string" || typeof f.image !== "string") {
         return false;
     }
@@ -97,26 +107,26 @@ function validateEmote(f) {
 };
 
 class EmoteModule extends ChannelModule {
-    emotes: any;
+    emotes: EmoteList;
 
     constructor(channel: Channel) {
         super(channel);
         this.emotes = new EmoteList();
     }
 
-    load(data: any): void {
-        if ("emotes" in data) {
+    load(data: { emotes?: Emote[] }): void {
+        if (data.emotes !== undefined) {
             for (var i = 0; i < data.emotes.length; i++) {
                 this.emotes.updateEmote(data.emotes[i]);
             }
         }
     }
 
-    save(data: any): void {
+    save(data: { emotes?: Emote[] }): void {
         data.emotes = this.emotes.pack();
     }
 
-    packInfo(data: any, isAdmin: bool): void {
+    packInfo(data: { emoteCount?: mixed }, isAdmin: bool): void {
         if (isAdmin) {
             data.emoteCount = this.emotes.emotes.length;
         }
@@ -138,7 +148,7 @@ class EmoteModule extends ChannelModule {
         });
     }
 
-    handleUpdateEmote(user: User, data: any): void {
+    handleUpdateEmote(user: User, data: Emote): void {
         if (typeof data !== "object") {
             return;
         }
@@ -170,7 +180,7 @@ class EmoteModule extends ChannelModule {
                         f.image);
     }
 
-    handleImportEmotes(user: User, data: any): void {
+    handleImportEmotes(user: User, data: Emote[]): void {
         if (!(data instanceof Array)) {
             return;
         }
@@ -181,13 +191,14 @@ class EmoteModule extends ChannelModule {
             return;
         }
 
-        this.emotes.importList(data.map(validateEmote).filter(function (f) {
-            return f !== false;
-        }));
+        let validated = data.map(validateEmote);
+        // $FlowIgnore
+        let emotes : Emote[] = validated.filter(e => e !== false);
+        this.emotes.importList(emotes);
         this.sendEmotes(this.channel.users);
     }
 
-    handleRemoveEmote(user: User, data: any): void {
+    handleRemoveEmote(user: User, data: Emote): void {
         if (typeof data !== "object") {
             return;
         }
@@ -205,7 +216,7 @@ class EmoteModule extends ChannelModule {
         this.channel.broadcastAll("removeEmote", data);
     }
 
-    handleMoveEmote(user: User, data: any): void {
+    handleMoveEmote(user: User, data: Emote): void {
         if (typeof data !== "object") {
             return;
         }

@@ -1,15 +1,16 @@
 // @flow
+import type { SocketEmitter, FrontendConnection, SocketUser } from './proxiedsocket';
 
 import logger from 'cytube-common/lib/logger';
 import ioServer from '../io/ioserver';
 import ProxiedSocket from './proxiedsocket';
 
 export default class ProxyInterceptor {
-    socketEmitter: mixed;
-    frontendConnections: any;
-    frontendProxiedSockets: any;
+    socketEmitter: SocketEmitter;
+    frontendConnections: { [key: string]: mixed };
+    frontendProxiedSockets: { [key: mixed]: { [key: mixed]: ProxiedSocket } };
 
-    constructor(socketEmitter: mixed) {
+    constructor(socketEmitter: SocketEmitter) {
         this.socketEmitter = socketEmitter;
         this.frontendConnections = {};
         this.frontendProxiedSockets = {};
@@ -20,7 +21,7 @@ export default class ProxyInterceptor {
      *
      * @param {Connection} socket frontend proxy connection
      */
-    onConnection(socket: { endpoint: string, on(mixed): mixed }): void {
+    onConnection(socket: FrontendConnection): void {
         if (this.frontendConnections.hasOwnProperty(socket.endpoint)) {
             logger.error(`Duplicate frontend connection: ${socket.endpoint}`);
             return;
@@ -34,7 +35,7 @@ export default class ProxyInterceptor {
         socket.on('SocketDisconnectEvent', this.onSocketDisconnect.bind(this, socket));
     }
 
-    onFrontendDisconnect(socket: any): void {
+    onFrontendDisconnect(socket: { endpoint: string }): void {
         const endpoint = socket.endpoint;
         if (this.frontendConnections.hasOwnProperty(endpoint)) {
             if (this.frontendProxiedSockets.hasOwnProperty(endpoint)) {
@@ -49,7 +50,8 @@ export default class ProxyInterceptor {
         }
     }
 
-    onSocketConnect(frontendConnection: any, socketID: any, socketIP: any, socketUser: any): void {
+    onSocketConnect(frontendConnection: FrontendConnection, socketID: string,
+                    socketIP: mixed, socketUser: SocketUser): void {
         const mapKey = frontendConnection.endpoint;
         const proxiedSocket = new ProxiedSocket(
                 socketID,
@@ -69,7 +71,8 @@ export default class ProxyInterceptor {
         ioServer.handleConnection(proxiedSocket);
     }
 
-    onSocketFrame(frontendConnection: any, socketID: any, event: any, args: any): void {
+    onSocketFrame(frontendConnection: FrontendConnection, socketID: mixed,
+                  event: mixed, args: mixed): void {
         const mapKey = frontendConnection.endpoint;
         const socketMap = this.frontendProxiedSockets[mapKey];
         if (!socketMap || !socketMap.hasOwnProperty(socketID)) {
@@ -82,7 +85,7 @@ export default class ProxyInterceptor {
         socket.onProxiedEventReceived.apply(socket, [event].concat(args));
     }
 
-    onSocketDisconnect(frontendConnection: any, socketID: any): void {
+    onSocketDisconnect(frontendConnection: FrontendConnection, socketID: mixed): void {
         const mapKey = frontendConnection.endpoint;
         const socketMap = this.frontendProxiedSockets[mapKey];
         if (!socketMap || !socketMap.hasOwnProperty(socketID)) {

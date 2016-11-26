@@ -4,17 +4,36 @@ import logger from 'cytube-common/lib/logger';
 import events from 'events';
 const EventEmitter = events.EventEmitter;
 
+
+export type SocketEmitter = {
+  to(): { emit(): mixed }
+};
+
+export type SocketUser = { name: mixed, globalRank: mixed };
+
+export type FrontendConnection = {
+  endpoint: string,
+  protocol: {
+    newSocketKickEvent(): mixed,
+    newSocketJoinRoomsEvent(): mixed,
+    newSocketLeaveRoomsEvent(): mixed,
+  },
+  on(): mixed,
+  write(): mixed
+};
+
 export default class ProxiedSocket extends EventEmitter {
     id: mixed;
     ip: mixed;
     _realip: mixed;
     user: mixed;
-    socketEmitter: any;
-    frontendConnection: any;
+    socketEmitter: SocketEmitter;
+    frontendConnection: FrontendConnection;
 
     constructor(socketID: mixed, socketIP: mixed,
-                socketUser: { name: mixed, globalRank: mixed },
-                socketEmitter: mixed, frontendConnection: any) {
+                socketUser: SocketUser,
+                socketEmitter: SocketEmitter,
+                frontendConnection: FrontendConnection) {
         super();
         this.id = socketID;
         this.ip = socketIP;

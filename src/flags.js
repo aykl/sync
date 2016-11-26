@@ -1,5 +1,7 @@
 // @flow
 
+export type Flags = number;
+
 export default {
     C_READY      : 1 << 0,
     C_ERROR      : 1 << 1,

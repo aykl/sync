@@ -1,4 +1,5 @@
 // @flow
+import type { SocketEmitter } from './proxiedsocket';
 
 import { RedisClusterClient } from '../io/cluster/redisclusterclient';
 import { DualClusterClient } from '../io/cluster/dualclusterclient';
@@ -20,7 +21,7 @@ const BACKEND_CONFIG_PATH = path.resolve(__dirname, '..', '..', 'backend.toml');
 class BackendModule {
     backendConfig: BackendConfiguration;
     redisAdapter: mixed;
-    sioEmitter: mixed;
+    sioEmitter: SocketEmitter;
     ioBackend: IOBackend;
     redisClusterClient: RedisClusterClient;
     frontendPool: mixed;

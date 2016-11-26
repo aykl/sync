@@ -1,8 +1,9 @@
 // @flow
+import type { Flags } from '../flags';
 
 import Logger from '../logger';
 import ChannelModule from './module';
-import Flags from '../flags';
+import Flag from '../flags';
 import Account from '../account';
 import util from '../utilities';
 import fs from 'graceful-fs';
@@ -20,12 +21,12 @@ import User from '../user';
 const USERCOUNT_THROTTLE = 10000;
 
 class ReferenceCounter {
-    channel: any;
-    channelName: any;
-    refCount: any;
-    references: any;
+    channel: Channel;
+    channelName: string;
+    refCount: number;
+    references: { [key: mixed]: number };
 
-    constructor(channel) {
+    constructor(channel: Channel) {
         this.channel = channel;
         this.channelName = channel.name;
         this.refCount = 0;
@@ -88,14 +89,14 @@ class Channel extends EventEmitter {
     name: string;
     uniqueName: string;
     modules: any;
-    logger: any;
+    logger: Logger.Logger;
     users: User[];
     refCounter: ReferenceCounter;
-    flags: any;
-    id: any;
-    broadcastUsercount: any;
-    _getDiskSizeTimeout: any;
-    _cachedDiskSize: any;
+    flags: Flags;
+    id: mixed;
+    broadcastUsercount: () => mixed;
+    _getDiskSizeTimeout: number;
+    _cachedDiskSize: mixed;
     leader: any;
 
     constructor(name: string) {
@@ -127,21 +128,21 @@ class Channel extends EventEmitter {
         });
     }
 
-    is(flag: any): bool {
+    is(flag: Flags): bool {
         return Boolean(this.flags & flag);
     }
 
-    setFlag(flag: any): void {
+    setFlag(flag: Flags): void {
         this.flags |= flag;
         this.emit("setFlag", flag);
     }
 
-    clearFlag(flag: any): void {
+    clearFlag(flag: Flags): void {
         this.flags &= ~flag;
         this.emit("clearFlag", flag);
     }
 
-    waitFlag(flag: any, cb: any): void {
+    waitFlag(flag: Flags, cb: any): void {
         var self = this;
         if (self.is(flag)) {
             cb();
@@ -156,7 +157,7 @@ class Channel extends EventEmitter {
         }
     }
 
-    moderators(): any[] {
+    moderators(): User[] {
         return this.users.filter(function (u) {
             return u.account.effectiveRank >= 2;
         });
@@ -213,9 +214,9 @@ class Channel extends EventEmitter {
 
     loadState(): void {
         /* Don't load from disk if not registered */
-        if (!this.is(Flags.C_REGISTERED)) {
+        if (!this.is(Flag.C_REGISTERED)) {
             this.modules.permissions.loadUnregistered();
-            this.setFlag(Flags.C_READY);
+            this.setFlag(Flag.C_READY);
             return;
         }
 
@@ -227,7 +228,7 @@ class Channel extends EventEmitter {
                 });
             }
 
-            self.setFlag(Flags.C_READY | Flags.C_ERROR);
+            self.setFlag(Flag.C_READY | Flag.C_ERROR);
         }
 
         ChannelStore.load(this.id, this.uniqueName).then(data => {
@@ -240,7 +241,7 @@ class Channel extends EventEmitter {
                 }
             });
 
-            this.setFlag(Flags.C_READY);
+            this.setFlag(Flag.C_READY);
         }).catch(ChannelStateSizeError, err => {
             const message = "This channel's state size has exceeded the memory limit " +
                     "enforced by this server.  Please contact an administrator " +
@@ -253,7 +254,7 @@ class Channel extends EventEmitter {
                 Object.keys(this.modules).forEach(m => {
                     this.modules[m].load({});
                 });
-                this.setFlag(Flags.C_READY);
+                this.setFlag(Flag.C_READY);
                 return;
             } else {
                 const message = "An error occurred when loading this channel's data from " +
@@ -267,14 +268,14 @@ class Channel extends EventEmitter {
     }
 
     saveState(): void {
-        if (!this.is(Flags.C_REGISTERED)) {
+        if (!this.is(Flag.C_REGISTERED)) {
             return Promise.resolve();
-        } else if (!this.is(Flags.C_READY)) {
+        } else if (!this.is(Flag.C_READY)) {
             return Promise.reject(new Error(`Attempted to save channel ${this.name} ` +
                     `but it wasn't finished loading yet!`));
         }
 
-        if (this.is(Flags.C_ERROR)) {
+        if (this.is(Flag.C_ERROR)) {
             return Promise.reject(new Error(`Channel is in error state`));
         }
 
@@ -299,10 +300,10 @@ class Channel extends EventEmitter {
         });
     }
 
-    checkModules(fn: any, args: any, cb: any): void {
+    checkModules(fn: string, args: mixed[], cb: any): void {
         const self = this;
         const refCaller = `Channel::checkModules/${fn}`;
-        this.waitFlag(Flags.C_READY, function () {
+        this.waitFlag(Flag.C_READY, function () {
             self.refCounter.ref(refCaller);
             var keys = Object.keys(self.modules);
             var next = function (err, result) {
@@ -330,9 +331,9 @@ class Channel extends EventEmitter {
         });
     }
 
-    notifyModules(fn: any, args: any): void {
+    notifyModules(fn: mixed, args: mixed): void {
         var self = this;
-        this.waitFlag(Flags.C_READY, function () {
+        this.waitFlag(Flag.C_READY, function () {
             var keys = Object.keys(self.modules);
             keys.forEach(function (k) {
                 self.modules[k][fn].apply(self.modules[k], args);
@@ -344,7 +345,7 @@ class Channel extends EventEmitter {
         const self = this;
 
         self.refCounter.ref("Channel::user");
-        self.waitFlag(Flags.C_READY, function () {
+        self.waitFlag(Flag.C_READY, function () {
             /* User closed the connection before the channel finished loading */
             if (user.socket.disconnected) {
                 self.refCounter.unref("Channel::user");
@@ -352,12 +353,12 @@ class Channel extends EventEmitter {
             }
 
             user.channel = self;
-            user.waitFlag(Flags.U_LOGGED_IN, () => {
-                if (user.is(Flags.U_REGISTERED)) {
+            user.waitFlag(Flag.U_LOGGED_IN, () => {
+                if (user.is(Flag.U_REGISTERED)) {
                     db.channels.getRank(self.name, user.getName(), (error, rank) => {
                         if (!error) {
                             user.setChannelRank(rank);
-                            user.setFlag(Flags.U_HAS_CHANNEL_RANK);
+                            user.setFlag(Flag.U_HAS_CHANNEL_RANK);
                             if (user.inChannel()) {
                                 self.broadcastAll("setUserRank", {
                                     name: user.getName(),
@@ -391,7 +392,7 @@ class Channel extends EventEmitter {
     }
 
     acceptUser(user: User): void {
-        user.setFlag(Flags.U_IN_CHANNEL);
+        user.setFlag(Flag.U_IN_CHANNEL);
         user.socket.join(this.name);
         user.autoAFK();
         user.socket.on("readChanLog", this.handleReadLog.bind(this, user));
@@ -412,7 +413,7 @@ class Channel extends EventEmitter {
         }
 
         var self = this;
-        user.waitFlag(Flags.U_LOGGED_IN, function () {
+        user.waitFlag(Flag.U_LOGGED_IN, function () {
             for (var i = 0; i < self.users.length; i++) {
                 if (self.users[i] !== user &&
                     self.users[i].getLowerName() === user.getLowerName()) {
@@ -437,7 +438,7 @@ class Channel extends EventEmitter {
 
         this.sendUserlist([user]);
         this.broadcastUsercount();
-        if (!this.is(Flags.C_REGISTERED)) {
+        if (!this.is(Flag.C_REGISTERED)) {
             user.socket.emit("channelNotRegistered");
         }
     };
@@ -452,9 +453,9 @@ class Channel extends EventEmitter {
                         "disconnected.");
         user.channel = null;
         /* Should be unnecessary because partUser only occurs if the socket dies */
-        user.clearFlag(Flags.U_IN_CHANNEL);
+        user.clearFlag(Flag.U_IN_CHANNEL);
 
-        if (user.is(Flags.U_LOGGED_IN)) {
+        if (user.is(Flag.U_LOGGED_IN)) {
             this.broadcastAll("userLeave", { name: user.getName() });
         }
 
@@ -473,14 +474,16 @@ class Channel extends EventEmitter {
         user.die();
     }
 
-    packUserData(user: User): any {
+    packUserData(user: User): { base: { meta: mixed },
+                                mod: { meta: mixed },
+                                sadmin: { meta: mixed } } {
         var base = {
             name: user.getName(),
             rank: user.account.effectiveRank,
             profile: user.account.profile,
             meta: {
-                afk: user.is(Flags.U_AFK),
-                muted: user.is(Flags.U_MUTED) && !user.is(Flags.U_SMUTED)
+                afk: user.is(Flag.U_AFK),
+                muted: user.is(Flag.U_MUTED) && !user.is(Flag.U_SMUTED)
             }
         };
 
@@ -489,9 +492,9 @@ class Channel extends EventEmitter {
             rank: user.account.effectiveRank,
             profile: user.account.profile,
             meta: {
-                afk: user.is(Flags.U_AFK),
-                muted: user.is(Flags.U_MUTED),
-                smuted: user.is(Flags.U_SMUTED),
+                afk: user.is(Flag.U_AFK),
+                muted: user.is(Flag.U_MUTED),
+                smuted: user.is(Flag.U_SMUTED),
                 aliases: user.account.aliases,
                 ip: user.displayip
             }
@@ -502,9 +505,9 @@ class Channel extends EventEmitter {
             rank: user.account.effectiveRank,
             profile: user.account.profile,
             meta: {
-                afk: user.is(Flags.U_AFK),
-                muted: user.is(Flags.U_MUTED),
-                smuted: user.is(Flags.U_SMUTED),
+                afk: user.is(Flag.U_AFK),
+                muted: user.is(Flag.U_MUTED),
+                smuted: user.is(Flag.U_SMUTED),
                 aliases: user.account.aliases,
                 ip: user.realip
             }
@@ -655,7 +658,7 @@ class Channel extends EventEmitter {
             return;
         }
 
-        if (!this.is(Flags.C_REGISTERED)) {
+        if (!this.is(Flag.C_REGISTERED)) {
             user.socket.emit("readChanLog", {
                 success: false,
                 data: "Channel log is only available to registered channels."
@@ -687,12 +690,12 @@ class Channel extends EventEmitter {
         this.broadcastToRoom(msg, data, this.name);
     }
 
-    packInfo(isAdmin: bool): any {
+    packInfo(isAdmin: bool): mixed {
         var data = {};
         data.name = this.name;
         data.usercount = this.users.length;
         data.users = [];
-        data.registered = this.is(Flags.C_REGISTERED);
+        data.registered = this.is(Flag.C_REGISTERED);
 
         for (var i = 0; i < this.users.length; i++) {
             if (this.users[i].getName() !== "") {

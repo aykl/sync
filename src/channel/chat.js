@@ -8,6 +8,7 @@ import util from '../utilities';
 import Flags from '../flags';
 import url from 'url';
 import counters from '../counters';
+import Channel from './channel';
 
 const SHADOW_TAG = "[shadow]";
 const LINK = /(\w+:\/\/(?:[^:\/\[\]\s]+|\[[0-9a-f:]+\])(?::\d+)?(?:\/[^\/\s]*)*)/ig;
@@ -31,12 +32,22 @@ const MIN_ANTIFLOOD = {
     sustained: 10
 };
 
+type Meta = {
+  modflair?: mixed,
+  addClass?: mixed,
+  action?: mixed,
+  addClassToNameAndTimestamp?: mixed,
+  forceShowName?: mixed,
+  superadminflair?: mixed
+};
+type CommandHandler = (User, string, Meta) => mixed;
+
 class ChatModule extends ChannelModule {
     buffer: mixed[];
     muted: util.Set;
-    commandHandlers: any;
+    commandHandlers: { [key: string]: CommandHandler };
 
-    constructor(channel: any) {
+    constructor(channel: Channel) {
         super(channel);
         this.buffer = [];
         this.muted = new util.Set();
@@ -57,29 +68,29 @@ class ChatModule extends ChannelModule {
         this.registerCommand("/unsmute", this.handleCmdUnmute.bind(this));
     }
 
-    load(data: any): void {
+    load(data: { chatbuffer?: mixed[], chatmuted?: mixed[] }): void {
         this.buffer = [];
         this.muted = new util.Set();
 
-        if ("chatbuffer" in data) {
+        if (data.chatbuffer !== undefined) {
             for (var i = 0; i < data.chatbuffer.length; i++) {
                 this.buffer.push(data.chatbuffer[i]);
             }
         }
 
-        if ("chatmuted" in data) {
+        if (data.chatmuted !== undefined) {
             for (var i = 0; i < data.chatmuted.length; i++) {
                 this.muted.add(data.chatmuted[i]);
             }
         }
     }
 
-    save(data: any): void {
+    save(data: { chatbuffer?: mixed[], chatmuted?: mixed[] }): void {
         data.chatbuffer = this.buffer;
         data.chatmuted = Array.prototype.slice.call(this.muted);
     }
 
-    packInfo(data: any, isAdmin: bool): void {
+    packInfo(data: { chat?: mixed }, isAdmin: bool): void {
         data.chat = Array.prototype.slice.call(this.buffer);
     }
 
@@ -148,8 +159,7 @@ class ChatModule extends ChannelModule {
     }
 
     handleChatMsg(user: User, data: { msg: string,
-                                      meta: { [key: mixed]: mixed },
-                                      modflair: mixed }): void {
+                                      meta: Meta }): void {
         var self = this;
         counters.add("chat:incoming");
 
@@ -184,7 +194,7 @@ class ChatModule extends ChannelModule {
         var meta = {};
         data.meta = data.meta || {};
         if (user.account.effectiveRank >= 2) {
-            if ("modflair" in data.meta && data.meta.modflair === user.account.effectiveRank) {
+            if (data.meta.modflair !== undefined && data.meta.modflair === user.account.effectiveRank) {
                 meta.modflair = data.meta.modflair;
             }
         }
@@ -198,7 +208,7 @@ class ChatModule extends ChannelModule {
     }
 
     handlePm(user: any, data: { msg: string, to: string,
-                                meta: { modflair: mixed } }): void {
+                                meta: Meta }): void {
         if (!this.channel) {
             return;
         }
@@ -265,7 +275,7 @@ class ChatModule extends ChannelModule {
         var meta = {};
         data.meta = data.meta || {};
         if (user.rank >= 2) {
-            if ("modflair" in data.meta && data.meta.modflair === user.rank) {
+            if (data.meta.modflair !== undefined && data.meta.modflair === user.rank) {
                 meta.modflair = data.meta.modflair;
             }
         }
@@ -282,8 +292,7 @@ class ChatModule extends ChannelModule {
         user.socket.emit("pm", msgobj);
     }
 
-    processChatMsg(user: User, data: { msg: string,
-                                      meta: { [key: mixed]: mixed } }): void {
+    processChatMsg(user: User, data: { msg: string, meta: Meta }): void {
         if (data.msg.match(Config.get("link-domain-blacklist-regex"))) {
             this.channel.logger.log(user.displayip + " (" + user.getName() + ") was kicked for " +
                     "blacklisted domain");
@@ -350,7 +359,7 @@ class ChatModule extends ChannelModule {
         counters.add("chat:sent");
     }
 
-    formatMessage(username: string, data: any): any {
+    formatMessage(username: string, data: { msg: string, meta: Meta }): any {
         var msg = XSS.sanitizeText(data.msg);
         if (this.channel.modules.filters) {
             msg = this.filterMessage(msg);
@@ -365,7 +374,7 @@ class ChatModule extends ChannelModule {
         return obj;
     }
 
-    filterMessage(msg: any): string {
+    filterMessage(msg: string): string {
         var filters = this.channel.modules.filters.filters;
         var chan = this.channel;
         var convertLinks = this.channel.modules.options.get("enable_link_regex");
@@ -374,6 +383,9 @@ class ChatModule extends ChannelModule {
 
         var result = filters.filter(intermediate, false);
         result = result.replace(LINK_PLACEHOLDER_RE, function () {
+            if (!links) {
+              return '';
+            }
             var link = links.shift();
             if (!link) {
                 return '';
@@ -393,7 +405,7 @@ class ChatModule extends ChannelModule {
         return XSS.sanitizeHTML(result);
     }
 
-    sendModMessage(msg: any, minrank: number): void {
+    sendModMessage(msg: mixed, minrank: number): void {
         if (isNaN(minrank)) {
             minrank = 2;
         }
@@ -415,7 +427,7 @@ class ChatModule extends ChannelModule {
         });
     }
 
-    sendMessage(msgobj: any): void {
+    sendMessage(msgobj: { username: string, meta: { addClass?: string }, msg: string }): void {
         this.channel.broadcastAll("chatMsg", msgobj);
 
         this.buffer.push(msgobj);
@@ -428,7 +440,7 @@ class ChatModule extends ChannelModule {
                                 "> " + XSS.decodeText(msgobj.msg));
     }
 
-    registerCommand(cmd: any, cb: any): void {
+    registerCommand(cmd: string, cb: CommandHandler): void {
         cmd = cmd.replace(/^\//, "");
         this.commandHandlers[cmd] = cb;
     }
@@ -437,7 +449,7 @@ class ChatModule extends ChannelModule {
      * == Default commands ==
      */
 
-    handleCmdMe(user: User, msg: any, meta: any): void {
+    handleCmdMe(user: User, msg: string, meta: Meta): void {
         meta.addClass = "action";
         meta.action = true;
         var args = msg.split(" ");
@@ -445,18 +457,18 @@ class ChatModule extends ChannelModule {
         this.processChatMsg(user, { msg: args.join(" "), meta: meta });
     }
 
-    handleCmdSp(user: User, msg: any, meta: any): void {
+    handleCmdSp(user: User, msg: string, meta: Meta): void {
         meta.addClass = "spoiler";
         var args = msg.split(" ");
         args.shift();
         this.processChatMsg(user, { msg: args.join(" "), meta: meta });
     }
 
-    handleCmdSay(user: User, msg: any, meta: any): void {
+    handleCmdSay(user: User, msg: string, meta: Meta): void {
         if (user.account.effectiveRank < 1.5) {
             return;
         }
-        meta.addClass = "shout";
+        meta.addClass = "shout"
         meta.addClassToNameAndTimestamp = true;
         meta.forceShowName = true;
         var args = msg.split(" ");
@@ -464,7 +476,7 @@ class ChatModule extends ChannelModule {
         this.processChatMsg(user, { msg: args.join(" "), meta: meta });
     }
 
-    handleCmdClear(user: User, msg: any, meta: any): void {
+    handleCmdClear(user: User, msg: mixed, meta: Meta): void {
         if (!this.channel.modules.permissions.canClearChat(user)) {
             return;
         }
@@ -474,7 +486,7 @@ class ChatModule extends ChannelModule {
         this.channel.logger.log("[mod] " + user.getName() + " used /clear");
     }
 
-    handleCmdAdminflair(user: User, msg: any, meta: any): void {
+    handleCmdAdminflair(user: User, msg: string, meta: Meta): void {
         if (user.account.globalRank < 255) {
             return;
         }
@@ -503,11 +515,11 @@ class ChatModule extends ChannelModule {
         this.processChatMsg(user, { msg: cargs.join(" "), meta: meta });
     }
 
-    handleCmdAfk(user: User, msg: any, meta: any): void {
+    handleCmdAfk(user: User, msg: mixed, meta: {}): void {
         user.setAFK(!user.is(Flags.U_AFK));
     }
 
-    handleCmdMute(user: User, msg: any, meta: any): void {
+    handleCmdMute(user: User, msg: string, meta: {}): void {
         if (!this.channel.modules.permissions.canMute(user)) {
             return;
         }
@@ -557,7 +569,7 @@ class ChatModule extends ChannelModule {
         this.sendModMessage(user.getName() + " muted " + target.getName(), muteperm);
     }
 
-    handleCmdSMute(user: User, msg: any, meta: any): void {
+    handleCmdSMute(user: User, msg: string, meta: {}): void {
         if (!this.channel.modules.permissions.canMute(user)) {
             return;
         }
@@ -608,7 +620,7 @@ class ChatModule extends ChannelModule {
         this.sendModMessage(user.getName() + " shadowmuted " + target.getName(), muteperm);
     }
 
-    handleCmdUnmute(user: User, msg: any, meta: any): void {
+    handleCmdUnmute(user: User, msg: string, meta: {}): void {
         if (!this.channel.modules.permissions.canMute(user)) {
             return;
         }

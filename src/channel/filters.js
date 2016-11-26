@@ -75,8 +75,8 @@ class ChatFilterModule extends ChannelModule {
         this.filters = new FilterList();
     }
 
-    load(data: any): void {
-        if ("filters" in data) {
+    load(data: { filters?: any }): void {
+        if (data.filters !== undefined) {
             var filters = data.filters.map(validateFilter).filter(function (f) {
                 return f !== null;
             });
@@ -92,11 +92,11 @@ class ChatFilterModule extends ChannelModule {
         }
     }
 
-    save(data: any): void {
+    save(data: { filters?: mixed }): void {
         data.filters = this.filters.pack();
     }
 
-    packInfo(data: any, isAdmin: any): void {
+    packInfo(data: { chatFilterCount?: mixed }, isAdmin: any): void {
         if (isAdmin) {
             data.chatFilterCount = this.filters.length;
         }
@@ -215,7 +215,7 @@ class ChatFilterModule extends ChannelModule {
                         " active: " + data.active + ", filterlinks: " + data.filterlinks);
     }
 
-    handleImportFilters(user: User, data: any): void {
+    handleImportFilters(user: User, data: any[]): void {
         if (!(data instanceof Array)) {
             return;
         }
@@ -274,7 +274,7 @@ class ChatFilterModule extends ChannelModule {
         this.channel.logger.log("[mod] " + user.getName() + " removed filter: " + data.name);
     }
 
-    handleMoveFilter(user: User, data: any): void {
+    handleMoveFilter(user: User, data: { to: number, from: number }): void {
         if (typeof data !== "object") {
             return;
         }

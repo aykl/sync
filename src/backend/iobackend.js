@@ -1,4 +1,6 @@
 // @flow
+import type { ProxyListenerConfig } from './backendconfiguration';
+import type { SocketEmitter } from './proxiedsocket';
 
 import Server from 'cytube-common/lib/proxy/server';
 import ProxyInterceptor from './proxyinterceptor';
@@ -9,16 +11,19 @@ import { formatProxyAddress } from 'cytube-common/lib/util/addressutil';
 
 const BACKEND_POOL = 'backend-hosts';
 
-export default class IOBackend {
-    proxyListenerConfig: any;
-    socketEmitter: any;
-    poolRedisClient: mixed;
-    protocol: any;
-    proxyInterceptor: any;
-    proxyListener: any;
-    poolEntryUpdater: any;
 
-    constructor(proxyListenerConfig: any, socketEmitter: any, poolRedisClient: mixed) {
+
+export default class IOBackend {
+    proxyListenerConfig: ProxyListenerConfig;
+    socketEmitter: SocketEmitter;
+    poolRedisClient: mixed;
+    protocol: mixed;
+    proxyInterceptor: ProxyInterceptor;
+    proxyListener: mixed;
+    poolEntryUpdater: mixed;
+
+    constructor(proxyListenerConfig: ProxyListenerConfig,
+                socketEmitter: SocketEmitter, poolRedisClient: mixed) {
         this.proxyListenerConfig = proxyListenerConfig;
         this.socketEmitter = socketEmitter;
         this.poolRedisClient = poolRedisClient;
@@ -28,17 +33,17 @@ export default class IOBackend {
         this.initBackendPoolUpdater();
     }
 
-    initProxyInterceptor() {
+    initProxyInterceptor(): void {
         this.proxyInterceptor = new ProxyInterceptor(this.socketEmitter);
     }
 
-    initProxyListener() {
+    initProxyListener(): void {
         this.proxyListener = new Server(this.proxyListenerConfig, this.protocol);
         this.proxyListener.on('connection',
                 this.proxyInterceptor.onConnection.bind(this.proxyInterceptor));
     }
 
-    initBackendPoolUpdater() {
+    initBackendPoolUpdater(): void {
         const hostname = this.proxyListenerConfig.getHost();
         const port = this.proxyListenerConfig.getPort();
         const entry = {

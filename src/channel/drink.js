@@ -16,7 +16,9 @@ class DrinkModule extends ChannelModule {
         user.socket.emit("drinkCount", this.drinks);
     };
 
-    onUserPreChat(user: User, data: any, cb: any): void {
+    onUserPreChat(user: User, data: { msg: string,
+                                      meta: { addClass?: mixed, forceShowName?: mixed }
+                                    }, cb: any): void {
         var msg = data.msg;
         var perms = this.channel.modules.permissions;
         if (msg.match(/^\/d-?[0-9]*/) && perms.canCallDrink(user)) {
